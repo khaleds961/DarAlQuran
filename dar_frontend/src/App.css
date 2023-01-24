@@ -1,0 +1,29 @@
+.login-form {
+    max-width: 600px;
+    margin: auto;
+    height: 100%;
+}
+
+.rtl {
+    direction: rtl;
+}
+
+.resize {
+    height: 100vh;
+}
+
+.bg-grey{
+    background-color: lightgray;
+}
+
+.hover:hover{
+    background-color: #f6f6f6;
+}
+
+
+@media screen and (max-width: 600px) {
+    .login-form {
+        max-width: 400px;
+        margin: auto;
+    }
+}
