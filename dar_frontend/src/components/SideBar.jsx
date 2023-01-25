@@ -1,17 +1,37 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { FaHome, FaSchool, FaUserGraduate } from 'react-icons/fa';
 import { BiLogOutCircle } from "react-icons/bi";
 import { ImUserTie } from "react-icons/im";
 import SessionContext from '../session/SessionContext';
+import Api from '../Api';
 
 
 
 function Navbar() {
+
+    const [center_location, setCenterLocation] = useState(null);
+
+    const getCenterById = () =>{
+        const location = centers;
+        Api.get(`/getcenterbyid/${location[0]['center_id']}`).then(
+            (res) => {
+                setCenterLocation(res.data.data.location);
+            }
+        )
+    } 
+    useEffect(() => {
+        getCenterById()
+    },[])
+
     const { actions: { logout } } = useContext(SessionContext);
+    const { session: { user: { centers } } } = useContext(SessionContext);
+
     return (
         <div className='text-dark col-auto col-md-3 col-xl-2 bg-white min-vh-100'>
             <h4 className='d-none d-md-block text-center mt-3'>دار القرآن الكريم</h4>
+            <h6 className='d-none d-md-block text-center mt-3'>{ center_location}</h6>
+
             <div className='mt-3'>
 
                 {/* case 1: small screen Dashboard */}

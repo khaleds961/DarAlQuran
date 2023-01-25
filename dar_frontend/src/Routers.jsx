@@ -49,7 +49,7 @@ export default function () {
           <Route path="studentprofile" element={<StudentProfile />} />
         </Route>
 
-        <Route element={<RequireAuth allowedRoles={[ROLES.superadmin, ROLES.teacher,ROLES.manager]} />}>
+        <Route element={<RequireAuth allowedRoles={[ROLES.superadmin,ROLES.manager]} />}>
           <Route path="centers" element={<Centers />} />
         </Route>
 

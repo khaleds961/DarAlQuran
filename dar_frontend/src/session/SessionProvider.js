@@ -52,7 +52,6 @@ export default function SessionProvider({ children }) {
                 .then((response) => {
                     let token = response?.data?.data?.token;
                     let user = { ...response.data.data.user, token }
-                    console.log(response);
                     updateSession({ user, roles: [user.role_id] });
                     navigate(from, { replace: true });
                     localStorage.setItem('token', token);

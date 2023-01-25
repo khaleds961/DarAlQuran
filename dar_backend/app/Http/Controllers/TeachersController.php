@@ -16,13 +16,16 @@ class TeachersController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($user_id)
     {
         try {
-            $teachers = Teachers::where('is_deleted', 0)->get();
+            $teacher_id = Teachers::where('user_id', $user_id)->first()->id;
+            $teachers = Teachers::where('is_deleted', 0)
+                ->get();
+
             return response(
                 [
-                    'data' => $teachers,
+                    'data' => $teachers->except($teacher_id),
                     'success' => true
                 ]
             );
@@ -132,11 +135,16 @@ class TeachersController extends Controller
         }
     }
 
-    public function getTeacherbySupervisor(Request $request)
+    public function getTeacherbySupervisor($center_id, $user_id)
     {
+        $supervisor_id = Teachers::select('id')->where('user_id', $user_id)->first()->id;
+        // return $supervisor_id;
         // get teachers by center id
-        $teacher_ids = Students_Centers_Teachers::select('teacher_id')->where('center_id', $request['center_id'])->get();
-
+        $teacher_ids = Students_Centers_Teachers::select('teacher_id')
+            ->where('center_id', $center_id)
+            ->where('teacher_id', '!=', $supervisor_id)
+            ->get();
+        // return $teacher_ids;
         $teacher = [];
         //get teacher details
         foreach ($teacher_ids as $teacher_id) {

@@ -64,7 +64,15 @@ class CentersController extends Controller
      */
     public function show($id)
     {
-        //
+        try{
+            $center = Centers::find($id)->first();
+            return response([
+                'data' => $center,
+                'success' => true
+            ]);
+        }catch(Exception $e){
+            return response($e->getMessage());
+        }
     }
 
     /**

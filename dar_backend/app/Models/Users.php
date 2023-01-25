@@ -26,4 +26,5 @@ class Users extends Model
         return $this->belongsToMany(Centers::class, 'students_centers_teachers', 'teacher_id', 'center_id')
         ->select('center_id','name','location');
     }
+
 }

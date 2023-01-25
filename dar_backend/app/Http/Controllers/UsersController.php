@@ -95,6 +95,11 @@ class UsersController extends Controller
         //get user_id from token 
         $token = PersonalAccessToken::findToken($request->bearerToken());
         $user = $token->tokenable;
+
+        $center_id = Students_Centers_Teachers::select('center_id')->where('teacher_id', $user->id)->get();
+        if ($center_id) {
+            $user->centers = $center_id;
+        }
         return response([
             'user' => $user,
             'success' => true
@@ -173,7 +178,7 @@ class UsersController extends Controller
                     'password.required' => __('message.password_required'),
                 ]
             );
-            
+
             $user = Users::with('centers')->where('username', $validate['username'])->first();
 
             if (!$user || !Hash::check($validate['password'], $user->password)) {

@@ -26,13 +26,14 @@ Route::group(['middleware'=>['auth:sanctum']],function(){
 Route::post('/addteacher',[UsersController::class,'register']);
 Route::post('/login',[UsersController::class,'login']);
 Route::get('getUserbyToken',[UsersController::class,'getUserbyToken']);
-Route::get('/tryme',[UsersController::class,'omarsfunction']);
+// Route::get('/tryme',[UsersController::class,'omarsfunction']);
 
 //TEACHERS
 // Route::post('/addteacher',[TeachersController::class,'store']);
-Route::get('/getteachers',[TeachersController::class,'index']);
+Route::get('/getteachers/{user_id}',[TeachersController::class,'index']);
 Route::put('/deleteteacher/{id}',[TeachersController::class,'destroy']);
-Route::get('/try',[TeachersController::class,'getTeacherbySupervisor']);
+//here we're getting teachers by supervisor center_id
+Route::get('/getTeacherbySupervisor/{center_id}/{supervisor_id}',[TeachersController::class,'getTeacherbySupervisor']);
 
 
 //STUDENTS
@@ -43,5 +44,6 @@ Route::post('/addstudent',[StudentsController::class,'store']);
 Route::get('/getcenters',[CentersController::class,'index']);
 Route::post('/addcenter',[CentersController::class,'store']);
 Route::put('/deleteCenter/{id}',[CentersController::class,'destroy']);
-Route::get('/getget',[CentersController::class,'studentsbycenter']);
+Route::get('/getcenterbyid/{id}',[CentersController::class,'show']);
+// Route::get('/getget',[CentersController::class,'studentsbycenter']);
 

@@ -10,8 +10,11 @@ import SessionContext from '../session/SessionContext';
 
 function TeachersTable() {
 
-  const { session: { roles } } = useContext(SessionContext)
-  const { session } = useContext(SessionContext)
+  const { session: { user: { role_id } } } = useContext(SessionContext);
+  const { session: { user: { centers } } } = useContext(SessionContext);
+  const { session: { user: { id } } } = useContext(SessionContext);
+  const { session } = useContext(SessionContext);
+
 
   const [teachers, setTeachers] = useState();
   const [fname, setFname] = useState('');
@@ -22,7 +25,7 @@ function TeachersTable() {
   const [username, setUsername] = useState(null);
   const [password, setPassword] = useState(null);
   const [phone_number, setPhone_number] = useState(null);
-  const [centers, setCenters] = useState(null);
+  const [allcenters, setAllCenters] = useState(null);
   const [center_id, setCenter_id] = useState(0);
   const [user_role, setUser_role] = useState(0);
   const [fname_error, setFname_error] = useState('');
@@ -51,14 +54,15 @@ function TeachersTable() {
       first_name: fname,
       middle_name: mname,
       last_name: lname,
-      role_id:roles[0] === 3 ? 4 : user_role,
+      role_id: role_id === 3 ? 4 : user_role,
       phone_number: phone_number,
-      center_id: center_id
+      center_id: role_id === 3 ? centers[0]['center_id'] : center_id
     })
       .then((response) => {
         hideModal()
         Swal.fire(response.data.message, '', 'success')
         getTeachers()
+        setCenter_id(0)
       })
       .catch(function (error) {
         console.log(error.response);
@@ -72,52 +76,66 @@ function TeachersTable() {
   }
 
   const getTeachers = () => {
-    
-    Api.get('getteachers').then(
-      (res) => {
-        setTeachers(res.data.data)
-      }
-    )
+    const user_id = id;
+
+    if (role_id === 1 || role_id === 2) {
+      Api.get(`getteachers/${user_id}`).then(
+        (res) => {
+          setTeachers(res.data.data)
+        }
+      )
+    } else {
+      const supervisor_center_id = centers[0].center_id;
+      Api.get(`getTeacherbySupervisor/${supervisor_center_id}/${user_id}`).then(
+        (res) => setTeachers(res.data.data)
+
+      )
+    }
   }
 
-  const userpass = () => {
-    setUsername(null);
-    setPassword(null);
+  const getTeachersByCenter = (e) => {
+    const user_id = id;
+    const id_center = e.target.value;
+    Api.get(`getTeacherbySupervisor/${id_center}/${user_id}`).then(
+      (res) => setTeachers(res.data.data)
+    )
   }
 
   const getCenters = () => {
     Api.get('getcenters').then((response) => {
-      setCenters(response.data.data);
+      setAllCenters(response.data.data);
     })
   }
-
-  // const userRole = () => {
-    // if (roles[0] === 3) {
-    //   setUser_role(4)
-    // }
-  // }
 
   useEffect(() => {
     getTeachers()
     getCenters()
-    // userRole()
-    console.log(session);
   }, [])
 
   return (
     <div>
       {teachers ?
         <div>
-          <button type="button" className="btn btn-dark mb-3 d-flex align-items-center" onClick={showModal}>
-            <BsPlusCircle className='text-white' />
-            <span className='px-2'>
-              اضافة استاذ جديد
-            </span>
-          </button>
+          <div className='d-flex justify-content-between'>
+            <button type="button" className="btn btn-dark mb-3 d-flex align-items-center" onClick={showModal}>
+              <BsPlusCircle className='text-white' />
+              <span className='px-2'>
+                اضافة استاذ جديد
+              </span>
+            </button>
+
+            <select className='mb-3 bg-dark text-white rounded' defaultValue={center_id} onChange={getTeachersByCenter}>
+              <option disabled="disabled" value='0'>اختر احد المراكز</option>
+              {allcenters ? allcenters.map((center) =>
+                <option key={center.id} value={center.id}>{center.name}</option>) :
+                'تحميل ...'}
+            </select>
+
+          </div>
 
           <Modal show={isOpen} onHide={hideModal}>
             <Modal.Body className='rtl'>
-            -  <div className='d-flex'>
+              <div className='d-flex'>
                 <p>هل تريد اضافة حساب لهذا المستخدم؟</p>
                 <div className='mx-2'>
                   <input type="radio" id='showdiv' name='showdiv_radio' onClick={() => setShowdiv(true)} />
@@ -171,22 +189,26 @@ function TeachersTable() {
               ></input>
               {phone_error ? <p><b className='text-danger'>{phone_error}</b></p> : ''}
 
-              <label htmlFor="">المراكز المتاحة</label>
-              <div className='my-2'>
-                <Form.Select defaultValue={0} value={center_id} onChange={(e) => setCenter_id(e.currentTarget.value)}>
-                  <option selected={true} disabled="disabled" value={0}>اختر احد المراكز</option>
-                  {centers ? centers.map((center) =>
-                    <option key={center.id} value={center.id}>{center.name}</option>) :
-                    'تحميل ...'}
-                </Form.Select>
-              </div>
+              {role_id === 1 || role_id === 2 ?
+                <>
+                  <label htmlFor="">المراكز المتاحة</label>
+                  <div className='my-2'>
+                    <Form.Select defaultValue={center_id} onChange={(e) => setCenter_id(e.currentTarget.value)}>
+                      <option disabled="disabled" value={0}>اختر احد المراكز</option>
+                      {allcenters ? allcenters.map((center) =>
+                        <option key={center.id} value={center.id}>{center.name}</option>) :
+                        'تحميل ...'}
+                    </Form.Select>
+                  </div>
+                </>
+                : ''}
 
-              {roles[0] === 1 || roles[0] === 2 ?
+              {role_id === 1 || role_id === 2 ?
                 <>
                   <label htmlFor="">نوع المستخدم</label>
                   <div className='my-2'>
-                    <Form.Select name='user_role' defaultValue={0} value={user_role} onChange={(e) => setUser_role(e.currentTarget.value)}>
-                      <option selected={true} disabled="disabled" value={0}>اختر احد المستخدمين</option>
+                    <Form.Select name='user_role' defaultValue={user_role} onChange={(e) => setUser_role(e.currentTarget.value)}>
+                      <option disabled="disabled" value={0}>اختر احد المستخدمين</option>
                       <option value="2">مسؤول عام</option>
                       <option value="3">مشرف</option>
                       <option value="4">استاذ</option>
