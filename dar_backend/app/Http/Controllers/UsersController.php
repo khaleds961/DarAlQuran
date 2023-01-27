@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Centers;
 use App\Models\Students_Centers_Teachers;
-use App\Models\Teachers;
 use App\Models\Users;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\PersonalAccessToken;
+use Illuminate\Support\Facades\Auth;
 
 
 
@@ -96,7 +98,8 @@ class UsersController extends Controller
         $token = PersonalAccessToken::findToken($request->bearerToken());
         $user = $token->tokenable;
 
-        $center_id = Students_Centers_Teachers::select('center_id')->where('teacher_id', $user->id)->get();
+        $center_id = Students_Centers_Teachers::select('center_id')->where('user_id', $user->id)->get();
+        // return $center_id;
         if ($center_id) {
             $user->centers = $center_id;
         }
@@ -133,28 +136,31 @@ class UsersController extends Controller
                 'phone_number.required' => __('message.phone_number_required'),
             ]
         );
+
         if ($request['username'] && $request['password']) {
             $user = Users::create([
                 'username'  => $request['username'],
                 'password' => bcrypt($request['password']),
-                'role_id' => $validate['role_id']
-            ]);
-        } else {
-            $user = [
-                'id' => null
-            ];
-        }
-
-        if ($user) {
-            $teacher = Teachers::create([
-                'user_id' => $user['id'],
+                'role_id' => $validate['role_id'],
                 'first_name' => $validate['first_name'],
                 'middle_name' => $validate['middle_name'],
                 'last_name'   => $validate['last_name'],
                 'phone_number' => $validate['phone_number']
             ]);
+        } else {
+            $user = Users::create([
+                'username'  => null,
+                'password' => null,
+                'role_id' => $validate['role_id'],
+                'first_name' => $validate['first_name'],
+                'middle_name' => $validate['middle_name'],
+                'last_name'   => $validate['last_name'],
+                'phone_number' => $validate['phone_number']
+            ]);
+        }
+        if ($user) {
             Students_Centers_Teachers::create([
-                'teacher_id' => $teacher->id,
+                'user_id' => $user['id'],
                 'center_id' => $request['center_id']
             ]);
         }
@@ -211,7 +217,74 @@ class UsersController extends Controller
         ]);
     }
 
-    // public function omarsfunction(){
-    //   return  Users::with('centers')->get();
+    public function getAllUsers($user_id)
+    {
+        try {
+            $teachers = Users::where('is_deleted', 0)
+                ->where('id', '!=', $user_id)
+                ->where('is_deleted', 0)
+                ->paginate(10);
+
+            return response(
+                [
+                    'data' => $teachers,
+                    'success' => true
+                ]
+            );
+        } catch (Exception $e) {
+            return response($e->getMessage());
+        }
+    }
+
+    public function getTeacherbySupervisor($center_id, $user_id)
+    {
+        $teacher_ids = Students_Centers_Teachers::select('user_id')
+            ->where('center_id', $center_id)
+            ->where('user_id', '!=', $user_id)
+            ->where('is_deleted', 0)
+            ->get();
+
+        $teacher = [];
+
+        //get teacher details
+        foreach ($teacher_ids as $teacher_id) {
+            $teacher[] = Users::find($teacher_id)->first();
+        }
+        return response([
+            'data' => $teacher,
+            'success' => true
+        ]);
+    }
+
+    // public function getAllTeacher()
+    // {
+    //     try {
+    //         $teachers = Users::where('is_deleted', 0)
+    //             ->where('role_id', 4)
+    //             ->get();
+    //         return response([
+    //             'data' => $teachers,
+    //             'success' => true
+    //         ]);
+    //     } catch (Exception $e) {
+    //         return response($e->getMessage());
+    //     }
     // }
+
+    public function getTeachersByCenter($center_id)
+    {
+        // try {
+        //       return  Users::whereHas('centers', function ($query) use ($center_id) {
+        //         $query->where('center_id','=',$center_id);
+        //     })
+        //         ->with('centers')
+        //         ->get();
+        // } catch (Exception $e) {
+        //     return response($e->getMessage());
+        // }
+
+        $center=Centers::find($center_id)->first();
+        $teachers=$center->teachers();
+        return $teachers;
+    }
 }

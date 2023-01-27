@@ -12,6 +12,6 @@ class Students_Centers_Teachers extends Model
     protected $fillable = [
         'center_id',
         'student_id',
-        'teacher_id'
+        'user_id'
     ];
 }

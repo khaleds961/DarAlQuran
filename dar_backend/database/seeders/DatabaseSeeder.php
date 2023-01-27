@@ -25,5 +25,25 @@ class DatabaseSeeder extends Seeder
             ['id' => 5, 'title' => 'student'],
         ];
         Roles::insert($roles);
+
+        DB::table('users')->insert([
+            'first_name' => 'admin',
+            'middle_name' => 'admin',
+            'last_name' => 'admin',
+            'username' => 'admin',
+            'password' => bcrypt('123123'),
+            'role_id'  => 1,
+            'phone_number'  => 710
+        ]);
+
+        DB::table('users')->insert([
+            'first_name' => 'manager',
+            'middle_name' => 'manager',
+            'last_name' => 'manager',
+            'username' => 'manager',
+            'password' => bcrypt('123123'),
+            'role_id'  => 2,
+            'phone_number'  => 711
+        ]);
     }
 }

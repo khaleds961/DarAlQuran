@@ -15,8 +15,8 @@ class Centers extends Model
         'is_deleted'
     ];
 
-    public function teacher()
+    public function teachers()
     {
-        return $this->belongsToMany(Teachers::class,'students_centers_teachers','center_id','teacher_id')->get();
+        return $this->belongsToMany(Users::class,'students_centers_teachers','center_id','user_id')->get();
      }
 }

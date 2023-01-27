@@ -15,10 +15,10 @@ return new class extends Migration
     {
         Schema::create('students_centers_teachers', function (Blueprint $table) {
             $table->id();
-            $table->integer('teacher_id')->nullable()->unsigned();
+            $table->integer('user_id')->nullable()->unsigned();
             $table->integer('student_id')->nullable()->unsigned();
             $table->integer('center_id')->nullable()->unsigned();
-            $table->index(['teacher_id', 'created_at'])->nullable();
+            $table->index(['user_id', 'created_at'])->nullable();
             $table->index(['student_id', 'created_at'])->nullable();
             $table->index(['center_id', 'created_at'])->nullable();
             $table->boolean('is_deleted')->default(0);

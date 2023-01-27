@@ -6,6 +6,8 @@ import Modal from "react-bootstrap/Modal";
 import Form from 'react-bootstrap/Form';
 import Swal from 'sweetalert2';
 import SessionContext from '../session/SessionContext';
+import { Pagination, makeStyles, createStyles } from '@mui/material'
+
 
 
 function TeachersTable() {
@@ -28,10 +30,19 @@ function TeachersTable() {
   const [allcenters, setAllCenters] = useState(null);
   const [center_id, setCenter_id] = useState(0);
   const [user_role, setUser_role] = useState(0);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(1);
+  const [filterclick, setFilterClick] = useState(false)
   const [fname_error, setFname_error] = useState('');
   const [mname_error, setMname_error] = useState('');
   const [lname_error, setLname_error] = useState('');
   const [phone_error, setPhone_error] = useState('');
+
+
+  const changePage = (e, value) => {
+    console.log(value)
+    setPage(value);
+  };
 
   const showModal = () => {
     setIsOpen(true);
@@ -77,11 +88,11 @@ function TeachersTable() {
 
   const getTeachers = () => {
     const user_id = id;
-
     if (role_id === 1 || role_id === 2) {
-      Api.get(`getteachers/${user_id}`).then(
+      Api.get(`getteachers/${user_id}?page=${page}`).then(
         (res) => {
-          setTeachers(res.data.data)
+          setTeachers(res.data.data.data)
+          setTotal(Math.ceil(res.data.data.total / 10))
         }
       )
     } else {
@@ -94,8 +105,10 @@ function TeachersTable() {
   }
 
   const getTeachersByCenter = (e) => {
+    setFilterClick(true)
     const user_id = id;
     const id_center = e.target.value;
+    setCenter_id(id_center)
     Api.get(`getTeacherbySupervisor/${id_center}/${user_id}`).then(
       (res) => setTeachers(res.data.data)
     )
@@ -110,7 +123,7 @@ function TeachersTable() {
   useEffect(() => {
     getTeachers()
     getCenters()
-  }, [])
+  }, [page])
 
   return (
     <div>
@@ -124,13 +137,13 @@ function TeachersTable() {
               </span>
             </button>
 
-            <select className='mb-3 bg-dark text-white rounded' defaultValue={center_id} onChange={getTeachersByCenter}>
+            <select className='mb-3 bg-dark text-white rounded' value={center_id} onChange={getTeachersByCenter}>
               <option disabled="disabled" value='0'>اختر احد المراكز</option>
               {allcenters ? allcenters.map((center) =>
                 <option key={center.id} value={center.id}>{center.name}</option>) :
                 'تحميل ...'}
+              {/* <option value="last" onClick={tryme}>عرض الكل</option> */}
             </select>
-
           </div>
 
           <Modal show={isOpen} onHide={hideModal}>
@@ -194,7 +207,7 @@ function TeachersTable() {
                   <label htmlFor="">المراكز المتاحة</label>
                   <div className='my-2'>
                     <Form.Select defaultValue={center_id} onChange={(e) => setCenter_id(e.currentTarget.value)}>
-                      <option disabled="disabled" value={0}>اختر احد المراكز</option>
+                      <option disabled="disabled" value='0'>اختر احد المراكز</option>
                       {allcenters ? allcenters.map((center) =>
                         <option key={center.id} value={center.id}>{center.name}</option>) :
                         'تحميل ...'}
@@ -245,6 +258,15 @@ function TeachersTable() {
               )}
             </tbody>
           </table>
+
+          {filterclick ? '' :
+            <Pagination
+              shape="rounded"
+              count={total}
+              size="small"
+              onChange={changePage}
+              variant="outlined" />
+          }
         </div>
         : <b>تحميل ...</b>}
     </div>

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Students;
+use App\Models\Students_Centers_Teachers;
 use App\Models\Users;
+use Exception;
 use Illuminate\Http\Request;
 
 class StudentsController extends Controller
@@ -15,7 +17,15 @@ class StudentsController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            $students = Students::where('is_deleted', 0)->get();
+            return response([
+                'data' => $students,
+                'success' => true
+            ]);
+        } catch (Exception $e) {
+            return response($e->getMessage());
+        }
     }
 
     /**
@@ -36,35 +46,26 @@ class StudentsController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->username && $request->password) {
-           $user = Users::create([
-                'username' => $request->username,
-                'password' => $request->password,
-                'role_id'  => $request->role_id
+        try {
+            $student = Students::create([
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'phone_number' => $request->phone_number
             ]);
-            Students::create([
-                'user_id'    => $user->id,
-                'first_name' => $request->first_name
-            ]);
-            return response([
-                'message' => __('message.student_added'),
-                'success' => true
-            ]);
-        } else {
-            $user = Users::create([
-                'username' => null,
-                'password' => null,
-                'role_id'  => $request->role_id
-            ]);
+            if ($student) {
+                Students_Centers_Teachers::create([
+                    'student_id' => $student['id'],
+                    'center_id' => $request['center_id'],
+                    'user_id' => null
+                ]);
 
-            Students::create([
-                'user_id'    => $user->id,
-                'first_name' => $request->first_name
-            ]);
-            return response([
-                'message' => __('message.student_added'),
-                'success' => true
-            ]);
+                return response([
+                    'message' => __('message.student_added'),
+                    'success' => true
+                ]);
+            }
+        } catch (Exception $e) {
+            return response($e->getMessage());
         }
     }
 

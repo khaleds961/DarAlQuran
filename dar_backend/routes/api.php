@@ -26,17 +26,13 @@ Route::group(['middleware'=>['auth:sanctum']],function(){
 Route::post('/addteacher',[UsersController::class,'register']);
 Route::post('/login',[UsersController::class,'login']);
 Route::get('getUserbyToken',[UsersController::class,'getUserbyToken']);
-// Route::get('/tryme',[UsersController::class,'omarsfunction']);
-
-//TEACHERS
-// Route::post('/addteacher',[TeachersController::class,'store']);
-Route::get('/getteachers/{user_id}',[TeachersController::class,'index']);
-Route::put('/deleteteacher/{id}',[TeachersController::class,'destroy']);
-//here we're getting teachers by supervisor center_id
-Route::get('/getTeacherbySupervisor/{center_id}/{supervisor_id}',[TeachersController::class,'getTeacherbySupervisor']);
-
+Route::get('/getteachers/{user_id}',[UsersController::class,'getAllUsers']);
+Route::get('/getTeacherbySupervisor/{center_id}/{supervisor_id}',[UsersController::class,'getTeacherbySupervisor']);
+// Route::get('/getAllTeachers',[UsersController::class,'getAllTeacher']);
+Route::get('/getTeachersByCenter/{center_id}',[UsersController::class,'getTeachersByCenter']);
 
 //STUDENTS
+Route::get('/getstudents',[StudentsController::class,'index']);
 Route::post('/addstudent',[StudentsController::class,'store']);
 
 

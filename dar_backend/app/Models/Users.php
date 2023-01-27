@@ -12,6 +12,10 @@ class Users extends Model
     use HasFactory, HasApiTokens;
     protected $table = 'users';
     protected $fillable = [
+        'first_name',
+        'middle_name',
+        'last_name',
+        'phone_number',
         'username',
         'password',
         'role_id'
@@ -23,7 +27,7 @@ class Users extends Model
 
     public function centers()
     {
-        return $this->belongsToMany(Centers::class, 'students_centers_teachers', 'teacher_id', 'center_id')
+        return $this->belongsToMany(Centers::class, 'students_centers_teachers', 'user_id', 'center_id')
         ->select('center_id','name','location');
     }
 
