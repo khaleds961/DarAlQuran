@@ -6,7 +6,8 @@ import Modal from "react-bootstrap/Modal";
 import Form from 'react-bootstrap/Form';
 import Swal from 'sweetalert2';
 import SessionContext from '../session/SessionContext';
-import { Pagination, makeStyles, createStyles } from '@mui/material'
+import { Pagination } from '@mui/material'
+import { Spinner } from 'react-bootstrap';
 
 
 
@@ -15,8 +16,8 @@ function TeachersTable() {
   const { session: { user: { role_id } } } = useContext(SessionContext);
   const { session: { user: { centers } } } = useContext(SessionContext);
   const { session: { user: { id } } } = useContext(SessionContext);
-  const { session } = useContext(SessionContext);
 
+  const default_center_id = role_id === 3 ? centers[0]['center_id'] : 0;
 
   const [teachers, setTeachers] = useState();
   const [fname, setFname] = useState('');
@@ -28,19 +29,18 @@ function TeachersTable() {
   const [password, setPassword] = useState(null);
   const [phone_number, setPhone_number] = useState(null);
   const [allcenters, setAllCenters] = useState(null);
-  const [center_id, setCenter_id] = useState(0);
+  const [center_id, setCenter_id] = useState(default_center_id);
   const [user_role, setUser_role] = useState(0);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(1);
-  const [filterclick, setFilterClick] = useState(false)
   const [fname_error, setFname_error] = useState('');
   const [mname_error, setMname_error] = useState('');
   const [lname_error, setLname_error] = useState('');
   const [phone_error, setPhone_error] = useState('');
+  const [loading, setLoading] = useState(false);
 
 
   const changePage = (e, value) => {
-    console.log(value)
     setPage(value);
   };
 
@@ -87,30 +87,27 @@ function TeachersTable() {
   }
 
   const getTeachers = () => {
-    const user_id = id;
-    if (role_id === 1 || role_id === 2) {
-      Api.get(`getteachers/${user_id}?page=${page}`).then(
-        (res) => {
-          setTeachers(res.data.data.data)
-          setTotal(Math.ceil(res.data.data.total / 10))
-        }
-      )
-    } else {
-      const supervisor_center_id = centers[0].center_id;
-      Api.get(`getTeacherbySupervisor/${supervisor_center_id}/${user_id}`).then(
-        (res) => setTeachers(res.data.data)
-
-      )
-    }
+    setLoading(true)
+    Api.get(`getTeachersByCenter/${center_id}?page=${page}`).then(
+      (res) => {
+        setTeachers(res.data.data.data)
+        setTotal(Math.ceil(res.data.data.total / 10))
+        setLoading(false)
+      }
+    ).catch(function (err) { console.log(err) })
   }
 
   const getTeachersByCenter = (e) => {
-    setFilterClick(true)
-    const user_id = id;
+    setLoading(true)
+    setPage(1)
     const id_center = e.target.value;
     setCenter_id(id_center)
-    Api.get(`getTeacherbySupervisor/${id_center}/${user_id}`).then(
-      (res) => setTeachers(res.data.data)
+    Api.get(`getTeachersByCenter/${id_center}?page=${page}`).then(
+      (res) => {
+        setTeachers(res.data.data.data)
+        setTotal(Math.ceil(res.data.data.total / 10))
+        setLoading(false)
+      }
     )
   }
 
@@ -137,13 +134,15 @@ function TeachersTable() {
               </span>
             </button>
 
-            <select className='mb-3 bg-dark text-white rounded' value={center_id} onChange={getTeachersByCenter}>
-              <option disabled="disabled" value='0'>اختر احد المراكز</option>
-              {allcenters ? allcenters.map((center) =>
-                <option key={center.id} value={center.id}>{center.name}</option>) :
-                'تحميل ...'}
-              {/* <option value="last" onClick={tryme}>عرض الكل</option> */}
-            </select>
+            {role_id === 3 ? '' :
+              <select className='mb-3 bg-dark text-white rounded' value={center_id} onChange={getTeachersByCenter}>
+                <option disabled="disabled" value='0'>اختر احد المراكز</option>
+                {allcenters ? allcenters.map((center) =>
+                  <option key={center.id} value={center.id}>{center.name}</option>) :
+                  'تحميل ...'}
+                {/* <option value="last" onClick={tryme}>عرض الكل</option> */}
+              </select>
+            }
           </div>
 
           <Modal show={isOpen} onHide={hideModal}>
@@ -245,30 +244,43 @@ function TeachersTable() {
               </tr>
             </thead>
             <tbody>
-              {teachers?.map(teacher =>
-                <tr key={teacher.id}>
-                  <th scope="row">{teacher.first_name} {teacher.middle_name} {teacher.last_name}</th>
-                  <td>{teacher.phone_number}</td>
+              {loading ?
+                <tr>
+                  <td></td>
                   <td>
-                    {/* <span className='delete_center' onClick={() => deleteCenter(center.id)}>
+                    <Spinner animation="border" variant="primary" />
+                  </td>
+                  <td></td>
+                </tr>
+                :
+                <>
+                  {teachers?.map(teacher =>
+                    <tr key={teacher.id}>
+                      <th scope="row">{teacher.first_name} {teacher.middle_name} {teacher.last_name}</th>
+                      <td>{teacher.phone_number}</td>
+                      <td>
+                        {/* <span className='delete_center' onClick={() => deleteCenter(center.id)}>
                                             <BsTrash />
                                         </span> */}
-                  </td>
-                </tr>
-              )}
+                      </td>
+                    </tr>
+                  )}
+                </>
+              }
             </tbody>
           </table>
 
-          {filterclick ? '' :
-            <Pagination
-              shape="rounded"
-              count={total}
-              size="small"
-              onChange={changePage}
-              variant="outlined" />
-          }
+
+          <Pagination
+            shape="rounded"
+            count={total}
+            page={page}
+            size="small"
+            onChange={changePage}
+            variant="outlined" />
         </div>
-        : <b>تحميل ...</b>}
+        : <p><b>تحميل ...</b></p>
+      }
     </div>
   )
 }

@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom'
 import { FaHome, FaSchool, FaUserGraduate } from 'react-icons/fa';
 import { BiLogOutCircle } from "react-icons/bi";
 import { ImUserTie } from "react-icons/im";
+import {MdClass} from 'react-icons/md'
 import SessionContext from '../session/SessionContext';
 import Api from '../Api';
 
@@ -94,6 +95,21 @@ function Navbar() {
                     </NavLink>
                 </div>
 
+                {/* case 1: small screen Class */}
+                <div className='text-center'>
+                    <NavLink to='/sessions' className='text-decoration-none'>
+                        <MdClass className='d-xs-block d-md-none text-dark' />
+                    </NavLink>
+                </div>
+
+                {/* case 2:md page and more Students */}
+                <div className='py-2 px-4 hover'>
+                    <NavLink to='/sessions' className='d-none d-md-flex align-items-center text-decoration-none text-dark'>
+                        <MdClass className='text-dark' />
+                        <span className='px-2 d-none d-md-block'>الحصص</span>
+                    </NavLink>
+                </div>
+
                 {/*case1: md and more logout button */}
                 <div className='d-xs-block d-md-none mt-5 py-2 px-2 text-center' onClick={logout}>
                     <NavLink className='text-decoration-none'>
@@ -108,7 +124,6 @@ function Navbar() {
                         <span className='px-2 text-white'>تسجيل الخروج</span>
                     </NavLink>
                 </div>
-
 
             </div>
         </div >

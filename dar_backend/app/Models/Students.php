@@ -37,4 +37,18 @@ class Students extends Model
         'female_question',
         'has_ijaza'
     ];
+
+    public function teachers()
+    {
+        return $this->belongsToMany(Users::class,'students_centers_teachers','center_id','user_id')
+        ->where('role_id',4)
+        ->where('users.is_deleted',0)
+        ->distinct();
+     }
+
+     public function centers()
+     {
+         return $this->belongsToMany(Centers::class, 'students_centers_teachers', 'student_id', 'center_id');
+     }
+
 }

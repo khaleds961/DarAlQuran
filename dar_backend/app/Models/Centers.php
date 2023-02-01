@@ -17,6 +17,14 @@ class Centers extends Model
 
     public function teachers()
     {
-        return $this->belongsToMany(Users::class,'students_centers_teachers','center_id','user_id')->get();
-     }
+        return $this->belongsToMany(Users::class, 'students_centers_teachers', 'center_id', 'user_id')
+            ->where('role_id', 4)
+            ->where('users.is_deleted', 0)
+            ->distinct();
+    }
+
+    public function students()
+    {
+        return $this->belongsToMany(Students::class, 'students_centers_teachers', 'center_id', 'student_id');
+    }
 }

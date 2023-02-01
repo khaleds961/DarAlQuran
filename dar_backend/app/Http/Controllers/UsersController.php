@@ -6,6 +6,7 @@ use App\Models\Centers;
 use App\Models\Students_Centers_Teachers;
 use App\Models\Users;
 use Exception;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
@@ -256,35 +257,34 @@ class UsersController extends Controller
         ]);
     }
 
-    // public function getAllTeacher()
-    // {
-    //     try {
-    //         $teachers = Users::where('is_deleted', 0)
-    //             ->where('role_id', 4)
-    //             ->get();
-    //         return response([
-    //             'data' => $teachers,
-    //             'success' => true
-    //         ]);
-    //     } catch (Exception $e) {
-    //         return response($e->getMessage());
-    //     }
-    // }
+    //without pagination
+    public function getAllTeachersByCenter($center_id)
+    {
+        try {
+            $center = Centers::find($center_id);
+            $teachers = $center->teachers()->get();
+            return response([
+                'data' => $teachers,
+                'success' => true
+            ]);
+        } catch (Exception $e) {
+            return response($e->getMessage());
+        }
+    }
 
+    //getting teachers by admin or supervisor with pagination
     public function getTeachersByCenter($center_id)
     {
-        // try {
-        //       return  Users::whereHas('centers', function ($query) use ($center_id) {
-        //         $query->where('center_id','=',$center_id);
-        //     })
-        //         ->with('centers')
-        //         ->get();
-        // } catch (Exception $e) {
-        //     return response($e->getMessage());
-        // }
+        if ($center_id != 0) {
+            $center = Centers::find($center_id);
+            $teachers = $center->teachers()->paginate(10);
+        } else {
+            $teachers = Users::where('is_deleted', 0)->where('role_id', 4)->paginate(10);
+        }
 
-        $center=Centers::find($center_id)->first();
-        $teachers=$center->teachers();
-        return $teachers;
+        return response([
+            'data' => $teachers,
+            'success' => true
+        ]);
     }
 }

@@ -28,7 +28,11 @@ class Users extends Model
     public function centers()
     {
         return $this->belongsToMany(Centers::class, 'students_centers_teachers', 'user_id', 'center_id')
-        ->select('center_id','name','location');
+            ->select('center_id', 'name', 'location');
     }
 
+    public function students()
+    {
+        return $this->belongsToMany(Students::class, 'students_centers_teachers', 'user_id', 'student_id');
+    }
 }

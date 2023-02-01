@@ -1,8 +1,7 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import Swal from 'sweetalert2'
 import Api from '../Api'
 import SessionContext from '../session/SessionContext';
-import { Form } from 'react-bootstrap';
 import CenterSelect from './CenterSelect';
 import TeacherSelect from './TeacherSelect';
 
@@ -11,22 +10,34 @@ export default function AddStudentForm() {
 
     const { session: { user: { role_id } } } = useContext(SessionContext);
     const { session: { user: { centers } } } = useContext(SessionContext);
+    const ok = role_id === 3 ? centers[0]['center_id'] : 0;
 
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [first_name, setFirst_name] = useState('')
     const [last_name, setLast_name] = useState('')
     const [phone_number, setPhone_number] = useState('')
-    const [center_id, setCenter_id] = useState(0)
+    const [center_id, setCenter_id] = useState(ok)
+    const [teachers, setTeachers] = useState([])
     const [teacher_id, setTeacher_id] = useState(0)
 
 
+    useEffect(() => {
+        if (center_id !== 0) {
+            getTeachersByCenter()
+        }
+    }, [center_id])
+
+    const getTeachersByCenter = () => {
+        setTeachers([])
+        setTeacher_id(0)
+        Api.get(`getAllTeachersByCenter/${center_id}`).then((res) => {
+            setTeachers(res.data.data);
+        })
+    }
+
     const addstudent = (e) => {
         e.preventDefault();
-        Api.get(`getTeachersByCenter/1`).then((res) => {
-            console.log(res.data);
-        })
-        return;
         console.log(center_id);
         console.log(teacher_id);
         Api.post('addstudent', {
@@ -35,12 +46,10 @@ export default function AddStudentForm() {
             first_name: first_name,
             last_name: last_name,
             phone_number: phone_number,
-            role_id: 5,
-            center_id: role_id === 3 || role_id === 4 ? centers[0]['center_id'] : center_id,
-            teacher_id: teacher_id
+            center_id: role_id === 3 || role_id === 4 ? centers[0]['center_id'] : center_id !== 0 ? center_id : null,
+            teacher_id: teacher_id !== 0 ? teacher_id : null
         }).then(
             (res) => {
-                console.log(res);
                 Swal.fire(res.data.message, '', 'success')
                 setUsername('')
                 setPassword('')
@@ -84,7 +93,7 @@ export default function AddStudentForm() {
 
                     <CenterSelect center_id={setCenter_id} />
 
-                    <TeacherSelect teacher_id={setTeacher_id} center_id={center_id} />
+                    <TeacherSelect teachers={teachers} teacher_id={setTeacher_id} />
 
                 </div>
                 <button className="btn btn-primary mt-3" onClick={addstudent}> اضافة</button>

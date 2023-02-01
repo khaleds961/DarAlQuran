@@ -5,6 +5,7 @@ return [
     
     //STUDENT
     'student_added'   => 'تم اضافة التلميذ',
+    'student_deleted' => 'تم حذف التلميذ',
 
     //USERS
     'first_name_required'   => 'يرجي ادخال الاسم الاول',
@@ -23,5 +24,9 @@ return [
 
     //CENTERS
     'center_added'          => 'تم اضافة المركز بنجاح',
-    'center_deleted'        => 'تم حذف المركز'
+    'center_deleted'        => 'تم حذف المركز',
+
+    //Sessions
+    'session_added' => 'تم اضافة الحصة',
+    'session_exist' => 'هذه الحصة موجودة'
 ];
