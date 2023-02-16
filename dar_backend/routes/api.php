@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CentersController;
+use App\Http\Controllers\RingsController;
 use App\Http\Controllers\SessionsController;
 use App\Http\Controllers\StudentsController;
 use App\Http\Controllers\TeachersController;
@@ -31,6 +32,10 @@ Route::get('/getteachers/{user_id}',[UsersController::class,'getAllUsers']);
 Route::get('/getTeacherbySupervisor/{center_id}/{supervisor_id}',[UsersController::class,'getTeacherbySupervisor']);
 Route::get('/getAllTeachersByCenter/{center_id}',[UsersController::class,'getAllTeachersByCenter']);
 Route::get('/getTeachersByCenter/{center_id}',[UsersController::class,'getTeachersByCenter']);
+Route::get('/checkteacher/{center_id}/{user_id}',[UsersController::class,'checkteacher']);
+Route::get('/getteacherbyid/{user_id}',[UsersController::class,'getteacherbyid']);
+Route::post('/editteacherbyid/{user_id}',[UsersController::class,'update']);
+Route::delete('/deleteteacher/{teacher_id}',[UsersController::class,'destroy']);
 
 //STUDENTS
 Route::get('/getAllStudents',[StudentsController::class,'index']);
@@ -45,7 +50,20 @@ Route::get('/getcenters',[CentersController::class,'index']);
 Route::post('/addcenter',[CentersController::class,'store']);
 Route::put('/deleteCenter/{id}',[CentersController::class,'destroy']);
 Route::get('/getcenterbyid/{id}',[CentersController::class,'show']);
+Route::post('/updatecenter/{id}',[CentersController::class,'update']);
 // Route::get('/getget',[CentersController::class,'studentsbycenter']);
 
 //Sessions
+Route::get('/getsessions/{center_id}',[SessionsController::class,'index']);
 Route::post('/addsession',[SessionsController::class,'store']);
+Route::delete('/deletesession/{id}/{st_ce_te}',[SessionsController::class,'destroy']);
+Route::get('/getsessionsbyid/{id}',[SessionsController::class,'getSessionsById']);
+
+//Ring
+Route::get('/getrings/{center_id}',[RingsController::class,'index']);
+Route::get('/getringbyid/{ring_id}',[RingsController::class,'show']);
+Route::get('/getringsbycenter/{center_id}',[RingsController::class,'getringsbycenter']);
+Route::post('/addring',[RingsController::class,'store']);
+Route::post('/editring/{id}',[RingsController::class,'update']);
+Route::delete('/deletering/{id}',[RingsController::class,'destroy']);
+// Route::get('/getsessionsbyid/{id}',[SessionsController::class,'getSessionsById']);

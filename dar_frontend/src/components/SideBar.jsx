@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { FaHome, FaSchool, FaUserGraduate } from 'react-icons/fa';
+import { FaHome, FaSchool, FaUserGraduate,FaRing } from 'react-icons/fa';
 import { BiLogOutCircle } from "react-icons/bi";
 import { ImUserTie } from "react-icons/im";
 import {MdClass} from 'react-icons/md'
 import SessionContext from '../session/SessionContext';
 import Api from '../Api';
+import { fontSize } from '@mui/system';
 
 
 
@@ -43,8 +44,8 @@ function Navbar() {
                 </div>
 
                 {/* case 2:md page and more Dashboard */}
-                <div className='py-2 px-4 hover'>
-                    <NavLink to='/' className='d-none d-md-flex align-items-center text-decoration-none text-dark'>
+                <div className='my-2'>
+                    <NavLink to='/' className='d-none d-md-flex align-items-center text-decoration-none text-dark hover py-2 px-2'>
                         <FaHome className='text-dark' />
                         <span className='px-2 d-none d-md-block'>الصفحة الرئيسية</span>
                     </NavLink>
@@ -58,8 +59,8 @@ function Navbar() {
                 </div>
 
                 {/* case 2:md page and more Centers */}
-                <div className='py-2 px-4 hover'>
-                    <NavLink to='/centers' className='d-none d-md-flex align-items-center text-decoration-none text-dark'>
+                <div className='my-2'>
+                    <NavLink to='/centers' className='d-none d-md-flex align-items-center text-decoration-none text-dark hover py-2 px-2'>
                         <FaSchool className='text-dark' />
                         <span className='px-2 d-none d-md-block'>المراكز</span>
                     </NavLink>
@@ -73,8 +74,8 @@ function Navbar() {
                 </div>
 
                 {/* case 2:md page and more TEACHERS */}
-                <div className='py-2 px-4 hover'>
-                    <NavLink to='/teachers' className='d-none d-md-flex align-items-center text-decoration-none text-dark'>
+                <div className='my-2'>
+                    <NavLink to='/teachers' className='d-none d-md-flex align-items-center text-decoration-none text-dark py-2 px-2 hover'>
                         <ImUserTie className='text-dark' />
                         <span className='px-2 d-none d-md-block'>الاساتذة</span>
                     </NavLink>
@@ -88,8 +89,8 @@ function Navbar() {
                 </div>
 
                 {/* case 2:md page and more Students */}
-                <div className='py-2 px-4 hover'>
-                    <NavLink to='/students' className='d-none d-md-flex align-items-center text-decoration-none text-dark'>
+                <div className='my-2'>
+                    <NavLink to='/students' className='d-none d-md-flex align-items-center text-decoration-none text-dark py-2 px-2 hover'>
                         <FaUserGraduate className='text-dark' />
                         <span className='px-2 d-none d-md-block'>الطلاب</span>
                     </NavLink>
@@ -102,11 +103,26 @@ function Navbar() {
                     </NavLink>
                 </div>
 
-                {/* case 2:md page and more Students */}
-                <div className='py-2 px-4 hover'>
-                    <NavLink to='/sessions' className='d-none d-md-flex align-items-center text-decoration-none text-dark'>
+                {/* case 2:md page and more */}
+                <div className='my-2'>
+                    <NavLink to='/sessions' className='d-none d-md-flex align-items-center text-decoration-none text-dark py-2 px-2 hover'>
                         <MdClass className='text-dark' />
                         <span className='px-2 d-none d-md-block'>الحصص</span>
+                    </NavLink>
+                </div>
+
+                {/* case 1: small screen Class */}
+                <div className='text-center'>
+                    <NavLink to='/rings' className='text-decoration-none'>
+                        <FaRing className='d-xs-block d-md-none text-dark' />
+                    </NavLink>
+                </div>
+
+                {/* case 2:md page and more */}
+                <div className='my-2'>
+                    <NavLink to='/rings' className='d-none d-md-flex align-items-center text-decoration-none text-dark py-2 px-2 hover'>
+                        <FaRing className='text-dark' />
+                        <span className='px-2 d-none d-md-block'>الحلقات</span>
                     </NavLink>
                 </div>
 
@@ -119,9 +135,9 @@ function Navbar() {
 
                 {/*case2: md and more logout button */}
                 <div className='d-none d-md-block mt-5 py-2 px-4 bg-dark text-white' onClick={logout}>
-                    <NavLink className='d-flex align-items-center text-decoration-none'>
-                        <BiLogOutCircle size={20} className='text-white' />
-                        <span className='px-2 text-white'>تسجيل الخروج</span>
+                    <NavLink className='d-flex align-items-center text-decoration-none '>
+                        <BiLogOutCircle size={18} className='text-white' />
+                        <span className='px-2 text-white' style={{fontSize:'14px'}}>تسجيل الخروج</span>
                     </NavLink>
                 </div>
 

@@ -50,9 +50,39 @@ class StudentsController extends Controller
     {
         try {
             $student = Students::create([
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'phone_number' => $request->phone_number
+                'first_name'        => $request->first_name,
+                'middle_name'       => $request->middle_name,
+                'last_name'         => $request->last_name,
+                'mother_name'       => $request->mother_name,
+                'place_of_birth'    => $request->place_of_birth,
+                'birthdate'         => $request->birthdate,
+                'marital_status'    => $request->marital_status,
+                'reading_level'     => $request->reading_level,
+                'school_uni_name'   => $request->school_uni_name,
+                'major'             => $request->major,
+                'blood_type'        => $request->blood_type,
+                'gender'            => $request->gender,
+                'nationality'       => $request->nationality,
+                'current_job'       => $request->current_job,
+                'phone_number'      => $request->phone_number,
+                'work_number'       => $request->work_number,
+                'home_number'       => $request->home_number,
+                'mother_number'     => $request->mother_number,
+                'father_number'     => $request->father_number,
+                'father_work'     => $request->father_work,
+                'mother_work'     => $request->mother_work,
+                'student_level_status' => $request->student_level_status,
+                'address'           => $request->address,
+                'suitable_days'     => $request->suitable_days,
+                'suitable_times'    => $request->suitable_times,
+                'sheikh_names'      => $request->sheikh_names,
+                'memorizing'        => $request->memorizing,
+                'female_question'   => $request->female_question,
+                'is_ring'           => $request->is_ring,
+                'ring_id'           => $request->ring_id,
+                'skills'            => $request->skills,
+                'rate'              => $request->rate,
+                'notes'             => $request->notes
             ]);
             if ($student) {
                 Students_Centers_Teachers::create([

@@ -1,14 +1,13 @@
 import React, { useEffect, useState, useContext } from 'react'
 import Api from '../Api';
-import { BsPlusCircle } from 'react-icons/bs'
-import { NavLink } from 'react-router-dom';
+import { BsPencil, BsPlusCircle, BsTrash } from 'react-icons/bs'
 import Modal from "react-bootstrap/Modal";
 import Form from 'react-bootstrap/Form';
 import Swal from 'sweetalert2';
 import SessionContext from '../session/SessionContext';
 import { Pagination } from '@mui/material'
 import { Spinner } from 'react-bootstrap';
-
+import { NavLink } from 'react-router-dom';
 
 
 function TeachersTable() {
@@ -19,7 +18,7 @@ function TeachersTable() {
 
   const default_center_id = role_id === 3 ? centers[0]['center_id'] : 0;
 
-  const [teachers, setTeachers] = useState();
+  const [teachers, setTeachers] = useState([]);
   const [fname, setFname] = useState('');
   const [mname, setMname] = useState('');
   const [lname, setLname] = useState('');
@@ -42,6 +41,8 @@ function TeachersTable() {
 
   const changePage = (e, value) => {
     setPage(value);
+    //value here is page number
+    getTeachers(value)
   };
 
   const showModal = () => {
@@ -86,10 +87,10 @@ function TeachersTable() {
       });
   }
 
-  const getTeachers = () => {
+  const getTeachers = (p) => {
     setLoading(true)
-    Api.get(`getTeachersByCenter/${center_id}?page=${page}`).then(
-      (res) => {
+    Api.get(`getTeachersByCenter/${center_id}?page=${p}`).then(
+      res => {
         setTeachers(res.data.data.data)
         setTotal(Math.ceil(res.data.data.total / 10))
         setLoading(false)
@@ -97,12 +98,15 @@ function TeachersTable() {
     ).catch(function (err) { console.log(err) })
   }
 
-  const getTeachersByCenter = (e) => {
+  const gets = (e) => {
     setLoading(true)
     setPage(1)
     const id_center = e.target.value;
     setCenter_id(id_center)
-    Api.get(`getTeachersByCenter/${id_center}?page=${page}`).then(
+    getTeachersByCenter(id_center,1)
+  }
+  const getTeachersByCenter = (id_center,p) => {  
+    Api.get(`getTeachersByCenter/${id_center}?page=${p}`).then(
       (res) => {
         setTeachers(res.data.data.data)
         setTotal(Math.ceil(res.data.data.total / 10))
@@ -117,17 +121,45 @@ function TeachersTable() {
     })
   }
 
+  const deleteteacher = (teacher_id) => {
+
+    Swal.fire({
+      title: 'هل انت متأكد من حذف هذا الاستاذ؟',
+      showCancelButton: true,
+      cancelButtonText: 'الغاء',
+      confirmButtonText: 'حذف',
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        Api.delete(`deleteteacher/${teacher_id}`).then(
+          (res) => {
+            if (res.data.success) {
+              Swal.fire(res.data.message, '', 'success')
+              const teachersList = teachers.filter((teacher) => teacher.id !== teacher_id)
+              setTeachers(teachersList)
+            } else {
+              Swal.fire(res.data.message, '', 'error')
+            }
+          }
+        )
+      }
+    })
+
+  }
+
   useEffect(() => {
-    getTeachers()
+    getTeachers(page)
     getCenters()
-  }, [page])
+  }, [])
 
   return (
     <div>
+      {teachers?.length === 0 ? <p><b>لا يوجد اي استاذ في هذا المركز</b></p> : ''}
+
       {teachers ?
         <div>
           <div className='d-flex justify-content-between'>
-            <button type="button" className="btn btn-dark mb-3 d-flex align-items-center" onClick={showModal}>
+            <button type="button" className="btn btn-success mb-3 d-flex align-items-center" onClick={showModal}>
               <BsPlusCircle className='text-white' />
               <span className='px-2'>
                 اضافة استاذ جديد
@@ -135,12 +167,13 @@ function TeachersTable() {
             </button>
 
             {role_id === 3 ? '' :
-              <select className='mb-3 bg-dark text-white rounded' value={center_id} onChange={getTeachersByCenter}>
-                <option disabled="disabled" value='0'>اختر احد المراكز</option>
+              <select className='mb-3 text-dark rounded bg-white' value={center_id} onChange={gets}>
+                <option disabled="disabled" value='0'>
+                  اختر احد المراكز
+                </option>
                 {allcenters ? allcenters.map((center) =>
                   <option key={center.id} value={center.id}>{center.name}</option>) :
                   'تحميل ...'}
-                {/* <option value="last" onClick={tryme}>عرض الكل</option> */}
               </select>
             }
           </div>
@@ -231,45 +264,48 @@ function TeachersTable() {
             </Modal.Body>
             <Modal.Footer>
               <button type='button' className='btn btn-dark' onClick={hideModal}>الغاء</button>
-              <button type='button' className='btn btn-dark' onClick={addTeacher} >اضافة</button>
+              <button type='button' className='btn btn-success' onClick={addTeacher} >اضافة</button>
             </Modal.Footer>
           </Modal>
 
-          <table className="table table-dark table-responsive table-hover">
+          <table className="table table-dark table-responsive table-hover text-center">
             <thead>
               <tr>
                 <th scope="col">الاسم</th>
                 <th scope="col">رقم الهاتف</th>
+                <th scope="col">المركز</th>
                 <th scope="col">اجراءات</th>
               </tr>
             </thead>
             <tbody>
               {loading ?
                 <tr>
-                  <td></td>
+                  <td colSpan={2}></td>
                   <td>
                     <Spinner animation="border" variant="primary" />
                   </td>
                   <td></td>
                 </tr>
-                :
-                <>
-                  {teachers?.map(teacher =>
-                    <tr key={teacher.id}>
-                      <th scope="row">{teacher.first_name} {teacher.middle_name} {teacher.last_name}</th>
-                      <td>{teacher.phone_number}</td>
-                      <td>
-                        {/* <span className='delete_center' onClick={() => deleteCenter(center.id)}>
-                                            <BsTrash />
-                                        </span> */}
-                      </td>
-                    </tr>
-                  )}
-                </>
+                : teachers.length > 0 ? teachers.map(teacher =>
+                  <tr key={teacher.id}>
+                    <th>{teacher.first_name} {teacher.middle_name} {teacher.last_name}</th>
+                    <td>{teacher.phone_number}</td>
+                    <td>{teacher.center_name}</td>
+                    <td>
+                      <span className='cursor_pointer'
+                        onClick={() => deleteteacher(teacher.id)}><BsTrash /></span>
+                      <NavLink to={`/editteacher/${teacher.id}`}>
+                        <span className='mx-2 cursor_pointer text-white'>
+                          <BsPencil />
+                        </span>
+                      </NavLink>
+
+                    </td>
+                  </tr>
+                ) : <></>
               }
             </tbody>
           </table>
-
 
           <Pagination
             shape="rounded"
@@ -277,7 +313,8 @@ function TeachersTable() {
             page={page}
             size="small"
             onChange={changePage}
-            variant="outlined" />
+            variant="outlined"
+          />
         </div>
         : <p><b>تحميل ...</b></p>
       }

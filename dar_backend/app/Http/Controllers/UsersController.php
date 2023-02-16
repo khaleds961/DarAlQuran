@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
+
 
 
 
@@ -70,16 +74,63 @@ class UsersController extends Controller
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+    //check if this teacher belong to this center
+    public function checkteacher($center_id, $user_id)
     {
-        //
+        $check_teacher = Students_Centers_Teachers::where('center_id', $center_id)
+            ->where('user_id', $user_id)->get();
+        // return $check_teacher;
+        if (count($check_teacher) > 0) {
+            $teacher = Users::find($user_id);
+            return response([
+                'data' => $teacher,
+                'success' => true
+            ]);
+        } else {
+            return response([
+                'data' => [],
+                'success' => false,
+                'message' => __('message.teacher_unauthorized')
+            ]);
+        }
+    }
+
+    public function getteacherbyid(Request $request, $user_id)
+    {
+        try {
+            $teacher = Users::find($user_id);
+            return response([
+                'data' => $teacher,
+                'success' => true
+            ]);
+        } catch (Exception $e) {
+            return response($e->getMessage());
+        }
+    }
+
+    public function update(Request $request, $user_id)
+    {
+        $teacher = Users::find($user_id);
+        if ($teacher) {
+            $teacher->first_name = $request->first_name;
+            $teacher->middle_name = $request->middle_name;
+            $teacher->last_name = $request->last_name;
+            $teacher->username = $request->username;
+            $teacher->phone_number = $request->phone_number;
+            if ($request->password) {
+                if (!Hash::check($request['password'], $teacher->password)) {
+                    $teacher->password = bcrypt($request->password);
+                }
+            }
+            $teacher->save();
+            $check_update = count($teacher->getChanges());
+            if ($check_update > 0) {
+                return response([
+                    'message' => __('message.teacher_updated'),
+                    'success' => true
+                ]);
+            }
+        }
     }
 
     /**
@@ -90,7 +141,28 @@ class UsersController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $check_teacher = Students_Centers_Teachers::where('user_id', $id)
+                ->whereNotNull('student_id')
+                ->select('student_id')->get();
+            if(count($check_teacher)> 0){
+                return response([
+                    'message' => __('message.cant_delete'),
+                    'success' => false
+                ]);
+            }else{
+                $teacher = Users::find($id);
+                if($teacher){
+                    $teacher->delete();
+                }
+                return response([
+                    'message' => __('message.teacher_deleted'),
+                    'success' => true
+                ]);
+            }
+        } catch (Exception $e) {
+            return response($e->getMessage());
+        }
     }
 
     public function getUserbyToken(Request $request)
@@ -261,8 +333,10 @@ class UsersController extends Controller
     public function getAllTeachersByCenter($center_id)
     {
         try {
+            if($center_id != 0 ){
             $center = Centers::find($center_id);
             $teachers = $center->teachers()->get();
+            }
             return response([
                 'data' => $teachers,
                 'success' => true
@@ -276,14 +350,46 @@ class UsersController extends Controller
     public function getTeachersByCenter($center_id)
     {
         if ($center_id != 0) {
-            $center = Centers::find($center_id);
-            $teachers = $center->teachers()->paginate(10);
+            // $center = Centers::find($center_id);
+            // $data = $center::with('teachers')
+            //     ->paginate(10);
+            // $data = $this->paginate($teachers);
+            $data = Users::join('students_centers_teachers', 'students_centers_teachers.user_id', '=', 'users.id')
+                ->join('centers', 'centers.id', '=', 'students_centers_teachers.center_id')
+                ->select(
+                    'users.id',
+                    'users.first_name',
+                    'users.middle_name',
+                    'users.last_name',
+                    'users.phone_number',
+                    'users.role_id',
+                    'centers.id as center_id',
+                    'centers.name as center_name'
+                )
+                ->where('center_id', $center_id)
+                ->where('role_id', 4)
+                ->groupBy('id')
+                ->paginate(10);
         } else {
-            $teachers = Users::where('is_deleted', 0)->where('role_id', 4)->paginate(10);
+            // $data = Users::where('is_deleted', 0)->where('role_id', 4)->paginate(10);
+            $data = Users::join('students_centers_teachers', 'students_centers_teachers.user_id', '=', 'users.id')
+                ->join('centers', 'centers.id', '=', 'students_centers_teachers.center_id')
+                ->select(
+                    'users.id',
+                    'users.first_name',
+                    'users.middle_name',
+                    'users.last_name',
+                    'users.phone_number',
+                    'users.role_id',
+                    'centers.id as center_id',
+                    'centers.name as center_name'
+                )
+                ->where('role_id', 4)
+                ->groupBy('id')
+                ->paginate(10);
         }
-
         return response([
-            'data' => $teachers,
+            'data' => $data,
             'success' => true
         ]);
     }

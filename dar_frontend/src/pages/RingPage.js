@@ -1,20 +1,19 @@
 import React from 'react'
-import TeachersTable from '../components/TeachersTable'
+import RingsTable from '../components/RingsTable'
 import SideBar from '../components/SideBar'
 
-
-function Teachers() {
+function RingPage() {
   return (
     <div className="container-fluid rtl">
       <div className="row flex-nowrap">
-        <SideBar/>
+        <SideBar />
         <div className="col py-3" style={{background:'#EEEEEE'}}>
-        <h3 className='mb-5 text-center'>الاساتذة</h3>
-        <TeachersTable/>
+        <h3 className='mb-5 text-center'>الحلقات</h3>
+        <RingsTable/>
         </div>
       </div>
     </div>
   )
 }
 
-export default Teachers
+export default RingPage

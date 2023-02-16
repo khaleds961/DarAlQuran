@@ -1,15 +1,21 @@
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState, useContext, useRef } from 'react'
 import Swal from 'sweetalert2';
 import Api from '../Api'
-import Form from 'react-bootstrap/Form';
 import Modal from "react-bootstrap/Modal";
 import { BsPlusCircle, BsTrash } from 'react-icons/bs';
-import { NavLink, Link } from 'react-router-dom';
+import { TbPencil } from 'react-icons/tb';
 import { Pagination } from '@mui/material'
-import SessionContext from '../session/SessionContext';
-import CenterSelect from './CenterSelect';
 import Spinner from 'react-bootstrap/Spinner'
+import SessionContext from '../session/SessionContext';
 import TeacherSelect from './TeacherSelect';
+import { AiOutlineEye } from 'react-icons/ai'
+import Button from 'react-bootstrap/Button';
+import Overlay from 'react-bootstrap/Overlay';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Popover from 'react-bootstrap/Popover';
+import { Link } from 'react-router-dom';
+
+
 function QuranSessionTable() {
 
     const { session: { user: { centers } } } = useContext(SessionContext);
@@ -61,28 +67,36 @@ function QuranSessionTable() {
         { 'id': 35, 'value': '22:00' },
     ]
 
-    const id_center = role_id === 3 ? centers[0]['center_id'] : 0;
+    const defaultValue = role_id === 3 ? centers[0]['center_id'] : 0;
+    const [id_center, setid_center] = useState(defaultValue)
+    const [page, setPage] = useState(1)
+    const [total, setTotal] = useState(1)
     const [isOpen, setIsOpen] = useState(false);
-    const [showdiv, setShowdiv] = useState(false);
-
     const [teachers, setTeachers] = useState([])
-    const [teacher_id, setTeacher_id] = useState()
+    const [teacher_id, setTeacher_id] = useState(0)
     const [students, setStudents] = useState([])
-    const [student_id, setStudent_id] = useState()
-    const [time, setTime] = useState('')
-    const [day, setDay] = useState('')
+    const [student_id, setStudent_id] = useState('')
+    const [time, setTime] = useState(0)
+    const [day, setDay] = useState(0)
+    const [selected, setSelected] = useState(0)
+    const [sessions, setSessions] = useState([])
+    const [day_time, setDay_time] = useState([])
+    const [show, setShow] = useState(false);
+    const [target, setTarget] = useState(null);
+    const ref = useRef(null);
+
 
     const getTeachersByCenter = () => {
         Api.get(`getAllTeachersByCenter/${id_center}`).then(
             (res) => {
                 setTeachers(res.data.data)
-                console.log(res.data)
             }
         )
     }
 
     const callStudents = (e) => {
         setStudents([])
+        setSelected(0)
         const teacher_id = e.target.value;
         Api.get(`getStudentsByTeacher/${id_center}/${teacher_id}`).then(
             (res) => {
@@ -100,7 +114,19 @@ function QuranSessionTable() {
             time: time,
             day: day
         }).then((res) => {
-            console.log(res.data);
+            if (res.data.success) {
+                Swal.fire(res.data.message, '', 'success')
+                setTeacher_id(0)
+                setStudent_id('')
+                setTime(0)
+                setDay(0)
+                setSelected(0)
+                getSessions(1)
+            } else {
+                Swal.fire(res.data.message, '', 'warning')
+            }
+        }).catch(function (error) {
+            console.log(error);
         })
     }
 
@@ -110,30 +136,97 @@ function QuranSessionTable() {
 
     const hideModal = () => {
         setIsOpen(false);
-        setShowdiv(false)
+        setTeacher_id(0)
+        setStudent_id('')
+        setTime(0)
+        setDay(0)
+        setSelected(0)
     };
+
+    const handleClick = (event, st_ct_te_id) => {
+        setShow(!show);
+        setTarget(event.target);
+        getTimes(st_ct_te_id)
+    };
+
+    const getSessions = (p) => {
+
+        Api.get(`getsessions/${id_center}?page=${p}`).then(
+            (res) => {
+                setSessions(res.data.data.data)
+                setTotal(Math.ceil(res.data.data.total / 10))
+            }
+        ).catch(function (err) { console.log(err) })
+    }
+
+    const changePage = (e, value) => {
+        setPage(value)
+        getSessions(value)
+    }
+
+    const deleteSession = (sess_id, st_ce_te) => {
+
+        Swal.fire({
+            title: 'هل انت متأكد من حذف الحصة؟',
+            showCancelButton: true,
+            cancelButtonText: 'الغاء',
+            confirmButtonText: 'حذف',
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                Api.delete(`deletesession/${sess_id}/${st_ce_te}`).then(
+                    res => {
+
+                        if (res.data.success) {
+                            Swal.fire(res.data.message, '', 'success')
+                        }
+
+                        const newList = day_time.filter((dt) => dt.id !== sess_id);
+                        setDay_time(newList);
+
+                        if (res.data.check === 0) {
+                            const list = sessions.filter(session => session.session_id !== st_ce_te)
+                            setSessions(list)
+                        }
+                    }
+                )
+            }
+        })
+    }
+
+    const getTimes = (st_ct_te_id) => {
+        setDay_time([])
+        Api.get(`getsessionsbyid/${st_ct_te_id}`).then(
+            (res) => setDay_time(res.data.data))
+            .catch(function (err) { console.log(err); })
+    }
 
     useEffect(() => {
         getTeachersByCenter()
+        getSessions(page)
     }, [])
+
 
     return (
         <div>
-            <div className='d-flex justify-content-between'>
-                <button type="button" className="btn btn-dark mb-3 d-flex align-items-center" onClick={showModal}>
-                    <BsPlusCircle className='text-white' />
-                    <span className='px-2'>
-                        اضافة حصة جديدة
-                    </span>
-                </button>
-            </div>
+            {role_id === 3 || role_id === 4 ?
+                <div className='d-flex justify-content-between'>
+                    <button type="button" className="btn btn-dark mb-3 d-flex align-items-center" onClick={showModal}>
+                        <BsPlusCircle className='text-white' />
+                        <span className='px-2'>
+                            اضافة حصة جديدة
+                        </span>
+                    </button>
+                </div>
+                : ''}
 
             {/* modal */}
             <Modal show={isOpen} onHide={hideModal}>
                 <Modal.Body className='rtl'>
 
                     <div >
-                        <select className='form-control mb-3' defaultValue={0} onChange={callStudents}>
+                        <label >الاستاذ</label>
+                        <select className='form-control mb-3' value={teacher_id} onChange={callStudents}>
                             <option disabled value='0'>اختر احد الاساتذة</option>
                             {teachers ? teachers.map((teacher) =>
                                 <option key={teacher.id} value={teacher.id}>{teacher.first_name} {teacher.middle_name} {teacher.last_name}</option>
@@ -142,19 +235,27 @@ function QuranSessionTable() {
 
                         {students.length !== 0 ?
                             <>
-                                <select className='form-control mb-3' defaultValue={0} onChange={(e) => setStudent_id(e.target.value)}>
-                                    <option value='0' disabled>اختر احد الطلاب</option>
+                                <label>الطالب</label>
+                                <select className='form-control mb-3' value={selected} onChange={(e) => {
+                                    setStudent_id(e.target.value)
+                                    setSelected(e.target.value)
+                                }}>
+                                    <option disabled value='0'>اختر احد الطلاب</option>
                                     {students.map((student) =>
                                         <option key={student.id} value={student.id}>{student.first_name} {student.middle_name} {student.last_name}</option>
                                     )}
                                 </select>
                             </>
                             :
-                            <select className='form-control mb-3' defaultValue={0}>
-                                <option value='0' disabled>اختر احد الطلاب</option>
-                            </select>}
+                            <>
+                                <label>الطالب</label>
+                                <select className='form-control mb-3' defaultValue={0}>
+                                    <option value='0' disabled>تحميل ...</option>
+                                </select>
+                            </>}
 
-                        <select className='form-control mb-3' defaultValue={0}
+                        <label htmlFor="">اليوم</label>
+                        <select className='form-control mb-3' value={day}
                             onChange={(e) => setDay(e.target.value)}>
                             <option disabled="disabled" value='0'>اختر احد ايام الاسبوع</option>
                             {days ?
@@ -166,7 +267,8 @@ function QuranSessionTable() {
                             }
                         </select>
 
-                        <select className='form-control mb-3' defaultValue={0}
+                        <label htmlFor="">الوقت</label>
+                        <select className='form-control mb-3' value={time}
                             onChange={(e) => setTime(e.target.value)}>
                             <option disabled value='0'>اختر احد الاوقات المتاحة</option>
                             {times ?
@@ -186,6 +288,75 @@ function QuranSessionTable() {
                     <button type='button' className='btn btn-dark' onClick={addSession} >اضافة</button>
                 </Modal.Footer>
             </Modal>
+            {sessions.length === 0 ? <p><b>لا يوجد اي حصة بعد</b></p> : ''}
+            {sessions.length > 0 ?
+                <>
+                    <table className="table table-dark table-responsive table-hover">
+                        <thead>
+                            <tr className='text-center'>
+                                <th scope="col">الطالب</th>
+                                <th scope="col">الاستاذ</th>
+                                <th scope="col">التاريخ</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+                            {sessions?.map(session =>
+                                <tr key={session.session_id} className='text-center'>
+                                    <td>{session.student_fn} {session.student_mn} {session.student_ln}</td>
+                                    <td>{session.teacher_fn} {session.teacher_mn} {session.teacher_ln}</td>
+
+                                    <td>
+                                        <div ref={ref}>
+                                            <Button variant="success" onClick={(e) => handleClick(e, session.session_id)}>اضغط هنا</Button>
+
+                                            <Overlay
+                                                show={show}
+                                                target={target}
+                                                placement="bottom"
+                                                container={ref}
+                                                containerPadding={20}
+                                            >
+                                                <Popover id="popover-contained">
+                                                    <Popover.Body>
+                                                        <table className='table'>
+                                                            <tbody>
+                                                                {day_time.length > 0 ? day_time.map((dt) =>
+                                                                    <tr key={dt.id}>
+                                                                        <td><Link to={`/addrecite/${dt.id}`}>{dt.weekday}</Link></td>
+                                                                        <td>{dt.session_time}</td>
+                                                                        <td>
+                                                                            <span className='cursor_pointer mx-2' onClick={() => deleteSession(dt.id, dt.center_student_teacher_id)}>
+                                                                                <BsTrash />
+                                                                            </span>
+                                                                        </td>
+                                                                    </tr>
+                                                                ) : <tr><td>تحميل...</td></tr>}
+                                                            </tbody>
+                                                        </table>
+                                                    </Popover.Body>
+                                                </Popover>
+                                            </Overlay>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+
+                    <Pagination
+                        shape="rounded"
+                        count={total}
+                        page={page}
+                        size="small"
+                        onChange={changePage}
+                        variant="outlined"
+                    />
+                </>
+                : <p><b>تحميل ...</b></p>
+            }
         </div>
     )
 }

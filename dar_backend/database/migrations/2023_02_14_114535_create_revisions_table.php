@@ -30,8 +30,6 @@ return new class extends Migration
             $table->timestamps();
         });
     }
-    // $table->date('birthdate')->format('Y.m.d');
-
 
     /**
      * Reverse the migrations.

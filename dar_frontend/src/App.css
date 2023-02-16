@@ -20,6 +20,14 @@
     background-color: #f6f6f6;
 }
 
+.cursor_pointer:hover{
+    cursor: pointer;
+}
+
+.filter_button{
+    background-color: #C7CB85;
+}
+
 
 @media screen and (max-width: 600px) {
     .login-form {

@@ -3,11 +3,13 @@ import Swal from 'sweetalert2';
 import Api from '../Api'
 import Form from 'react-bootstrap/Form';
 import { BsPlusCircle, BsTrash } from 'react-icons/bs';
+import { TbPencil } from 'react-icons/tb'
 import { NavLink, Link } from 'react-router-dom';
 import { Pagination } from '@mui/material'
 import SessionContext from '../session/SessionContext';
 import CenterSelect from './CenterSelect';
 import Spinner from 'react-bootstrap/Spinner'
+
 
 function StudentsTable() {
 
@@ -60,6 +62,7 @@ function StudentsTable() {
   };
 
   useEffect(() => {
+    console.log(centers);
     getStudentsByCenter(center_id, page)
   }, [])
 
@@ -68,7 +71,7 @@ function StudentsTable() {
     setCenter_id(center_id)
     getStudentsByCenter(center_id, 1)
   }
-  
+
   return (
     <div>
       {students ?
@@ -76,17 +79,17 @@ function StudentsTable() {
           <div>
             <div className='d-flex justify-content-between'>
               <Link className='text-decoration-none text-white' to='/addstudent'>
-                <button type="button" className="btn btn-dark mb-3 d-flex align-items-center">
+                <button type="button" className="btn btn-success mb-3 d-flex align-items-center">
                   <BsPlusCircle className='text-white' />
-                  <span className='px-2'>
+                  <span className='px-2 text-center'>
                     اضافة طالب جديد
                   </span>
                 </button>
               </Link>
 
-              <CenterSelect fromstudent={true} data={data} />
+              <CenterSelect fromstudent={true} data={data} c_id={center_id} />
             </div>
-            <table className="table table-dark table-responsive table-hover">
+            <table className="table table-dark table-responsive table-hover text-center">
               <thead>
                 <tr>
                   <th scope="col">الاسم</th>
@@ -96,12 +99,16 @@ function StudentsTable() {
                   <th scope="col">اجراءات</th>
                 </tr>
               </thead>
-              {loading ? <tbody>
-                <td colSpan={2}></td>
-                <td>
-                  <Spinner animation="border" variant="primary" />
-                </td>
-              </tbody> :
+              {loading ?
+                <tbody>
+                  <tr>
+                    <td colSpan={2}></td>
+                    <td>
+                      <Spinner animation="border" variant="primary" />
+                    </td>
+                    <td colSpan={2}></td>
+                  </tr>
+                </tbody> :
                 <tbody>
                   {students?.map(student =>
                     <tr key={student.id}>
@@ -109,9 +116,14 @@ function StudentsTable() {
                       <td>{student.nationality}</td>
                       <td>{student.phone_number}</td>
                       <td>{student.skills}</td>
-                      <td>
-                        <span onClick={() => deleteStudent(student.id)}>
+
+                      <td className='d-flex'>
+                        <span className='mx-2' onClick={() => deleteStudent(student.id)}>
                           <BsTrash />
+                        </span>
+
+                        <span>
+                          <TbPencil />
                         </span>
                       </td>
                     </tr>

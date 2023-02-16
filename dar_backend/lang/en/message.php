@@ -21,12 +21,25 @@ return [
     'phone_number_required' => 'يرجي ادخال رقم الهاتف',
     'user_added'            => 'تم اضافة مستخدم جديد',
     'bad_creds'             => 'خطأ في ادخال المستخدم او كلمة السر',
+    'teacher_unauthorized'  => 'خطأ في الادخال',
+    'teacher_updated'       => 'تم تحديث الاستاذ',
+    'teacher_deleted'       => 'تم حذف الاستاذ بنجاح',
+    'cant_delete'           => 'لا يمكن حذف استاذ ملحق بتلاميذ',
 
     //CENTERS
     'center_added'          => 'تم اضافة المركز بنجاح',
+    'center_updated'        => 'تم تعديل المركز',
     'center_deleted'        => 'تم حذف المركز',
+    'center_cannot_deleted' => 'لا يمكنك حذف هذا المعهد',
 
     //Sessions
     'session_added' => 'تم اضافة الحصة',
-    'session_exist' => 'هذه الحصة موجودة'
+    'session_exist' => 'هذه الحصة موجودة',
+    'session_deleted' => 'تم حذف الحصة ',
+
+    //Ring
+    'ring_added' => 'تم اضافة الحلقة ',
+    'ring_updated' => 'تم تحديث الحلقة',
+    'ring_deleted' => 'تم حذف الحلقة ',
+    'cant_delete' => 'لا يمكن حذف الحلقة لان فيها طلاب'
 ];

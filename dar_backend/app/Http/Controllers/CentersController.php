@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Centers;
+use App\Models\Students_Centers_Teachers;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -64,13 +65,13 @@ class CentersController extends Controller
      */
     public function show($id)
     {
-        try{
-            $center = Centers::find($id)->first();
+        try {
+            $center = Centers::select('location','name','id')->find($id);
             return response([
                 'data' => $center,
                 'success' => true
             ]);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return response($e->getMessage());
         }
     }
@@ -82,8 +83,8 @@ class CentersController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {
-        //
+    { 
+
     }
 
     /**
@@ -95,7 +96,19 @@ class CentersController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $center = Centers::find($id);
+        if ($center) {
+            if ($request->name && $request->location) { 
+                $center->update([
+                   'name' => $request->name,
+                   'location' => $request->location
+                ]);
+                return response([
+                    'message' => __('message.center_updated'),
+                    'success' => true
+                ]);
+            }
+        }
     }
 
     /**
@@ -108,20 +121,23 @@ class CentersController extends Controller
     {
         try {
             $center =  Centers::find($id);
-            //    return $center;
-            if ($center) {
-                $center->update(['is_deleted' => 1]);
+            $checkcenter = Students_Centers_Teachers::where('center_id', $center['id'])->get();
+            if (!$checkcenter) {
+                if ($center) {
+                    $center->update(['is_deleted' => 1]);
+                    return response([
+                        'message' => __('message.center_deleted'),
+                        'success' => true
+                    ]);
+                }
+            } else {
                 return response([
-                    'message' => __('message.center_deleted'),
-                    'success' => true
+                    'message' => __('message.center_cannot_deleted'),
+                    'success' => false
                 ]);
             }
         } catch (Exception $e) {
             return response($e->getMessage());
         }
     }
-
-    // public function studentsbycenter(){
-    //     return Centers::with('teacher')->get();
-    // }
 }

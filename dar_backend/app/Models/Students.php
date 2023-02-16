@@ -26,6 +26,10 @@ class Students extends Model
         'gender',
         'nationality',
         'current_job',
+        'mother_work',
+        'father_work',
+        'father_number',
+        'mother_number',
         'phone_number',
         'work_number',
         'home_number',
@@ -35,7 +39,11 @@ class Students extends Model
         'sheikh_names',
         'memorizing',
         'female_question',
-        'has_ijaza'
+        'has_ijaza',
+        'address',
+        'rate',
+        'skills',
+        'notes'
     ];
 
     public function teachers()

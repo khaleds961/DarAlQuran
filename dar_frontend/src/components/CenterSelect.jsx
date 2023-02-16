@@ -2,15 +2,14 @@ import React, { useState, useContext, useEffect } from 'react'
 import Api from '../Api'
 import SessionContext from '../session/SessionContext';
 
-function CenterSelect({ center_id, fromstudent = false,data }) {
+function CenterSelect({ center_id, fromstudent = false, data, c_id }) {
 
     const { session: { user: { role_id } } } = useContext(SessionContext);
     const [allcenters, setAllCenters] = useState([]);
 
-
+    console.log(c_id,'c_iddd');
     useEffect(() => {
         getCenters()
-        console.log(fromstudent, 'fromstudent');
     }, [])
 
     const getCenters = () => {
@@ -31,9 +30,9 @@ function CenterSelect({ center_id, fromstudent = false,data }) {
                     {!fromstudent ?
                         <>
                             <label htmlFor="">المراكز المتاحة</label>
-                            <div className='form-group col-md-6 my-2'>
-                                <select className="form-control col-md-6 my-2" defaultValue={0} onChange={(e) => center_id(e.target.value)}>
-                                    <option disabled="disabled" value='0'>اختر احد المراكز</option>
+                            <div>
+                                <select className="form-control col my-2" value={c_id} onChange={(e) => center_id(e.target.value)}>
+                                    <option disabled="disabled" value={0}>اختر احد المراكز</option>
                                     {allcenters ? allcenters.map((center) =>
                                         <option key={center.id} value={center.id}>{center.name}</option>) :
                                         'تحميل ...'}
@@ -42,8 +41,8 @@ function CenterSelect({ center_id, fromstudent = false,data }) {
                         </>
                         :
                         <div>
-                            <select className="btn btn-dark mb-3 px-2" defaultValue={0} onChange={(e) => data(e.target.value)}>
-                                <option disabled="disabled" value='0'>اختر احد المراكز</option>
+                            <select className="btn bg-white text-dark mb-3 px-2" value={c_id} onChange={(e) => data(e.target.value)}>
+                                <option disabled="disabled" value={0}>اختر احد المراكز</option>
                                 {allcenters ? allcenters.map((center) =>
                                     <option key={center.id} value={center.id}>{center.name}</option>) :
                                     'تحميل ...'}

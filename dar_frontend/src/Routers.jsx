@@ -13,6 +13,9 @@ import Missing from './components/Missing';
 import Teachers from './pages/Teachers';
 import AddStudent from './pages/AddStudent';
 import QuranSession from './pages/QuranSession';
+import AddReciteRevision from './components/AddReciteRevision';
+import EditTeacher from './components/EditTeacher';
+import RingPage from './pages/RingPage'
 
 
 
@@ -57,11 +60,18 @@ export default function () {
 
         <Route element={<RequireAuth allowedRoles={[ROLES.supervisor, ROLES.teacher,ROLES.superadmin]} />}>
           <Route path="sessions" element={<QuranSession/>} />
+          <Route path="addrecite/:id" element={<AddReciteRevision/>} />
+        </Route>
+
+        <Route element={<RequireAuth allowedRoles={[ROLES.supervisor, ROLES.teacher,ROLES.superadmin]} />}>
+          <Route path="rings" element={<RingPage/>} />
+          {/* <Route path="addrecite/:id" element={<AddReciteRevision/>} /> */}
         </Route>
 
         <Route element={<RequireAuth allowedRoles={[ROLES.superadmin, ROLES.manager, ROLES.supervisor]} />}>
           <Route path="teachers" element={<Teachers />} />
-        </Route>
+          <Route path="editteacher/:teacher_id" element={<EditTeacher />} />
+        </Route>  
 
         {/* catch all */}
         <Route path="*" element={<Missing />} />

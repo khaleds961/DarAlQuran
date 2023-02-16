@@ -20,7 +20,7 @@ class Centers extends Model
         return $this->belongsToMany(Users::class, 'students_centers_teachers', 'center_id', 'user_id')
             ->where('role_id', 4)
             ->where('users.is_deleted', 0)
-            ->distinct();
+            ->groupBy('id');
     }
 
     public function students()

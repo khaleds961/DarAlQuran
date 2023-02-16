@@ -8,7 +8,7 @@ function Centers() {
       <div className="row flex-nowrap">
         <SideBar />
         <div className="col py-3" style={{background:'#EEEEEE'}}>
-        <h3 className='mb-5'>المراكز</h3>
+        <h3 className='mb-5 text-center'>المراكز</h3>
         <CenterTable/>
         </div>
       </div>
