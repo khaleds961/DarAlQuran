@@ -41,5 +41,8 @@ return [
     'ring_added' => 'تم اضافة الحلقة ',
     'ring_updated' => 'تم تحديث الحلقة',
     'ring_deleted' => 'تم حذف الحلقة ',
-    'cant_delete' => 'لا يمكن حذف الحلقة لان فيها طلاب'
+    'cant_delete' => 'لا يمكن حذف الحلقة لان فيها طلاب',
+    
+    //Revision 
+    'revision_added' => 'تمت الاضافة',
 ];

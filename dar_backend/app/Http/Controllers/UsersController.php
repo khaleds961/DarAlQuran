@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Centers;
+use App\Models\Students;
 use App\Models\Students_Centers_Teachers;
 use App\Models\Users;
 use Exception;
@@ -81,7 +82,10 @@ class UsersController extends Controller
             ->where('user_id', $user_id)->get();
         // return $check_teacher;
         if (count($check_teacher) > 0) {
-            $teacher = Users::find($user_id);
+            $teacher = Users::join('students_centers_teachers', 'students_centers_teachers.user_id', '=', 'users.id')
+                ->where('user_id', $user_id)
+                ->select('users.*', 'students_centers_teachers.center_id as center_id')
+                ->first();
             return response([
                 'data' => $teacher,
                 'success' => true
@@ -98,7 +102,10 @@ class UsersController extends Controller
     public function getteacherbyid(Request $request, $user_id)
     {
         try {
-            $teacher = Users::find($user_id);
+            $teacher = Users::join('students_centers_teachers', 'students_centers_teachers.user_id', '=', 'users.id')
+                ->where('user_id', $user_id)
+                ->select('users.*', 'students_centers_teachers.center_id as center_id')
+                ->first();
             return response([
                 'data' => $teacher,
                 'success' => true
@@ -145,14 +152,14 @@ class UsersController extends Controller
             $check_teacher = Students_Centers_Teachers::where('user_id', $id)
                 ->whereNotNull('student_id')
                 ->select('student_id')->get();
-            if(count($check_teacher)> 0){
+            if (count($check_teacher) > 0) {
                 return response([
                     'message' => __('message.cant_delete'),
                     'success' => false
                 ]);
-            }else{
+            } else {
                 $teacher = Users::find($id);
-                if($teacher){
+                if ($teacher) {
                     $teacher->delete();
                 }
                 return response([
@@ -333,9 +340,9 @@ class UsersController extends Controller
     public function getAllTeachersByCenter($center_id)
     {
         try {
-            if($center_id != 0 ){
-            $center = Centers::find($center_id);
-            $teachers = $center->teachers()->get();
+            if ($center_id != 0) {
+                $center = Centers::find($center_id);
+                $teachers = $center->teachers()->get();
             }
             return response([
                 'data' => $teachers,
@@ -350,10 +357,6 @@ class UsersController extends Controller
     public function getTeachersByCenter($center_id)
     {
         if ($center_id != 0) {
-            // $center = Centers::find($center_id);
-            // $data = $center::with('teachers')
-            //     ->paginate(10);
-            // $data = $this->paginate($teachers);
             $data = Users::join('students_centers_teachers', 'students_centers_teachers.user_id', '=', 'users.id')
                 ->join('centers', 'centers.id', '=', 'students_centers_teachers.center_id')
                 ->select(
@@ -392,5 +395,25 @@ class UsersController extends Controller
             'data' => $data,
             'success' => true
         ]);
+    }
+
+    public function counting()
+    {
+        try {
+            $centers = Centers::where('is_deleted', 0)->count();
+            $students = Students::where('is_deleted', 0)->count();
+            $teachers = Users::where('is_deleted', 0)->where('role_id', 4)->count();
+            $count = [
+                'centers' => $centers,
+                'students' => $students,
+                'teachers' => $teachers
+            ];
+            return response([
+                'data' => $count,
+                'success' => true
+            ]);
+        } catch (Exception $e) {
+            return response($e);
+        }
     }
 }

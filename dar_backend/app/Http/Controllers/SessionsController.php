@@ -103,6 +103,91 @@ class SessionsController extends Controller
         }
     }
 
+    public function getsessionsbystcente($ct_st_te)
+    {
+        $sessions = Sessions::join('revisions', 'revisions.session_id', '=', 'quran_sessions.id')
+            ->where('quran_sessions.center_student_teacher_id', $ct_st_te)
+            ->select(
+                'quran_sessions.*',
+                'revisions.id as revision_id',
+                'revisions.surah_from',
+                'revisions.surah_to',
+                'revisions.notes',
+                'revisions.created_at  as rivison_date',
+                'revisions.type',
+                'revisions.ayyah_from',
+                'revisions.ayyah_to',
+                'revisions.riwayahname'
+            )
+            ->paginate(10);
+        return response([
+            'data' => $sessions,
+            'success' => true
+        ]);
+    }
+
+    public function getsessionsbyteacher($center_id, $teacher_id)
+    {
+        try {
+            $sessions = Sessions::join('students_centers_teachers', 'students_centers_teachers.id', '=', 'quran_sessions.center_student_teacher_id')
+                ->join('centers', 'centers.id', '=', 'students_centers_teachers.center_id')
+                ->join('users', 'users.id', '=', 'students_centers_teachers.user_id')
+                ->join('students', 'students.id', '=', 'students_centers_teachers.student_id')
+                ->select(
+                    'students_centers_teachers.id',
+                    'users.id as teacher_id',
+                    'users.first_name as teacher_fn',
+                    'users.middle_name as teacher_mn',
+                    'users.last_name as teacher_ln',
+                    'students.id as student_id',
+                    'students.first_name as student_fn',
+                    'students.middle_name as student_mn',
+                    'students.last_name as student_ln',
+                    'centers.id as center_id',
+                )
+                // ->where('centers.id', $center_id)
+                // ->where('users.id', $teacher_id)
+                ->where(function ($query) use ($center_id, $teacher_id) {
+                    if ($center_id != 0) {
+                        $query->where('centers.id', $center_id);
+                    }
+                    if ($teacher_id != 0) {
+                        $query->where('users.id', $teacher_id);
+                    }
+                })
+                ->orderBy('student_id')
+                ->distinct()
+                ->get();
+
+            $session_arr = [];
+
+            foreach ($sessions as $session) {
+                $session_arr[] = [
+                    'session_id' => $session->id,
+                    'student_fn' => $session->student_fn,
+                    'student_mn' => $session->student_mn,
+                    'student_ln' => $session->student_ln,
+                    'teacher_fn' => $session->teacher_fn,
+                    'teacher_mn' => $session->teacher_mn,
+                    'teacher_ln' => $session->teacher_ln,
+                    'day_time'   => Sessions::where('center_student_teacher_id', $session->id)->select('weekday', 'session_time')->get()
+                ];
+            }
+
+            $data = $this->paginate($session_arr);
+
+            return response([
+                'data' => $data,
+                'success' => true
+            ]);
+        } catch (Exception $e) {
+            return response($e->getMessage());
+        }
+    }
+
+    public function getsessionsbycenter($center_id, $teacher_id)
+    { }
+
     public function paginate($items, $perPage = 10, $page = null, $options = [])
     {
         $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
@@ -216,13 +301,13 @@ class SessionsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id,$st_ce_te)
+    public function destroy($id, $st_ce_te)
     {
         try {
             $session = Sessions::find($id);
             if ($session) {
                 $session->delete();
-                $check = Sessions::where('center_student_teacher_id',$st_ce_te)->get();
+                $check = Sessions::where('center_student_teacher_id', $st_ce_te)->get();
                 return response([
                     'message' => __('message.session_deleted'),
                     'success' => true,

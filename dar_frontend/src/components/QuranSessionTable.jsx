@@ -2,21 +2,22 @@ import React, { useEffect, useState, useContext, useRef } from 'react'
 import Swal from 'sweetalert2';
 import Api from '../Api'
 import Modal from "react-bootstrap/Modal";
-import { BsPlusCircle, BsTrash } from 'react-icons/bs';
-import { TbPencil } from 'react-icons/tb';
+import { BsPlusCircle, BsTrash, BsEyeFill } from 'react-icons/bs';
 import { Pagination } from '@mui/material'
 import Spinner from 'react-bootstrap/Spinner'
 import SessionContext from '../session/SessionContext';
-import TeacherSelect from './TeacherSelect';
-import { AiOutlineEye } from 'react-icons/ai'
 import Button from 'react-bootstrap/Button';
 import Overlay from 'react-bootstrap/Overlay';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
-import { Link } from 'react-router-dom';
+import { Link, NavLink, useNavigate, useParams } from 'react-router-dom';
+import TeacherSelect from './TeacherSelect';
+import CenterSelect from './CenterSelect';
 
 
 function QuranSessionTable() {
+
+    const navigate = useNavigate()
+    const { session_id } = useParams()
 
     const { session: { user: { centers } } } = useContext(SessionContext);
     const { session: { user: { role_id } } } = useContext(SessionContext);
@@ -74,6 +75,7 @@ function QuranSessionTable() {
     const [isOpen, setIsOpen] = useState(false);
     const [teachers, setTeachers] = useState([])
     const [teacher_id, setTeacher_id] = useState(0)
+    const [filterteacher_id, setfilterteacher_id] = useState(0)
     const [students, setStudents] = useState([])
     const [student_id, setStudent_id] = useState('')
     const [time, setTime] = useState(0)
@@ -83,12 +85,15 @@ function QuranSessionTable() {
     const [day_time, setDay_time] = useState([])
     const [show, setShow] = useState(false);
     const [target, setTarget] = useState(null);
+    const [loading, setloading] = useState(true)
     const ref = useRef(null);
 
 
-    const getTeachersByCenter = () => {
-        Api.get(`getAllTeachersByCenter/${id_center}`).then(
+    const getTeachersByCenter = (center_id = 0) => {
+        setTeachers([])
+        Api.get(`getAllTeachersByCenter/${center_id}`).then(
             (res) => {
+                console.log('teacherbycenterrr', res.data)
                 setTeachers(res.data.data)
             }
         )
@@ -122,6 +127,9 @@ function QuranSessionTable() {
                 setDay(0)
                 setSelected(0)
                 getSessions(1)
+                setPage(1)
+                setfilterteacher_id(0)
+                setid_center(0)
             } else {
                 Swal.fire(res.data.message, '', 'warning')
             }
@@ -150,11 +158,13 @@ function QuranSessionTable() {
     };
 
     const getSessions = (p) => {
-
+        setloading(true)
         Api.get(`getsessions/${id_center}?page=${p}`).then(
             (res) => {
+                console.log(res.data)
                 setSessions(res.data.data.data)
                 setTotal(Math.ceil(res.data.data.total / 10))
+                setloading(false)
             }
         ).catch(function (err) { console.log(err) })
     }
@@ -165,7 +175,6 @@ function QuranSessionTable() {
     }
 
     const deleteSession = (sess_id, st_ce_te) => {
-
         Swal.fire({
             title: 'هل انت متأكد من حذف الحصة؟',
             showCancelButton: true,
@@ -201,24 +210,96 @@ function QuranSessionTable() {
             .catch(function (err) { console.log(err); })
     }
 
+    const popup = (sess_id) => {
+        Swal.fire({
+            title: 'هل تقوم باضافة مراجعة او تسميع؟',
+            showCancelButton: true,
+            cancelButtonText: 'مراجعة',
+            confirmButtonText: 'تسميع',
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                navigate(`/addrecite/${sess_id}/recite`)
+            } else {
+                navigate(`/addrecite/${sess_id}/revision`)
+            }
+        })
+    }
+
+    const getteacherid = (teacher_id) => {
+        setfilterteacher_id(teacher_id)
+    }
+
+    const getfiltercenterid = (center_id) => {
+        setid_center(center_id)
+    }
+
+    const getsessionsbyteacher = (teacher_id) => {
+        setloading(true)
+        Api.get(`getsessionsbyteacher/${id_center}/${teacher_id}`).then(
+            (res) => {
+                setSessions(res.data.data.data)
+                setloading(false)
+            }
+        ).catch(function (err) { console.log(err) })
+    }
+
     useEffect(() => {
-        getTeachersByCenter()
+        getTeachersByCenter(id_center)
         getSessions(page)
     }, [])
 
+    useEffect(() => {
+        if (filterteacher_id !== 0) {
+            getsessionsbyteacher(filterteacher_id)
+        }
+    }, [filterteacher_id])
+
+    useEffect(() => {
+        if (id_center) {
+            getTeachersByCenter(id_center)
+            getSessions(1)
+            setfilterteacher_id(0)
+        }
+    }, [id_center])
 
     return (
         <div>
-            {role_id === 3 || role_id === 4 ?
+            {role_id === 3 ?
                 <div className='d-flex justify-content-between'>
-                    <button type="button" className="btn btn-dark mb-3 d-flex align-items-center" onClick={showModal}>
+                    <button type="button" className="btn btn-dark my-2 d-flex align-items-center" onClick={showModal}>
                         <BsPlusCircle className='text-white' />
                         <span className='px-2'>
                             اضافة حصة جديدة
                         </span>
                     </button>
+                    {
+                        loading ? '' :
+                            <>
+                                <TeacherSelect teachers={teachers} teacher_id={getteacherid} tid={filterteacher_id} fromquransession={true} />
+                            </>
+                    }
+
                 </div>
-                : ''}
+                :
+                <div>
+                    <div className='d-flex flex-row-reverse'>
+                        {id_center !== 0 ?
+                            <select className="btn bg-white text-dark my-2 px-2 mx-3"
+                                value={filterteacher_id}
+                                onChange={(e) => setfilterteacher_id(e.target.value)}>
+                                <option value={0} disabled> اختر احد الاساتذة</option>
+                                {teachers ? teachers.map((teacher) =>
+                                    <option key={teacher.id} value={teacher.id}>{teacher.first_name} {teacher.middle_name} {teacher.last_name}</option>):
+                                    <option disabled> ...تحميل</option>}
+                            </select>
+                            : ''}
+                        <CenterSelect c_id={id_center} data={getfiltercenterid} fromstudent={true} />
+
+                    </div>
+
+                </div>
+            }
 
             {/* modal */}
             <Modal show={isOpen} onHide={hideModal}>
@@ -288,74 +369,86 @@ function QuranSessionTable() {
                     <button type='button' className='btn btn-dark' onClick={addSession} >اضافة</button>
                 </Modal.Footer>
             </Modal>
-            {sessions.length === 0 ? <p><b>لا يوجد اي حصة بعد</b></p> : ''}
-            {sessions.length > 0 ?
+            {loading ? <div className='mt-5 text-center'>
+                <Spinner />
+            </div> :
                 <>
-                    <table className="table table-dark table-responsive table-hover">
-                        <thead>
-                            <tr className='text-center'>
-                                <th scope="col">الطالب</th>
-                                <th scope="col">الاستاذ</th>
-                                <th scope="col">التاريخ</th>
-                            </tr>
+                    {sessions.length > 0 ?
+                        <>
+                            <table className="table table-dark table-responsive table-hover">
+                                <thead>
+                                    <tr className='text-center'>
+                                        <th scope="col">الطالب</th>
+                                        <th scope="col">الاستاذ</th>
+                                        <th scope="col">التاريخ</th>
+                                        <th scope="col">عرض الحصص</th>
+                                    </tr>
 
-                        </thead>
+                                </thead>
 
-                        <tbody>
-                            {sessions?.map(session =>
-                                <tr key={session.session_id} className='text-center'>
-                                    <td>{session.student_fn} {session.student_mn} {session.student_ln}</td>
-                                    <td>{session.teacher_fn} {session.teacher_mn} {session.teacher_ln}</td>
+                                <tbody>
+                                    {sessions?.map(session =>
+                                        <tr key={session.session_id} className='text-center'>
+                                            <td>{session.student_fn} {session.student_mn} {session.student_ln}</td>
+                                            <td>{session.teacher_fn} {session.teacher_mn} {session.teacher_ln}</td>
+                                            <td>
+                                                <div ref={ref}>
 
-                                    <td>
-                                        <div ref={ref}>
-                                            <Button variant="success" onClick={(e) => handleClick(e, session.session_id)}>اضغط هنا</Button>
+                                                    <Button variant="success" onClick={(e) => handleClick(e, session.session_id)}>اضغط هنا</Button>
 
-                                            <Overlay
-                                                show={show}
-                                                target={target}
-                                                placement="bottom"
-                                                container={ref}
-                                                containerPadding={20}
-                                            >
-                                                <Popover id="popover-contained">
-                                                    <Popover.Body>
-                                                        <table className='table'>
-                                                            <tbody>
-                                                                {day_time.length > 0 ? day_time.map((dt) =>
-                                                                    <tr key={dt.id}>
-                                                                        <td><Link to={`/addrecite/${dt.id}`}>{dt.weekday}</Link></td>
-                                                                        <td>{dt.session_time}</td>
-                                                                        <td>
-                                                                            <span className='cursor_pointer mx-2' onClick={() => deleteSession(dt.id, dt.center_student_teacher_id)}>
-                                                                                <BsTrash />
-                                                                            </span>
-                                                                        </td>
-                                                                    </tr>
-                                                                ) : <tr><td>تحميل...</td></tr>}
-                                                            </tbody>
-                                                        </table>
-                                                    </Popover.Body>
-                                                </Popover>
-                                            </Overlay>
-                                        </div>
-                                    </td>
+                                                    <Overlay
+                                                        show={show}
+                                                        target={target}
+                                                        placement="bottom"
+                                                        container={ref}
+                                                        containerPadding={20}
+                                                    >
+                                                        <Popover id="popover-contained">
+                                                            <Popover.Body>
+                                                                <table className='table table-responsive'>
+                                                                    <tbody>
+                                                                        {day_time.length > 0 ? day_time.map((dt) =>
+                                                                            <tr key={dt.id}>
+                                                                                <td><Link onClick={() => popup(dt.id)}>{dt.weekday}</Link></td>
+                                                                                <td>{dt.session_time}</td>
+                                                                                <td>
+                                                                                    <span className='cursor_pointer mx-2' onClick={() => deleteSession(dt.id, dt.center_student_teacher_id)}>
+                                                                                        <BsTrash />
+                                                                                    </span>
+                                                                                </td>
+                                                                            </tr>
+                                                                        ) : <tr><td>تحميل...</td></tr>}
+                                                                    </tbody>
+                                                                </table>
+                                                            </Popover.Body>
+                                                        </Popover>
+                                                    </Overlay>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <NavLink to={`/showsessions/${session.session_id}`} className='text-white'>
+                                                    <span className=''>
+                                                        <BsEyeFill />
+                                                    </span>
+                                                </NavLink>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
 
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-
-                    <Pagination
-                        shape="rounded"
-                        count={total}
-                        page={page}
-                        size="small"
-                        onChange={changePage}
-                        variant="outlined"
-                    />
+                            <Pagination
+                                shape="rounded"
+                                count={total}
+                                page={page}
+                                size="small"
+                                onChange={changePage}
+                                variant="outlined"
+                            />
+                        </>
+                        : <p><b>لا يوجد اي حصة بعد</b></p>
+                    }
                 </>
-                : <p><b>تحميل ...</b></p>
             }
         </div>
     )

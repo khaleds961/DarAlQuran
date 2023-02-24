@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CentersController;
+use App\Http\Controllers\RevisonsController;
 use App\Http\Controllers\RingsController;
 use App\Http\Controllers\SessionsController;
 use App\Http\Controllers\StudentsController;
@@ -36,6 +37,7 @@ Route::get('/checkteacher/{center_id}/{user_id}',[UsersController::class,'checkt
 Route::get('/getteacherbyid/{user_id}',[UsersController::class,'getteacherbyid']);
 Route::post('/editteacherbyid/{user_id}',[UsersController::class,'update']);
 Route::delete('/deleteteacher/{teacher_id}',[UsersController::class,'destroy']);
+Route::get('/counting',[UsersController::class,'counting']);
 
 //STUDENTS
 Route::get('/getAllStudents',[StudentsController::class,'index']);
@@ -58,6 +60,8 @@ Route::get('/getsessions/{center_id}',[SessionsController::class,'index']);
 Route::post('/addsession',[SessionsController::class,'store']);
 Route::delete('/deletesession/{id}/{st_ce_te}',[SessionsController::class,'destroy']);
 Route::get('/getsessionsbyid/{id}',[SessionsController::class,'getSessionsById']);
+Route::get('/getsessionsbystcente/{id}',[SessionsController::class,'getsessionsbystcente']);
+Route::get('/getsessionsbyteacher/{center_id}/{teacher_id}',[SessionsController::class,'getsessionsbyteacher']);
 
 //Ring
 Route::get('/getrings/{center_id}',[RingsController::class,'index']);
@@ -67,3 +71,6 @@ Route::post('/addring',[RingsController::class,'store']);
 Route::post('/editring/{id}',[RingsController::class,'update']);
 Route::delete('/deletering/{id}',[RingsController::class,'destroy']);
 // Route::get('/getsessionsbyid/{id}',[SessionsController::class,'getSessionsById']);
+
+//Revision
+Route::post('/addrevision',[RevisonsController::class,'store']);

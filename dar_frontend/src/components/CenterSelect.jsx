@@ -6,8 +6,9 @@ function CenterSelect({ center_id, fromstudent = false, data, c_id }) {
 
     const { session: { user: { role_id } } } = useContext(SessionContext);
     const [allcenters, setAllCenters] = useState([]);
+    
+    console.log(c_id,'la la la la')
 
-    console.log(c_id,'c_iddd');
     useEffect(() => {
         getCenters()
     }, [])
@@ -41,7 +42,7 @@ function CenterSelect({ center_id, fromstudent = false, data, c_id }) {
                         </>
                         :
                         <div>
-                            <select className="btn bg-white text-dark mb-3 px-2" value={c_id} onChange={(e) => data(e.target.value)}>
+                            <select className="btn bg-white text-dark my-2 px-2" value={c_id} onChange={(e) => data(e.target.value)}>
                                 <option disabled="disabled" value={0}>اختر احد المراكز</option>
                                 {allcenters ? allcenters.map((center) =>
                                     <option key={center.id} value={center.id}>{center.name}</option>) :

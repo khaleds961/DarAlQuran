@@ -20,10 +20,11 @@ class RingsController extends Controller
             if ($center_id == 0) {
                 $rings = Rings::join('users', 'users.id', '=', 'rings.teacher_id')
                     ->join('centers', 'centers.id', '=', 'rings.center_id')
-                    ->where('is_active', 1)
                     ->select(
                         'rings.id',
                         'rings.name',
+                        'rings.is_active',
+                        'rings.created_at',
                         'users.id as teacher_id',
                         'users.first_name as teacher_fn',
                         'users.middle_name as teacher_mn',
@@ -35,11 +36,12 @@ class RingsController extends Controller
             } else {
                 $rings = Rings::join('users', 'users.id', '=', 'rings.teacher_id')
                     ->join('centers', 'centers.id', '=', 'rings.center_id')
-                    ->where('is_active', 1)
                     ->where('center_id', $center_id)
                     ->select(
                         'rings.id',
                         'rings.name',
+                        'rings.is_active',
+                        'rings.created_at', 
                         'users.id as teacher_id',
                         'users.first_name as teacher_fn',
                         'users.middle_name as teacher_mn',
@@ -155,7 +157,7 @@ class RingsController extends Controller
             if ($ring) {
                 $ring->name = $request->name;
                 // $ring->center_id = $request->center_id;
-                // $ring->teacher_id = $request->teacher_id;
+                $ring->teacher_id = $request->teacher_id;
                 $ring->is_active = $request->is_active;
                 // $check_student = Students::where('ring_id',$id)
                 // ->where('is_ring',1)

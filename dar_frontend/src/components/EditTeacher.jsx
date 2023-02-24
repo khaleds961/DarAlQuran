@@ -3,7 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import Api from '../Api'
 import SessionContext from '../session/SessionContext'
+import CenterSelect from './CenterSelect'
 import SideBar from './SideBar'
+import { Spinner } from 'react-bootstrap'
 
 
 export default function EditTeacher() {
@@ -20,6 +22,8 @@ export default function EditTeacher() {
     const [newusername, setnewusername] = useState('')
     const [newpassword, setnewpassword] = useState('')
     const [newphone_number, setnewphone_number] = useState('')
+    const [newcenterid, setnewcenterid] = useState(0)
+    const [loading, setLoading] = useState(true)
 
 
     const checkteacher = () => {
@@ -35,6 +39,8 @@ export default function EditTeacher() {
                         setnewusername(res.data.data.username)
                         setnewpassword(res.data.data.password)
                         setnewphone_number(res.data.data.phone_number)
+                        setnewcenterid(res.data.data.center_id)
+                        setLoading(false)
                     } else {
                         Swal.fire(res.data.message, '', 'warning')
                         navigate('/teachers')
@@ -51,6 +57,8 @@ export default function EditTeacher() {
                     setnewusername(res.data.data.username)
                     setnewpassword(res.data.data.password)
                     setnewphone_number(res.data.data.phone_number)
+                    setnewcenterid(res.data.data.center_id)
+                    setLoading(false)
                 }
             ).catch(function (err) { console.log(err) })
         }
@@ -59,6 +67,7 @@ export default function EditTeacher() {
     const goback = () => {
         navigate('/teachers')
     }
+
     const editTeacher = (teacher_id) => {
         console.log(newphone_number)
         Api.post(`/editteacherbyid/${teacher_id}`, {
@@ -70,14 +79,18 @@ export default function EditTeacher() {
             phone_number: newphone_number
         }).then((res) => {
             console.log(res)
-            if(res.data.success){
+            if (res.data.success) {
                 console.log(res.data.message)
                 Swal.fire(res.data.message, '', 'success')
                 checkteacher()
             }
         }
-            
+
         )
+    }
+
+    const getnewcenterid = (center_id) =>{
+        setnewcenterid(center_id)
     }
 
     useEffect(() => {
@@ -89,66 +102,75 @@ export default function EditTeacher() {
         <div className="container-fluid rtl">
             <div className="row flex-nowrap">
                 <SideBar />
-                <div className="col py-3" style={{ background: '#EEEEEE' }}>
-                    <h3 className='mb-5 text-center'>تعديل الاستاذ</h3>
+                {loading ?
+                    <div className="col py-3" style={{ background: '#EEEEEE' }}>
+                        <div className='text-center mt-5'>
+                            <Spinner />
+                        </div>
+                    </div> :
+                    <div className="col py-3" style={{ background: '#EEEEEE' }}>
+                        <h3 className='mb-5 text-center'>تعديل الاستاذ</h3>
 
-                    <div className='container' style={{ width: '80%' }}>
+                        <div className='container' style={{ width: '80%' }}>
 
-                        <div className="form-group row">
-                            <div className='col'>
-                                <label className='my-2'>الاسم الاول</label>
-                                <input type="text" className="form-control item" defaultValue={newfirst_name}
-                                    onChange={(e) => setnewfirst_name(e.target.value)} />
+                            <div className="form-group row">
+                                <div className='col'>
+                                    <label className='my-2'>الاسم الاول</label>
+                                    <input type="text" className="form-control item" defaultValue={newfirst_name}
+                                        onChange={(e) => setnewfirst_name(e.target.value)} />
+                                </div>
+                            </div>
+
+                            <div className="form-group row">
+                                <div className='col'>
+                                    <label className='my-2'>الاسم الاوسط</label>
+                                    <input type="text" className="form-control item" defaultValue={newmiddle_name}
+                                        onChange={(e) => setnewmiddle_name(e.target.value)} />
+                                </div>
+                            </div>
+
+                            <div className="form-group row">
+                                <div className='col'>
+                                    <label className='my-2'>الاسم الاخير</label>
+                                    <input type="text" className="form-control item" defaultValue={newlast_name}
+                                        onChange={(e) => setnewlast_name(e.target.value)} />
+                                </div>
+                            </div>
+
+                            <div className="form-group row">
+                                <div className='col'>
+                                    <label className='my-2'>رقم الهاتف</label>
+                                    <input type="text" className="form-control item" defaultValue={newphone_number}
+                                        onChange={(e) => setnewphone_number(e.target.value)} />
+                                </div>
+                            </div>
+
+                            <div className="form-group row">
+                                <div className='col'>
+                                    <label className='my-2'>اسم المستخدم</label>
+                                    <input type="text" className="form-control item" defaultValue={newusername}
+                                        onChange={(e) => setnewusername(e.target.value)} />
+                                </div>
+                            </div>
+
+                            <div className="form-group row">
+                                <div className='col'>
+                                    <label className='my-2'>كلمة السر</label>
+                                    <input type="text" className="form-control item" defaultValue={newpassword}
+                                        onChange={(e) => setnewpassword(e.target.value)} />
+                                </div>
+                            </div>
+
+                            <CenterSelect c_id={newcenterid} center_id={getnewcenterid}/>
+
+                            <div>
+                                <button className='btn btn-success mt-3 px-3' onClick={() => editTeacher(teacher.id)}>تعديل</button>
+                                <button className='btn btn-dark mt-3 px-3 mx-2' onClick={() => goback()}>الغاء</button>
                             </div>
                         </div>
 
-                        <div className="form-group row">
-                            <div className='col'>
-                                <label className='my-2'>الاسم الاوسط</label>
-                                <input type="text" className="form-control item" defaultValue={newmiddle_name}
-                                    onChange={(e) => setnewmiddle_name(e.target.value)} />
-                            </div>
-                        </div>
-
-                        <div className="form-group row">
-                            <div className='col'>
-                                <label className='my-2'>الاسم الاخير</label>
-                                <input type="text" className="form-control item" defaultValue={newlast_name}
-                                    onChange={(e) => setnewlast_name(e.target.value)} />
-                            </div>
-                        </div>
-
-                        <div className="form-group row">
-                            <div className='col'>
-                                <label className='my-2'>رقم الهاتف</label>
-                                <input type="text" className="form-control item" defaultValue={newphone_number}
-                                onChange={(e)=>setnewphone_number(e.target.value)} />
-                            </div>
-                        </div>
-
-                        <div className="form-group row">
-                            <div className='col'>
-                                <label className='my-2'>اسم المستخدم</label>
-                                <input type="text" className="form-control item" defaultValue={newusername}
-                                    onChange={(e) => setnewusername(e.target.value)} />
-                            </div>
-                        </div>
-
-                        <div className="form-group row">
-                            <div className='col'>
-                                <label className='my-2'>كلمة السر</label>
-                                <input type="text" className="form-control item" defaultValue={newpassword}
-                                    onChange={(e) => setnewpassword(e.target.value)} />
-                            </div>
-                        </div>
-
-                        <div>
-                            <button className='btn btn-success mt-3 px-3' onClick={() => editTeacher(teacher.id)}>تعديل</button>
-                            <button className='btn btn-dark mt-3 px-3 mx-2' onClick={() => goback()}>الغاء</button>
-                        </div>
                     </div>
-
-                </div>
+                }
 
             </div>
         </div>

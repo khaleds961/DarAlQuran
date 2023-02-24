@@ -13,10 +13,10 @@ import Missing from './components/Missing';
 import Teachers from './pages/Teachers';
 import AddStudent from './pages/AddStudent';
 import QuranSession from './pages/QuranSession';
-import AddReciteRevision from './components/AddReciteRevision';
 import EditTeacher from './components/EditTeacher';
 import RingPage from './pages/RingPage'
-
+import AddReciteRevisionPage from './pages/AddReciteRevisionPage';
+import ShowSessionsPage from './pages/ShowSessionsPage';
 
 
 
@@ -47,7 +47,7 @@ export default function () {
 
         <Route element={<RequireAuth allowedRoles={[ROLES.supervisor, ROLES.teacher, ROLES.superadmin, ROLES.manager]} />}>
           <Route path="students" element={<Students />} />
-          <Route path="addstudent" element={<AddStudent />} />
+          <Route path="addstudent/:id" element={<AddStudent />} />
         </Route>
 
         <Route element={<RequireAuth allowedRoles={[ROLES.superadmin, ROLES.manager]} />}>
@@ -60,7 +60,8 @@ export default function () {
 
         <Route element={<RequireAuth allowedRoles={[ROLES.supervisor, ROLES.teacher,ROLES.superadmin]} />}>
           <Route path="sessions" element={<QuranSession/>} />
-          <Route path="addrecite/:id" element={<AddReciteRevision/>} />
+          <Route path="showsessions/:session_id" element={<ShowSessionsPage/>} />
+          <Route path="addrecite/:id/:rev_rec" element={<AddReciteRevisionPage/>} />
         </Route>
 
         <Route element={<RequireAuth allowedRoles={[ROLES.supervisor, ROLES.teacher,ROLES.superadmin]} />}>

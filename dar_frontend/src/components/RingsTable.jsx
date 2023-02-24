@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react'
 import { Spinner } from 'react-bootstrap';
 import Modal from "react-bootstrap/Modal";
 import { BsPlusCircle, BsTrash, BsPencil } from 'react-icons/bs';
+import Moment from 'react-moment';
 import { NavLink } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import Api from '../Api'
@@ -20,6 +21,7 @@ export default function RingsTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [ringname, setringname] = useState('')
+  const [editringname, seteditringname] = useState('')
   const [rings, setrings] = useState([])
   const [ringbyid, setringbyid] = useState([])
   const [centerid, setcenterid] = useState(defaultvalue)
@@ -30,7 +32,7 @@ export default function RingsTable() {
   const [teachers, setteachers] = useState([])
   const [loading, setLoading] = useState(false)
   const [insideloading, setinsideLoading] = useState(false)
-  const [isactive,setisactive] = useState(1)
+  const [isactive, setisactive] = useState(null)
 
   const showModal = () => {
     setIsOpen(true);
@@ -99,14 +101,19 @@ export default function RingsTable() {
     setinsideLoading(true)
     Api.get(`getringbyid/${ring_id}`).then((res) => {
       setringbyid(res.data.data)
+      setisactive(res.data.data.isactive)
+      seteditringname(res.data.data.name)
+      seteditteacherid(res.data.data.teacher_id)
       setinsideLoading(false)
     })
   }
 
   const editring = (ring_id) => {
+
     Api.post(`editring/${ring_id}`, {
-      name: ringname,
-      is_active:isactive
+      name: editringname,
+      is_active: isactive,
+      teacher_id:editteacherid
     }).then((res) => {
       if (res.data.success) {
         Swal.fire(res.data.message, '', 'success')
@@ -184,6 +191,8 @@ export default function RingsTable() {
             <th scope="col">اسم الحلقة</th>
             <th scope="col">المركز</th>
             <th scope="col">الاستاذ</th>
+            <th scope="col">الحالة</th>
+            <th scope="col">التاريخ</th>
             <th scope="col">اجراءات</th>
           </tr>
         </thead>
@@ -194,7 +203,7 @@ export default function RingsTable() {
               <td>
                 <Spinner animation="border" variant="primary" />
               </td>
-              <td></td>
+              <td colSpan={3}></td>
             </tr>
             :
             rings.length > 0 ? rings.map(ring =>
@@ -202,9 +211,15 @@ export default function RingsTable() {
                 <th>{ring.name}</th>
                 <td>{ring.center_name}</td>
                 <td>{ring.teacher_fn} {ring.teacher_mn} {ring.teacher_ln}</td>
+                <td>{ring.is_active ? 'نشط' : 'غير نشط'}</td>
                 <td>
-                  <span className='cursor_pointer'
-                    onClick={() => deletering(ring.id)}><BsTrash /></span>
+                  <Moment format="YYYY/MM/DD">
+                    {ring.created_at}
+                  </Moment>
+                </td>
+                <td>
+                  {/* <span className='cursor_pointer'
+                    onClick={() => deletering(ring.id)}><BsTrash /></span> */}
                   <span className='mx-2 cursor_pointer text-white'
                     onClick={() => getringbyid(ring.id)}>
                     <BsPencil />
@@ -227,13 +242,13 @@ export default function RingsTable() {
               <label htmlFor="center_name">اسم الحلقة</label>
               <input type='text' className='form-control rtl my-2'
                 defaultValue={ringbyid['name']}
-                onChange={(e) => setringname(e.target.value)}
+                onChange={(e) => seteditringname(e.target.value)}
               ></input>
               <CenterSelect center_id={getcenteridforedit} c_id={ringbyid['center_id']} />
-              <TeacherSelect teachers={teachers} teacher_id={geteditteacherid} tid={ringbyid['teacher_id']} />
+              <TeacherSelect teachers={teachers} teacher_id={geteditteacherid} tid={editteacherid} />
 
               <label>هل ما تزال الحلقة قائمة؟</label>
-              <select className="form-control col my-2" value={isactive} onChange={(e) => setisactive(e.target.value)}>
+              <select className="form-control col my-2" defaultValue={ringbyid['is_active']} onChange={(e) => setisactive(e.target.value)}>
                 <option value={0}>لا</option>
                 <option value={1}>نعم</option>
               </select>

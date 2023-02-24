@@ -11,12 +11,13 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import CreatableSelect from 'react-select/creatable';
+import { useParams } from 'react-router-dom';
 
 
 
 export default function AddStudentForm() {
 
-
+    const {id} = useParams()
 
     const { session: { user: { role_id } } } = useContext(SessionContext);
     const { session: { user: { centers } } } = useContext(SessionContext);
@@ -94,6 +95,14 @@ export default function AddStudentForm() {
         }
     }, [center_id])
 
+    useEffect(()=>{
+        console.log(id)
+        if(id === '1'){
+            setstudent_isring('yes')
+        }else{
+            setstudent_isring('no')
+        }
+    })
 
     const components = {
         DropdownIndicator: null,
@@ -336,7 +345,7 @@ export default function AddStudentForm() {
         <>
             <div className='container' style={{ width: '80%' }}>
 
-                <div className='bg-info text-white px-4 py-2 rounded my-3'>
+                {/* <div className='bg-info text-white px-4 py-2 rounded my-3'>
 
                     <div className="col-md d-flex justify-content-between align-items-center">
                         <span>هل يتبع هذا الطالب لاحد الحلقات؟</span>
@@ -354,7 +363,7 @@ export default function AddStudentForm() {
                                 onClick={(e) => setstudent_isring(e.target.value)} />
                         </span>
                     </div>
-                </div>
+                </div> */}
 
 
                 {/* first middle last name */}
@@ -467,10 +476,10 @@ export default function AddStudentForm() {
                     gender === 'female' ?
                         <div className="col-md">
                             <label >هل لديك مانع من القراءة مع شيخ؟</label>
-                            <select className="form-control my-2" defaultValue={female_question}
+                            <select className="form-control my-2" value={female_question}
                                 onChange={(e) => setfemale_question(e.target.value)}>
-                                <option value="0">لا</option>
-                                <option value="1">نعم</option>
+                                <option value={0}>لا</option>
+                                <option value={1}>نعم</option>
                             </select>
                         </div>
                         : ''}
@@ -601,7 +610,7 @@ export default function AddStudentForm() {
                             </div>
 
                             <div className='col-md'>
-                                <label>المستوى الذي يقرأ فيه</label>
+                                <label>المستوى الذي يود ان يقرأ فيه</label>
                                 <select className="form-control my-2" value={reading_level}
                                     onChange={(e) => setreading_level(e.target.value)}>
                                     <option value="tilawa">تلاوة</option>

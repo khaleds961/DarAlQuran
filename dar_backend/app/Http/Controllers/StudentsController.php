@@ -164,9 +164,33 @@ class StudentsController extends Controller
         try {
             if ($center_id != 0) {
                 $center = Centers::find($center_id);
-                $students = $center->students()->paginate(10);
+                $students = $center->students()
+                    ->join('users', 'users.id', '=', 'students_centers_teachers.user_id')
+                    ->join('centers', 'centers.id', '=', 'students_centers_teachers.center_id')
+                    ->select(
+                        'users.id as teacher_id',
+                        'users.first_name as teacher_fn',
+                        'users.middle_name as teacher_mn',
+                        'users.last_name as teacher_ln',
+                        'centers.id as center_id',
+                        'centers.name as center_name'
+                    )
+                    ->paginate(10);
             } else {
-                $students = Students::where('is_deleted', 0)->paginate(10);
+                $students = Students::join('students_centers_teachers', 'students_centers_teachers.student_id', '=', 'students.id')
+                    ->join('centers', 'centers.id', '=', 'students_centers_teachers.center_id')
+                    ->join('users', 'users.id', '=', 'students_centers_teachers.user_id')
+                    ->select(
+                        'students.*',
+                        'users.id as teacher_id',
+                        'users.first_name as teacher_fn',
+                        'users.middle_name as teacher_mn',
+                        'users.last_name as teacher_ln',
+                        'centers.id as center_id',
+                        'centers.name as center_name'
+                    )
+                    ->where('students.is_deleted', 0)
+                    ->paginate(10);
             }
             return response([
                 'data' => $students,

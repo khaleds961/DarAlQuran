@@ -18,15 +18,19 @@ return new class extends Migration
             $table->integer('session_id');
             $table->index(['session_id', 'created_at']);
             $table->date('date')->format('Y.m.d');
-            $table->string('jizie_from');
-            $table->string('jizie_to');
+            $table->string('jizie_from')->nullable();
+            $table->string('jizie_to')->nullable();
             $table->string('surah_from');
             $table->string('surah_to');
-            $table->string('page_from');
-            $table->string('page_to');
-            $table->string('grade');
-            $table->string('notes');
+            $table->string('ayyah_from')->nullable();
+            $table->string('ayyah_to')->nullable();
+            $table->string('page_from')->nullable();
+            $table->string('page_to')->nullable();
+            $table->string('grade')->nullable();
+            $table->string('notes')->nullable();
+            $table->string('riwayahname')->nullable();
             $table->boolean('is_deleted')->default(0);
+            $table->enum('type', ['recite', 'revision']);
             $table->timestamps();
         });
     }

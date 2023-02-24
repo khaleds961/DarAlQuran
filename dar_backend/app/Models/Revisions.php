@@ -16,9 +16,13 @@ class Revisions extends Model
         'jizie_to',
         'surah_from',
         'surah_to',
+        'ayyah_from',
+        'ayyah_to',
         'page_from',
         'page_to',
         'grade',
-        'notes'
+        'notes',
+        'type',
+        'riwayahname'
     ];
 }
