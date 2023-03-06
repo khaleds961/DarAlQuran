@@ -23,6 +23,7 @@ class Revisions extends Model
         'grade',
         'notes',
         'type',
+        'absence_type',
         'riwayahname'
     ];
 }

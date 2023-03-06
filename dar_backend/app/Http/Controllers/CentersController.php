@@ -66,7 +66,7 @@ class CentersController extends Controller
     public function show($id)
     {
         try {
-            $center = Centers::select('location','name','id')->find($id);
+            $center = Centers::select('location', 'name', 'id')->find($id);
             return response([
                 'data' => $center,
                 'success' => true
@@ -83,9 +83,7 @@ class CentersController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    { 
-
-    }
+    { }
 
     /**
      * Update the specified resource in storage.
@@ -98,15 +96,18 @@ class CentersController extends Controller
     {
         $center = Centers::find($id);
         if ($center) {
-            if ($request->name && $request->location) { 
+            if ($request->name && $request->location) {
                 $center->update([
-                   'name' => $request->name,
-                   'location' => $request->location
+                    'name' => $request->name,
+                    'location' => $request->location
                 ]);
-                return response([
-                    'message' => __('message.center_updated'),
-                    'success' => true
-                ]);
+
+                if (count($center->getchanges()) > 0) {
+                    return response([
+                        'message' => __('message.center_updated'),
+                        'success' => true
+                    ]);
+                }
             }
         }
     }
@@ -122,7 +123,7 @@ class CentersController extends Controller
         try {
             $center =  Centers::find($id);
             $checkcenter = Students_Centers_Teachers::where('center_id', $center['id'])->get();
-            if (!$checkcenter) {
+            if (count($checkcenter) == 0) {
                 if ($center) {
                     $center->update(['is_deleted' => 1]);
                     return response([

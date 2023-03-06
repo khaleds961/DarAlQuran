@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Spinner } from 'react-bootstrap';
 import Modal from "react-bootstrap/Modal";
 import { BsPlusCircle, BsTrash, BsPencil } from 'react-icons/bs';
 import Swal from 'sweetalert2';
@@ -15,6 +16,8 @@ function CenterTable() {
     const [newname, setnewName] = useState('');
     const [location, setLocation] = useState('');
     const [newlocation, setnewLocation] = useState('');
+    const [loading, setloading] = useState(true)
+    const [innerloading, setinnerloading] = useState(true)
 
     const showModal = () => {
         setIsOpen(true);
@@ -72,14 +75,19 @@ function CenterTable() {
             .then(res => {
                 const response = res.data.data;
                 setCenters(response);
+                setloading(false)
             })
     }
 
     const getcenterbyid = (center_id) => {
+        setinnerloading(true)
         setCenterbyid([])
         setEditModal(true)
         Api.get(`getcenterbyid/${center_id}`).
-            then((res) => setCenterbyid(res.data.data)).
+            then((res) => {
+                setCenterbyid(res.data.data)
+                setinnerloading(false)
+            }).
             catch(function (err) { console.log(err) })
     }
 
@@ -120,8 +128,7 @@ function CenterTable() {
     return (
 
         <>
-            {centers?.length === 0 ? <p><b>لا يوجد اي مركز بعد</b></p> : ''}
-            {centers ?
+            {!loading ?
                 <div>
                     <button type="button" className="btn btn-success mb-3 d-flex align-items-center" onClick={showModal}>
                         <BsPlusCircle className='text-white' />
@@ -152,7 +159,7 @@ function CenterTable() {
                             <tr>
                                 <th scope="col">المركز</th>
                                 <th scope="col">العنوان</th>
-                                <th scope="col">اجراءات</th>
+                                <th scope="col"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -173,34 +180,39 @@ function CenterTable() {
                             )}
                             {/* here */}
                             <Modal show={editModal} onHide={hideModal}>
-                                <Modal.Body className='rtl'>
-                                    <label htmlFor="new_center_name">اسم المركز</label>
-                                    <input type='text' id="new_center_name"
-                                        name="newname"
-                                        className='form-control rtl my-2'
-                                        defaultValue={centerbyid['name']}
-                                        onChange={(e) => setnewName(e.target.value)}
-                                    ></input>
-                                    <label htmlFor="center_location_new">العنوان</label>
-                                    <input type='text' id="center_location_new"
-                                        defaultValue={centerbyid['location']}
-                                        className='form-control rtl my-2'
-                                        name='newlocation'
-                                        onChange={(e) => setnewLocation(e.target.value)}
-                                    ></input>
-                                </Modal.Body>
-                                <Modal.Footer>
-                                    <button type='button' className='btn btn-dark' onClick={hideModal}>الغاء</button>
-                                    <button type='button'
-                                        className='btn btn-success'
-                                        onClick={() => updatecenter(centerbyid['id'])} >حفظ</button>
-                                </Modal.Footer>
+                                {innerloading ? <div className='text-center'><Spinner/></div> :
+                                    <>
+                                        <Modal.Body className='rtl'>
+
+                                            <label htmlFor="new_center_name">اسم المركز</label>
+                                            <input type='text' id="new_center_name"
+                                                name="newname"
+                                                className='form-control rtl my-2'
+                                                defaultValue={centerbyid['name']}
+                                                onChange={(e) => setnewName(e.target.value)}
+                                            ></input>
+                                            <label htmlFor="center_location_new">العنوان</label>
+                                            <input type='text' id="center_location_new"
+                                                defaultValue={centerbyid['location']}
+                                                className='form-control rtl my-2'
+                                                name='newlocation'
+                                                onChange={(e) => setnewLocation(e.target.value)}
+                                            ></input>
+                                        </Modal.Body>
+                                        <Modal.Footer>
+                                            <button type='button' className='btn btn-dark' onClick={hideModal}>الغاء</button>
+                                            <button type='button'
+                                                className='btn btn-success'
+                                                onClick={() => updatecenter(centerbyid['id'])} >حفظ</button>
+                                        </Modal.Footer>
+                                    </>
+                                }
                             </Modal>
                             {/* here */}
                         </tbody>
                     </table>
                 </div>
-                : <p><b>تحميل ...</b></p>}
+                : <div className='mt-5 text-center'><Spinner /></div>}
         </>
     )
 }

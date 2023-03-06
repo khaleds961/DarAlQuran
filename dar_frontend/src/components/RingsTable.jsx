@@ -193,7 +193,7 @@ export default function RingsTable() {
             <th scope="col">الاستاذ</th>
             <th scope="col">الحالة</th>
             <th scope="col">التاريخ</th>
-            <th scope="col">اجراءات</th>
+            <th scope="col"></th>
           </tr>
         </thead>
         <tbody>

@@ -37,6 +37,8 @@ function TeachersTable() {
   const [lname_error, setLname_error] = useState('');
   const [phone_error, setPhone_error] = useState('');
   const [loading, setLoading] = useState(false);
+  const [outloading, setoutloading] = useState(true)
+  const [noteacher, setnoteacher] = useState(false)
 
 
   const changePage = (e, value) => {
@@ -89,11 +91,16 @@ function TeachersTable() {
 
   const getTeachers = (p) => {
     setLoading(true)
+    setnoteacher(false)
     Api.get(`getTeachersByCenter/${center_id}?page=${p}`).then(
       res => {
         setTeachers(res.data.data.data)
         setTotal(Math.ceil(res.data.data.total / 10))
         setLoading(false)
+        setoutloading(false)
+        if(res.data.data.data.length === 0 ){
+          setnoteacher(true)
+        }
       }
     ).catch(function (err) { console.log(err) })
   }
@@ -103,14 +110,18 @@ function TeachersTable() {
     setPage(1)
     const id_center = e.target.value;
     setCenter_id(id_center)
-    getTeachersByCenter(id_center,1)
+    getTeachersByCenter(id_center, 1)
   }
-  const getTeachersByCenter = (id_center,p) => {  
+  const getTeachersByCenter = (id_center, p) => {
+    setnoteacher(false)
     Api.get(`getTeachersByCenter/${id_center}?page=${p}`).then(
       (res) => {
         setTeachers(res.data.data.data)
         setTotal(Math.ceil(res.data.data.total / 10))
         setLoading(false)
+        if (res.data.data.data.length === 0) {
+          setnoteacher(true)
+        }
       }
     )
   }
@@ -154,9 +165,9 @@ function TeachersTable() {
 
   return (
     <div>
-      {teachers?.length === 0 ? <p><b>لا يوجد اي استاذ في هذا المركز</b></p> : ''}
+      {/*  */}
 
-      {teachers ?
+      {!outloading ?
         <div>
           <div className='d-flex justify-content-between'>
             <button type="button" className="btn btn-success mb-3 d-flex align-items-center" onClick={showModal}>
@@ -274,7 +285,7 @@ function TeachersTable() {
                 <th scope="col">الاسم</th>
                 <th scope="col">رقم الهاتف</th>
                 <th scope="col">المركز</th>
-                <th scope="col">اجراءات</th>
+                <th scope="col"></th>
               </tr>
             </thead>
             <tbody>
@@ -307,6 +318,8 @@ function TeachersTable() {
             </tbody>
           </table>
 
+          {noteacher ? <div className='m-3 text-center'><b>لا يوجد اي استاذ في هذا المركز</b></div> : ''}
+
           <Pagination
             shape="rounded"
             count={total}
@@ -315,8 +328,9 @@ function TeachersTable() {
             onChange={changePage}
             variant="outlined"
           />
+
         </div>
-        : <p><b>تحميل ...</b></p>
+        : <div className='mt-5 text-center'><Spinner /></div>
       }
     </div>
   )

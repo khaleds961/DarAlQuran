@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { FaHome, FaSchool, FaUserGraduate,FaRing } from 'react-icons/fa';
+import { FaHome, FaSchool, FaUserGraduate, FaRing } from 'react-icons/fa';
 import { BiLogOutCircle } from "react-icons/bi";
 import { ImUserTie } from "react-icons/im";
-import {MdClass} from 'react-icons/md'
+import { MdClass } from 'react-icons/md'
+import { AiFillSchedule } from 'react-icons/ai'
 import SessionContext from '../session/SessionContext';
-import Api from '../Api';
-import { fontSize } from '@mui/system';
+
 
 
 
@@ -107,7 +107,22 @@ function Navbar() {
                 <div className='my-2'>
                     <NavLink to='/sessions' className='d-none d-md-flex align-items-center text-decoration-none text-dark py-2 px-2 hover'>
                         <MdClass className='text-dark' />
-                        <span className='px-2 d-none d-md-block'>الحصص</span>
+                        <span className='px-2 d-none d-md-block'>الحصص والجلسات</span>
+                    </NavLink>
+                </div>
+
+                {/* case 1: small screen Class */}
+                <div className='text-center'>
+                    <NavLink to='/teacherschedule' className='text-decoration-none'>
+                        <AiFillSchedule className='d-xs-block d-md-none text-dark' />
+                    </NavLink>
+                </div>
+
+                {/* case 2:md page and more */}
+                <div className='my-2'>
+                    <NavLink to='/teacherschedule' className='d-none d-md-flex align-items-center text-decoration-none text-dark py-2 px-2 hover'>
+                        <AiFillSchedule className='text-dark' />
+                        <span className='px-2 d-none d-md-block'>جدول الاستاذ</span>
                     </NavLink>
                 </div>
 
@@ -137,7 +152,7 @@ function Navbar() {
                 <div className='d-none d-md-block mt-5 py-2 px-4 bg-dark text-white' onClick={logout}>
                     <NavLink className='d-flex align-items-center text-decoration-none '>
                         <BiLogOutCircle size={18} className='text-white' />
-                        <span className='px-2 text-white' style={{fontSize:'14px'}}>تسجيل الخروج</span>
+                        <span className='px-2 text-white' style={{ fontSize: '14px' }}>تسجيل الخروج</span>
                     </NavLink>
                 </div>
 

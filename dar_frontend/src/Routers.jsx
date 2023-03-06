@@ -17,6 +17,7 @@ import EditTeacher from './components/EditTeacher';
 import RingPage from './pages/RingPage'
 import AddReciteRevisionPage from './pages/AddReciteRevisionPage';
 import ShowSessionsPage from './pages/ShowSessionsPage';
+import TeacherSchedulePage from './pages/TeacherSchedulePage';
 
 
 
@@ -67,6 +68,10 @@ export default function () {
         <Route element={<RequireAuth allowedRoles={[ROLES.supervisor, ROLES.teacher,ROLES.superadmin]} />}>
           <Route path="rings" element={<RingPage/>} />
           {/* <Route path="addrecite/:id" element={<AddReciteRevision/>} /> */}
+        </Route>
+
+        <Route element={<RequireAuth allowedRoles={[ROLES.supervisor, ROLES.teacher,ROLES.superadmin]} />}>
+          <Route path="teacherschedule" element={<TeacherSchedulePage/>} />
         </Route>
 
         <Route element={<RequireAuth allowedRoles={[ROLES.superadmin, ROLES.manager, ROLES.supervisor]} />}>

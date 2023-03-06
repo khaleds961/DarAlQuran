@@ -12,7 +12,18 @@ class Sessions extends Model
     protected $fillable = [
         'center_student_teacher_id',
         'weekday',
+        'weekday_id',
         'session_time',
         'is_deleted'
     ];
+
+    public function student()
+    {
+        return $this->hasOneThrough(
+            Students::class,
+            Sessions::class,
+            'id',
+            'id'
+        );
+    }
 }

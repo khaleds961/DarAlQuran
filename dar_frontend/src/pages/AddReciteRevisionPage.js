@@ -8,7 +8,7 @@ function AddReciteRevisionPage() {
       <div className="row flex-nowrap">
         <SideBar />
         <div className="col py-3" style={{background:'#EEEEEE'}}>
-        <h3 className='mb-5 text-center'>مراجعة وتسميع</h3>
+        {/* <h3 className='mb-5 text-center'>مراجعة وتسميع</h3> */}
         <AddReciteRevision/>
         </div>
       </div>

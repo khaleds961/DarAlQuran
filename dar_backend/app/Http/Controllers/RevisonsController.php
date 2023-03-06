@@ -37,26 +37,47 @@ class RevisonsController extends Controller
     public function store(Request $request)
     {
         try {
-            if (
-                $request->session_id &&
-                $request->surah_from && $request->surah_to &&
-                $request->ayyah_from && $request->ayyah_to &&
-                $request->type
-            ) {
-                Revisions::create([
-                    'session_id' => $request->session_id,
-                    'surah_from' => $request->surah_from,
-                    'surah_to'   => $request->surah_to,
-                    'ayyah_from' => $request->ayyah_from,
-                    'ayyah_to'   => $request->ayyah_to,
-                    'notes'      => $request->notes,
-                    'type'       => $request->type,
-                    'riwayahname'  => $request->riwayahname
-                ]);
-                return response([
-                    'message' => __('message.revision_added'),
-                    'success' => true
-                ]);
+            if ($request->type == 'absence') {
+                if (
+                    $request->session_id && $request->type &&
+                    $request->date && $request->absence_type
+                ) {
+                    Revisions::create([
+                        'session_id' => $request->session_id,
+                        'notes'      => $request->notes,
+                        'type'       => $request->type,
+                        'absence_type' => $request->absence_type,
+                        'date'         => $request->date
+                    ]);
+                    return response([
+                        'message' => __('message.revision_added'),
+                        'success' => true
+                    ]);
+                }
+            } else {
+                if (
+                    $request->session_id &&
+                    $request->surah_from && $request->surah_to &&
+                    $request->ayyah_from && $request->ayyah_to &&
+                    $request->type &&
+                    $request->date
+                ) {
+                    Revisions::create([
+                        'session_id' => $request->session_id,
+                        'surah_from' => $request->surah_from,
+                        'surah_to'   => $request->surah_to,
+                        'ayyah_from' => $request->ayyah_from,
+                        'ayyah_to'   => $request->ayyah_to,
+                        'notes'      => $request->notes,
+                        'type'       => $request->type,
+                        'riwayahname'  => $request->riwayahname,
+                        'date'         => $request->date
+                    ]);
+                    return response([
+                        'message' => __('message.revision_added'),
+                        'success' => true
+                    ]);
+                }
             }
         } catch (Exception $e) {
             return response($e->getMessage());

@@ -1,20 +1,19 @@
 import React from 'react'
 import SideBar from '../components/SideBar'
-import QuranSessionTable from '../components/QuranSessionTable'
+import TeacherSchedule from '../components/TeacherSchedule'
 
-
-function QuranSession() {
+function TeacherSchedulePage() {
   return (
     <div className="container-fluid rtl">
       <div className="row flex-nowrap">
-        <SideBar />
+        <SideBar/>
         <div className="col py-3" style={{background:'#EEEEEE'}}>
-        <h3 className='mb-5 text-center'>الحصص والجلسات</h3>
-                <QuranSessionTable/>
+        <h3 className='mb-5 text-center'>الاساتذة</h3>
+        <TeacherSchedule/>
         </div>
       </div>
     </div>
   )
 }
 
-export default QuranSession
+export default TeacherSchedulePage

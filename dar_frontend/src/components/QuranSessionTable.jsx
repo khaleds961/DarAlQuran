@@ -29,18 +29,19 @@ function QuranSessionTable() {
         { 'id': 4, 'value': 'الخميس' },
         { 'id': 5, 'value': 'الجمعة' },
         { 'id': 6, 'value': 'السبت' },
+        { 'id': 7, 'value': 'الاحد' },
     ]
     const times = [
-        { 'id': 1, 'value': '4:30' },
-        { 'id': 2, 'value': '5:00' },
-        { 'id': 3, 'value': '5:30' },
-        { 'id': 4, 'value': '6:00' },
-        { 'id': 5, 'value': '6:30' },
-        { 'id': 6, 'value': '7:00' },
-        { 'id': 7, 'value': '7:30' },
-        { 'id': 8, 'value': '8:00' },
-        { 'id': 9, 'value': '8:30' },
-        { 'id': 10, 'value': '9:00' },
+        { 'id': 1, 'value': '04:30' },
+        { 'id': 2, 'value': '05:00' },
+        { 'id': 3, 'value': '05:30' },
+        { 'id': 4, 'value': '06:00' },
+        { 'id': 5, 'value': '06:30' },
+        { 'id': 6, 'value': '07:00' },
+        { 'id': 7, 'value': '07:30' },
+        { 'id': 8, 'value': '08:00' },
+        { 'id': 9, 'value': '08:30' },
+        { 'id': 10, 'value': '09:00' },
         { 'id': 11, 'value': '10:00' },
         { 'id': 12, 'value': '10:30' },
         { 'id': 13, 'value': '11:00' },
@@ -80,6 +81,7 @@ function QuranSessionTable() {
     const [student_id, setStudent_id] = useState('')
     const [time, setTime] = useState(0)
     const [day, setDay] = useState(0)
+    const [day_id, setDay_id] = useState(0)
     const [selected, setSelected] = useState(0)
     const [sessions, setSessions] = useState([])
     const [day_time, setDay_time] = useState([])
@@ -88,12 +90,16 @@ function QuranSessionTable() {
     const [loading, setloading] = useState(true)
     const ref = useRef(null);
 
+    const dayandid = (e) => {
+        var index = e.nativeEvent.target.selectedIndex;
+        setDay_id(e.target.value)
+        setDay(e.nativeEvent.target[index].text)
+    }
 
     const getTeachersByCenter = (center_id = 0) => {
         setTeachers([])
         Api.get(`getAllTeachersByCenter/${center_id}`).then(
             (res) => {
-                console.log('teacherbycenterrr', res.data)
                 setTeachers(res.data.data)
             }
         )
@@ -103,6 +109,7 @@ function QuranSessionTable() {
         setStudents([])
         setSelected(0)
         const teacher_id = e.target.value;
+
         Api.get(`getStudentsByTeacher/${id_center}/${teacher_id}`).then(
             (res) => {
                 setStudents(res.data.data)
@@ -112,12 +119,14 @@ function QuranSessionTable() {
     }
 
     const addSession = () => {
+
         Api.post('addsession', {
             center_id: id_center,
             user_id: teacher_id,
             student_id: student_id,
             time: time,
-            day: day
+            day: day,
+            day_id: day_id
         }).then((res) => {
             if (res.data.success) {
                 Swal.fire(res.data.message, '', 'success')
@@ -125,11 +134,11 @@ function QuranSessionTable() {
                 setStudent_id('')
                 setTime(0)
                 setDay(0)
+                setDay_id(0)
                 setSelected(0)
                 getSessions(1)
                 setPage(1)
                 setfilterteacher_id(0)
-                setid_center(0)
             } else {
                 Swal.fire(res.data.message, '', 'warning')
             }
@@ -161,7 +170,6 @@ function QuranSessionTable() {
         setloading(true)
         Api.get(`getsessions/${id_center}?page=${p}`).then(
             (res) => {
-                console.log(res.data)
                 setSessions(res.data.data.data)
                 setTotal(Math.ceil(res.data.data.total / 10))
                 setloading(false)
@@ -171,7 +179,11 @@ function QuranSessionTable() {
 
     const changePage = (e, value) => {
         setPage(value)
-        getSessions(value)
+        if (filterteacher_id != 0) {
+            getsessionsbyteacher(filterteacher_id,value)
+        } else {
+            getSessions(value)
+        }
     }
 
     const deleteSession = (sess_id, st_ce_te) => {
@@ -214,12 +226,16 @@ function QuranSessionTable() {
         Swal.fire({
             title: 'هل تقوم باضافة مراجعة او تسميع؟',
             showCancelButton: true,
+            showDenyButton: true,
             cancelButtonText: 'مراجعة',
             confirmButtonText: 'تسميع',
+            denyButtonText: 'غياب',
         }).then((result) => {
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
                 navigate(`/addrecite/${sess_id}/recite`)
+            } else if (result.isDenied) {
+                navigate(`/addrecite/${sess_id}/absence`)
             } else {
                 navigate(`/addrecite/${sess_id}/revision`)
             }
@@ -234,11 +250,13 @@ function QuranSessionTable() {
         setid_center(center_id)
     }
 
-    const getsessionsbyteacher = (teacher_id) => {
+    const getsessionsbyteacher = (teacher_id,p) => {
         setloading(true)
-        Api.get(`getsessionsbyteacher/${id_center}/${teacher_id}`).then(
+        Api.get(`getsessionsbyteacher/${id_center}/${teacher_id}?page=${p}`).then(
             (res) => {
+                // setPage(1)
                 setSessions(res.data.data.data)
+                setTotal(Math.ceil(res.data.data.total / 10))
                 setloading(false)
             }
         ).catch(function (err) { console.log(err) })
@@ -251,7 +269,8 @@ function QuranSessionTable() {
 
     useEffect(() => {
         if (filterteacher_id !== 0) {
-            getsessionsbyteacher(filterteacher_id)
+            getsessionsbyteacher(filterteacher_id,1)
+            setPage(1)
         }
     }, [filterteacher_id])
 
@@ -259,6 +278,7 @@ function QuranSessionTable() {
         if (id_center) {
             getTeachersByCenter(id_center)
             getSessions(1)
+            setPage(1)
             setfilterteacher_id(0)
         }
     }, [id_center])
@@ -290,12 +310,11 @@ function QuranSessionTable() {
                                 onChange={(e) => setfilterteacher_id(e.target.value)}>
                                 <option value={0} disabled> اختر احد الاساتذة</option>
                                 {teachers ? teachers.map((teacher) =>
-                                    <option key={teacher.id} value={teacher.id}>{teacher.first_name} {teacher.middle_name} {teacher.last_name}</option>):
+                                    <option key={teacher.id} value={teacher.id}>{teacher.first_name} {teacher.middle_name} {teacher.last_name}</option>) :
                                     <option disabled> ...تحميل</option>}
                             </select>
                             : ''}
                         <CenterSelect c_id={id_center} data={getfiltercenterid} fromstudent={true} />
-
                     </div>
 
                 </div>
@@ -304,8 +323,7 @@ function QuranSessionTable() {
             {/* modal */}
             <Modal show={isOpen} onHide={hideModal}>
                 <Modal.Body className='rtl'>
-
-                    <div >
+                    <div>
                         <label >الاستاذ</label>
                         <select className='form-control mb-3' value={teacher_id} onChange={callStudents}>
                             <option disabled value='0'>اختر احد الاساتذة</option>
@@ -336,12 +354,12 @@ function QuranSessionTable() {
                             </>}
 
                         <label htmlFor="">اليوم</label>
-                        <select className='form-control mb-3' value={day}
-                            onChange={(e) => setDay(e.target.value)}>
+                        <select className='form-control mb-3' value={day_id}
+                            onChange={(e) => dayandid(e)}>
                             <option disabled="disabled" value='0'>اختر احد ايام الاسبوع</option>
                             {days ?
                                 days.map((day) =>
-                                    <option key={day.id} value={day.value}>{day.value}</option>
+                                    <option key={day.id} value={day.id}>{day.value}</option>
                                 )
                                 :
                                 <option>تحميل...</option>
@@ -381,7 +399,7 @@ function QuranSessionTable() {
                                         <th scope="col">الطالب</th>
                                         <th scope="col">الاستاذ</th>
                                         <th scope="col">التاريخ</th>
-                                        <th scope="col">عرض الحصص</th>
+                                        <th scope="col">عرض الجدول</th>
                                     </tr>
 
                                 </thead>
@@ -394,7 +412,7 @@ function QuranSessionTable() {
                                             <td>
                                                 <div ref={ref}>
 
-                                                    <Button variant="success" onClick={(e) => handleClick(e, session.session_id)}>اضغط هنا</Button>
+                                                    <Button variant="success" onClick={(e) => handleClick(e, session.session_id)}>جلسة</Button>
 
                                                     <Overlay
                                                         show={show}
@@ -409,12 +427,18 @@ function QuranSessionTable() {
                                                                     <tbody>
                                                                         {day_time.length > 0 ? day_time.map((dt) =>
                                                                             <tr key={dt.id}>
-                                                                                <td><Link onClick={() => popup(dt.id)}>{dt.weekday}</Link></td>
+                                                                                <td>{dt.weekday}</td>
                                                                                 <td>{dt.session_time}</td>
                                                                                 <td>
                                                                                     <span className='cursor_pointer mx-2' onClick={() => deleteSession(dt.id, dt.center_student_teacher_id)}>
                                                                                         <BsTrash />
                                                                                     </span>
+
+                                                                                    <Link onClick={() => popup(dt.id)}>
+                                                                                        <span className='cursor_pointer mx-2'>
+                                                                                            <BsPlusCircle />
+                                                                                        </span>
+                                                                                    </Link>
                                                                                 </td>
                                                                             </tr>
                                                                         ) : <tr><td>تحميل...</td></tr>}

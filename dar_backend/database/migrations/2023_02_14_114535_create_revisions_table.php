@@ -30,7 +30,8 @@ return new class extends Migration
             $table->string('notes')->nullable();
             $table->string('riwayahname')->nullable();
             $table->boolean('is_deleted')->default(0);
-            $table->enum('type', ['recite', 'revision']);
+            $table->enum('type', ['recite', 'revision','absence']);
+            $table->enum('absence_type', ['excused', 'unexcused','teacher_excused'])->nullable();
             $table->timestamps();
         });
     }

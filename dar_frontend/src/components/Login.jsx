@@ -26,7 +26,7 @@ function Login() {
 
     return (
         <div className='rtl login-form' >
-            <Form className='m-5 p-5 border'>
+            <Form className='m-5 p-5 border' onSubmit={handleSubmit}>
                 {/* <h3 className='text-center mb-5' >دار القران الكريم</h3> */}
                 <div className='d-flex align-items-center justify-content-center mb-3'>
                 <img src={dar_quran} alt="cur"
@@ -36,7 +36,7 @@ function Login() {
                 </div>
                 <Form.Group className="mb-3" controlId="formBasicEmail">
                     <Form.Label className='h5' >اسم المستخدم</Form.Label>
-                    <Form.Control type="email" placeholder=""
+                    <Form.Control type="text" placeholder=""
                         value={username}
                         onChange={(e) => setUsername(e.target.value)} />
                 </Form.Group>
@@ -47,10 +47,7 @@ function Login() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)} />
                 </Form.Group>
-                <Button className='form-control btn btn-dark rounded submit px-3'
-                    onClick={handleSubmit}>
-                    تسجيل الدخول
-                </Button>
+                <input type='submit' className='form-control btn btn-dark rounded submit px-3' value="تسجيل الدخول"/>
             </Form>
         </div>
     )

@@ -95,7 +95,7 @@ function Statistics() {
                             <Card.Body>
                                 {/* <Card.Title>Card Title </Card.Title> */}
                                 <Card.Text className='text-center' style={{ fontSize: '1.4em' }}>
-                                    {statistics['students']}
+                                    {statistics['teachers']}
                                 </Card.Text>
                             </Card.Body>
                         </Card>

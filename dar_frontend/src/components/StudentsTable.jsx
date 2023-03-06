@@ -118,7 +118,7 @@ function StudentsTable() {
                   <th scope="col">رقم الهاتف</th>
                   <th scope="col">الاستاذ</th>
                   <th scope="col">المركز</th>
-                  <th scope="col">اجراءات</th>
+                  <th scope="col"></th>
                 </tr>
               </thead>
               {loading ?

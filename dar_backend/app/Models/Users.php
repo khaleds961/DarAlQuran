@@ -35,4 +35,14 @@ class Users extends Model
     {
         return $this->belongsToMany(Students::class, 'students_centers_teachers', 'user_id', 'student_id');
     }
+
+    public function sessions()
+    {
+        return $this->hasManyThrough(
+            Sessions::class,
+            Students_Centers_Teachers::class,
+            'user_id',
+            'center_student_teacher_id',
+        );
+    }
 }

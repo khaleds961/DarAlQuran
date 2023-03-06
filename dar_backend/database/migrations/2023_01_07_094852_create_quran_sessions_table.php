@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->integer('center_student_teacher_id');
             $table->string('weekday');
+            $table->string('weekday_id');
             $table->string('session_time');
             $table->index(['center_student_teacher_id', 'created_at']);
             $table->boolean('is_deleted')->default(0);

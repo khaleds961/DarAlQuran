@@ -202,7 +202,7 @@ class StudentsController extends Controller
     }
 
     public function getStudentsByTeacher($center_id, $user_id)
-    {
+    {   
         try {
             $students = Students::join('students_centers_teachers', 'students_centers_teachers.student_id', '=', 'students.id')
                 ->join('centers', 'centers.id', '=', 'students_centers_teachers.center_id')
@@ -215,6 +215,18 @@ class StudentsController extends Controller
                 'data' => $students,
                 'success' => true
             ]);
+        } catch (Exception $e) {
+            return response($e->getMessage());
+        }
+    }
+
+    public function getstudentsbystcete($id)
+    {
+        try {
+            $stu_cent_teac = Students_Centers_Teachers::find($id );
+            $center_id = $stu_cent_teac->center_id;
+            $teacher_id = $stu_cent_teac->user_id;
+            return $this->getStudentsByTeacher($center_id,$teacher_id);
         } catch (Exception $e) {
             return response($e->getMessage());
         }

@@ -14,4 +14,5 @@ class Students_Centers_Teachers extends Model
         'student_id',
         'user_id'
     ];
+
 }
