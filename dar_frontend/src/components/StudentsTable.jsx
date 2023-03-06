@@ -4,11 +4,12 @@ import Api from '../Api'
 import Form from 'react-bootstrap/Form';
 import { BsPlusCircle, BsTrash } from 'react-icons/bs';
 import { TbPencil } from 'react-icons/tb'
-import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Pagination } from '@mui/material'
 import SessionContext from '../session/SessionContext';
 import CenterSelect from './CenterSelect';
 import Spinner from 'react-bootstrap/Spinner'
+import TeacherSelect from './TeacherSelect';
 
 
 function StudentsTable() {
@@ -27,6 +28,8 @@ function StudentsTable() {
   const [total, setTotal] = useState(1);
   const [center_id, setCenter_id] = useState(defualt_center_id);
   const [loading, setLoading] = useState(false)
+  const [teachers, setteachers] = useState([])
+  const [filterteacher, setfilterteacher] = useState(0)
 
   const deleteStudent = (student_id, center_id) => {
     Swal.fire({
@@ -63,7 +66,11 @@ function StudentsTable() {
 
   const changePage = (e, value) => {
     setPage(value);
-    getStudentsByCenter(center_id, value)
+    if (filterteacher !== 0) {
+      getstudentbyteacher(filterteacher, value)
+    } else {
+      getStudentsByCenter(center_id, value)
+    }
   };
 
   const popup = () => {
@@ -82,14 +89,41 @@ function StudentsTable() {
     })
   }
 
+  const getfilterteacherid = (id) => {
+    setfilterteacher(id)
+    setPage(1)
+    getstudentbyteacher(id, 1)
+  }
+
+  const getstudentbyteacher = (teacher_id, p) => {
+    setLoading(true)
+    Api.get(`getStudentsByTeacherPagination/${center_id}/${teacher_id}?page=${p}`).then(
+      (res) => {
+        console.log(res.data);
+        setStudents(res.data.data.data);
+        setTotal(Math.ceil(res.data.data.total / 10))
+        setLoading(false)
+      }
+    )
+  }
+
+  const getTeachersByCenter = (center_id) => {
+    setteachers([])
+    Api.get(`getAllTeachersByCenter/${center_id}`).then((res) => {
+      setteachers(res.data.data);
+    })
+  }
+
   useEffect(() => {
-    console.log(centers);
     getStudentsByCenter(center_id, page)
+    getTeachersByCenter(center_id)
   }, [])
 
   const data = (center_id) => {
     setPage(1)
     setCenter_id(center_id)
+    setfilterteacher(0)
+    getTeachersByCenter(center_id)
     getStudentsByCenter(center_id, 1)
   }
 
@@ -99,16 +133,22 @@ function StudentsTable() {
         <>
           <div>
             <div className='d-flex justify-content-between'>
-              {/* <Link className='text-decoration-none text-white' to='/addstudent'> */}
               <button type="button" onClick={popup} className="btn btn-success mb-3 d-flex align-items-center">
                 <BsPlusCircle className='text-white' />
                 <span className='px-2 text-center'>
                   اضافة طالب جديد
                 </span>
               </button>
-              {/* </Link> */}
 
-              <CenterSelect fromstudent={true} data={data} c_id={center_id} />
+              <div className='d-flex'>
+                <div className='mx-2'>
+                <CenterSelect fromstudent={true} data={data} c_id={center_id} />
+                </div>
+                {center_id !== 0 ?
+                  <TeacherSelect teachers={teachers} teacher_id={getfilterteacherid} tid={filterteacher} fromquransession={true} />
+                  : ''}
+              </div>
+
             </div>
             <table className="table table-dark table-hover text-center text-center">
               <thead>

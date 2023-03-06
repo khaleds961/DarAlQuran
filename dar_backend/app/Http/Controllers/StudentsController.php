@@ -202,7 +202,7 @@ class StudentsController extends Controller
     }
 
     public function getStudentsByTeacher($center_id, $user_id)
-    {   
+    {
         try {
             $students = Students::join('students_centers_teachers', 'students_centers_teachers.student_id', '=', 'students.id')
                 ->join('centers', 'centers.id', '=', 'students_centers_teachers.center_id')
@@ -220,13 +220,40 @@ class StudentsController extends Controller
         }
     }
 
+    public function getStudentsByTeacherPagination($center_id, $user_id)
+    {
+        try {
+            $students = Students::join('students_centers_teachers', 'students_centers_teachers.student_id', '=', 'students.id')
+                ->join('centers', 'centers.id', '=', 'students_centers_teachers.center_id')
+                ->join('users', 'users.id', '=', 'students_centers_teachers.user_id')
+                ->select(
+                    'users.id as user_id',
+                    'users.first_name as teacher_fn',
+                    'users.middle_name as teacher_mn',
+                    'users.last_name as teacher_ln',
+                    'students.*',
+                    'centers.id as center_id',
+                    'centers.name as center_name',
+                )
+                ->where('centers.id', $center_id)
+                ->where('users.id', $user_id)
+                ->paginate(10);
+            return response([
+                'data' => $students,
+                'success' => true
+            ]);
+        } catch (Exception $e) {
+            return response($e->getMessage());
+        }
+    }
+
     public function getstudentsbystcete($id)
     {
         try {
-            $stu_cent_teac = Students_Centers_Teachers::find($id );
+            $stu_cent_teac = Students_Centers_Teachers::find($id);
             $center_id = $stu_cent_teac->center_id;
             $teacher_id = $stu_cent_teac->user_id;
-            return $this->getStudentsByTeacher($center_id,$teacher_id);
+            return $this->getStudentsByTeacher($center_id, $teacher_id);
         } catch (Exception $e) {
             return response($e->getMessage());
         }

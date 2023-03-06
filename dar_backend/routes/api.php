@@ -44,6 +44,7 @@ Route::get('/counting', [UsersController::class, 'counting']);
 Route::get('/getAllStudents', [StudentsController::class, 'index']);
 Route::get('/getStudentsByCenter/{center_id}', [StudentsController::class, 'getStudentsByCenter']);
 Route::get('/getStudentsByTeacher/{center_id}/{user_id}', [StudentsController::class, 'getStudentsByTeacher']);
+Route::get('/getStudentsByTeacherPagination/{center_id}/{user_id}', [StudentsController::class, 'getStudentsByTeacherPagination']);
 Route::get('/getstudentsbystcete/{id}', [StudentsController::class, 'getstudentsbystcete']);
 Route::post('/addstudent', [StudentsController::class, 'store']);
 Route::delete('/deletestudent/{id}/{center_id}', [StudentsController::class, 'destroy']);
