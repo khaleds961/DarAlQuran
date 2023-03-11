@@ -4,7 +4,7 @@ import Api from '../Api'
 import Form from 'react-bootstrap/Form';
 import { BsPlusCircle, BsTrash } from 'react-icons/bs';
 import { TbPencil } from 'react-icons/tb'
-import { useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { Pagination } from '@mui/material'
 import SessionContext from '../session/SessionContext';
 import CenterSelect from './CenterSelect';
@@ -129,71 +129,71 @@ function StudentsTable() {
 
   return (
     <div>
-      {students ?
-        <>
-          <div>
-            <div className='d-flex justify-content-between'>
-              <button type="button" onClick={popup} className="btn btn-success mb-3 d-flex align-items-center">
-                <BsPlusCircle className='text-white' />
-                <span className='px-2 text-center'>
-                  اضافة طالب جديد
-                </span>
-              </button>
 
-              <div className='d-flex'>
-                <div className='mx-2'>
-                <CenterSelect fromstudent={true} data={data} c_id={center_id} />
-                </div>
-                {center_id !== 0 ?
-                  <TeacherSelect teachers={teachers} teacher_id={getfilterteacherid} tid={filterteacher} fromquransession={true} />
-                  : ''}
-              </div>
+      <div>
+        <div className='d-flex justify-content-between'>
+          <button type="button" onClick={popup} className="btn btn-success mb-3 d-flex align-items-center">
+            <BsPlusCircle className='text-white' />
+            <span className='px-2 text-center'>
+              اضافة طالب جديد
+            </span>
+          </button>
 
+          <div className='d-flex'>
+            <div className='mx-2'>
+              <CenterSelect fromstudent={true} data={data} c_id={center_id} />
             </div>
-            <table className="table table-dark table-hover text-center text-center">
-              <thead>
-                <tr>
-                  <th scope="col">الاسم</th>
-                  <th scope="col">الجنسية</th>
-                  <th scope="col">رقم الهاتف</th>
-                  <th scope="col">الاستاذ</th>
-                  <th scope="col">المركز</th>
-                  <th scope="col"></th>
-                </tr>
-              </thead>
-              {loading ?
-                <tbody>
-                  <tr>
-                    <td colSpan={2}></td>
-                    <td>
-                      <Spinner animation="border" variant="primary" />
-                    </td>
-                    <td colSpan={3}></td>
-                  </tr>
-                </tbody> :
-                <tbody>
-                  {students?.map(student =>
-                    <tr key={student.id}>
-                      <th scope="row">{student.first_name} {student.last_name}</th>
-                      <td>{student.nationality}</td>
-                      <td>{student.phone_number}</td>
-                      <td>{student.teacher_fn} {student.teacher_mn} {student.teacher_ln}</td>
-                      <td>{student.center_name}</td>
-                      <td >
-                        <span className='mx-2 cursor_pointer' onClick={() => deleteStudent(student.id, student.center_id)}>
-                          <BsTrash />
-                        </span>
-
-                        <span>
-                          <TbPencil />
-                        </span>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              }
-            </table>
+            {center_id !== 0 ?
+              <TeacherSelect teachers={teachers} teacher_id={getfilterteacherid} tid={filterteacher} fromquransession={true} />
+              : ''}
           </div>
+
+        </div>
+        <>
+          <table className="table table-dark table-hover text-center text-center">
+            <thead>
+              <tr>
+                <th scope="col">الاسم</th>
+                <th scope="col">الجنسية</th>
+                <th scope="col">رقم الهاتف</th>
+                <th scope="col">الاستاذ</th>
+                <th scope="col">المركز</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            {loading ?
+              <tbody>
+                <tr>
+                  <td colSpan={2}></td>
+                  <td>
+                    <Spinner animation="border" variant="primary" />
+                  </td>
+                  <td colSpan={3}></td>
+                </tr>
+              </tbody> :
+              <tbody>
+                {students?.map(student =>
+                  <tr key={student.id}>
+                    <th scope="row">{student.first_name} {student.last_name}</th>
+                    <td>{student.nationality}</td>
+                    <td>{student.phone_number}</td>
+                    <td>{student.teacher_fn} {student.teacher_mn} {student.teacher_ln}</td>
+                    <td>{student.center_name}</td>
+                    <td >
+                      <span className='mx-2 cursor_pointer' onClick={() => deleteStudent(student.id, student.center_id)}>
+                        <BsTrash />
+                      </span>
+                      <NavLink className='text-white'  to={`/editstudent/${student.id}`}>
+                      <span>
+                        <TbPencil />
+                      </span>
+                      </NavLink>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            }
+          </table>
           <Pagination
             shape="rounded"
             count={total}
@@ -202,8 +202,9 @@ function StudentsTable() {
             onChange={changePage}
             variant="outlined" />
         </>
-        : <p><b>... تحميل</b></p>}
-    </div>
+        {/* : <p><b>لا يوجد اي طالب بعد</b></p>} */}
+      </div>
+    </div >
   )
 }
 

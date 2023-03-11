@@ -4,20 +4,20 @@ import Api from '../Api'
 import SessionContext from '../session/SessionContext';
 import CenterSelect from './CenterSelect';
 import TeacherSelect from './TeacherSelect';
-import { Theme, useTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 import CreatableSelect from 'react-select/creatable';
-import { useParams } from 'react-router-dom';
+import { NavLink, useParams } from 'react-router-dom';
 
 
 
 export default function AddStudentForm() {
 
-    const {id} = useParams()
+    const { id } = useParams()
 
     const { session: { user: { role_id } } } = useContext(SessionContext);
     const { session: { user: { centers } } } = useContext(SessionContext);
@@ -33,6 +33,7 @@ export default function AddStudentForm() {
         { 'id': 7, 'value': 'O+' },
         { 'id': 8, 'value': 'O-' }
     ]
+
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [first_name, setFirst_name] = useState('')
@@ -59,8 +60,6 @@ export default function AddStudentForm() {
     const [home_number, sethome_number] = useState('')
     const [student_level_status, setstudent_level_status] = useState('beginner')
     const [reading_level, setreading_level] = useState('tilawa')
-    const [skills, setskills] = useState('')
-    const [has_ijaza, sethas_ijaza] = useState('')
     const [female_question, setfemale_question] = useState(0)
     const [memorizing, setmemorizing] = useState('')
     const [center_id, setCenter_id] = useState(defaultvalue)
@@ -85,7 +84,7 @@ export default function AddStudentForm() {
                 console.log(err)
             })
     }
-    const geteditteacherid = (t_id) =>{
+    const geteditteacherid = (t_id) => {
         setTeacher_id(t_id)
     }
     useEffect(() => {
@@ -95,11 +94,11 @@ export default function AddStudentForm() {
         }
     }, [center_id])
 
-    useEffect(()=>{
+    useEffect(() => {
         console.log(id)
-        if(id === '1'){
+        if (id === '1') {
             setstudent_isring('yes')
-        }else{
+        } else {
             setstudent_isring('no')
         }
     })
@@ -773,7 +772,9 @@ export default function AddStudentForm() {
                         <button className="btn btn-success mt-3 px-3" onClick={addringstudent}> اضافة</button> :
                         <button className="btn btn-success mt-3 px-3" onClick={addstudent}> اضافة</button>
                     }
-                    <button className="btn btn-dark mt-3 px-3 mx-2" onClick={addstudent}> الغاء</button>
+                    <NavLink to='/students'>
+                        <button className="btn btn-dark mt-3 px-3 mx-2"> الغاء</button>
+                    </NavLink>
                 </span>
             </div>
         </>

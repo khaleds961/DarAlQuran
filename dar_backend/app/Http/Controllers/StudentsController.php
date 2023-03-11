@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Centers;
+use App\Models\Rings;
 use App\Models\Students;
 use App\Models\Students_Centers_Teachers;
 use App\Models\Users;
@@ -30,6 +31,21 @@ class StudentsController extends Controller
         }
     }
 
+    public function getstudentsbyring($ring_id){
+        try{
+            $students = Students::where('ring_id',$ring_id)->paginate(10);
+            $teacher_ring = Rings::with('teacher')->find($ring_id);
+            return response([
+                'data'    => $students,
+                'teacher_ring' => $teacher_ring,
+                'success' => true
+            ]);
+        }catch(Exception $e){
+            return response($e->getMessage());
+        }
+        
+        }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -49,48 +65,69 @@ class StudentsController extends Controller
     public function store(Request $request)
     {
         try {
-            $student = Students::create([
-                'first_name'        => $request->first_name,
-                'middle_name'       => $request->middle_name,
-                'last_name'         => $request->last_name,
-                'mother_name'       => $request->mother_name,
-                'place_of_birth'    => $request->place_of_birth,
-                'birthdate'         => $request->birthdate,
-                'marital_status'    => $request->marital_status,
-                'reading_level'     => $request->reading_level,
-                'school_uni_name'   => $request->school_uni_name,
-                'major'             => $request->major,
-                'blood_type'        => $request->blood_type,
-                'gender'            => $request->gender,
-                'nationality'       => $request->nationality,
-                'current_job'       => $request->current_job,
-                'phone_number'      => $request->phone_number,
-                'work_number'       => $request->work_number,
-                'home_number'       => $request->home_number,
-                'mother_number'     => $request->mother_number,
-                'father_number'     => $request->father_number,
-                'father_work'     => $request->father_work,
-                'mother_work'     => $request->mother_work,
-                'student_level_status' => $request->student_level_status,
-                'address'           => $request->address,
-                'suitable_days'     => $request->suitable_days,
-                'suitable_times'    => $request->suitable_times,
-                'sheikh_names'      => $request->sheikh_names,
-                'memorizing'        => $request->memorizing,
-                'female_question'   => $request->female_question,
-                'is_ring'           => $request->is_ring,
-                'ring_id'           => $request->ring_id,
-                'skills'            => $request->skills,
-                'rate'              => $request->rate,
-                'notes'             => $request->notes
-            ]);
-            if ($student) {
-                Students_Centers_Teachers::create([
-                    'student_id' => $student['id'],
-                    'center_id' => $request['center_id'],
-                    'user_id' => $request['teacher_id']
+            if ($request->is_ring == 1) {
+                $student = Students::create([
+                    'first_name'        => $request->first_name,
+                    'middle_name'       => $request->middle_name,
+                    'last_name'         => $request->last_name,
+                    'mother_name'       => $request->mother_name,
+                    'place_of_birth'    => $request->place_of_birth,
+                    'birthdate'         => $request->birthdate,
+                    'school_uni_name'   => $request->school_uni_name,
+                    'major'             => $request->major,
+                    'gender'            => $request->gender,
+                    'nationality'       => $request->nationality,
+                    'phone_number'      => $request->phone_number,
+                    'mother_number'     => $request->mother_number,
+                    'father_number'     => $request->father_number,
+                    'father_work'       => $request->father_work,
+                    'mother_work'       => $request->mother_work,
+                    'address'           => $request->address,
+                    'is_ring'           => $request->is_ring,
+                    'ring_id'           => $request->ring_id,
+                    'skills'            => $request->skills,
+                    'rate'              => $request->rate,
+                    'notes'             => $request->notes
                 ]);
-
+            } else {
+                $student = Students::create([
+                    'first_name'        => $request->first_name,
+                    'middle_name'       => $request->middle_name,
+                    'last_name'         => $request->last_name,
+                    'mother_name'       => $request->mother_name,
+                    'place_of_birth'    => $request->place_of_birth,
+                    'birthdate'         => $request->birthdate,
+                    'marital_status'    => $request->marital_status,
+                    'reading_level'     => $request->reading_level,
+                    'school_uni_name'   => $request->school_uni_name,
+                    'major'             => $request->major,
+                    'blood_type'        => $request->blood_type,
+                    'gender'            => $request->gender,
+                    'nationality'       => $request->nationality,
+                    'current_job'       => $request->current_job,
+                    'phone_number'      => $request->phone_number,
+                    'work_number'       => $request->work_number,
+                    'home_number'       => $request->home_number,
+                    'student_level_status' => $request->student_level_status,
+                    'address'           => $request->address,
+                    'suitable_days'     => $request->suitable_days,
+                    'suitable_times'    => $request->suitable_times,
+                    'sheikh_names'      => $request->sheikh_names,
+                    'memorizing'        => $request->memorizing,
+                    'female_question'   => $request->female_question,
+                    'skills'            => $request->skills,
+                    'rate'              => $request->rate,
+                    'notes'             => $request->notes
+                ]);
+                if ($student) {
+                    Students_Centers_Teachers::create([
+                        'student_id' => $student['id'],
+                        'center_id' => $request['center_id'],
+                        'user_id' => $request['teacher_id']
+                    ]);
+                }
+            }
+            if ($student) {
                 return response([
                     'message' => __('message.student_added'),
                     'success' => true
@@ -101,15 +138,30 @@ class StudentsController extends Controller
         }
     }
 
+
     /**
      * Display the specified resource.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    //not ring
     public function show($id)
     {
-        //
+        try {
+            $student = Students::where('is_deleted', 0)->where('ring_id', null)->find($id);
+            $teacher_id = Students_Centers_Teachers::where('student_id', $id)->first()->user_id;
+            $center_id = Students_Centers_Teachers::where('student_id', $id)
+                ->where('user_id', $teacher_id)->first()->center_id;
+            $student->teacher_id = $teacher_id;
+            $student->center_id = $center_id;
+            return response([
+                'data' => $student,
+                'success' => true
+            ]);
+        } catch (Exception $e) {
+            return response($e->getMessage());
+        }
     }
 
     /**
@@ -132,7 +184,51 @@ class StudentsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $student = Students::find($id);
+        if ($request->is_ring) { } else {
+            $student->update([
+                'first_name' => $request->first_name,
+                'middle_name' => $request->middle_name,
+                'last_name' => $request->last_name,
+                'mother_name' => $request->mother_name,
+                'address' => $request->address,
+                'place_of_birth' => $request->place_of_birth,
+                'birthdate' => $request->birthdate,
+                'marital_status' => $request->marital_status,
+                'reading_level' => $request->reading_level,
+                'school_uni_name' => $request->school_uni_name,
+                'major' => $request->major,
+                'blood_type' => $request->blood_type,
+                'gender' => $request->gender,
+                'nationality' => $request->nationality,
+                'current_job' => $request->current_job,
+                'work_number' => $request->work_number,
+                'home_number' => $request->home_number,
+                'student_level_status' => $request->student_level_status,
+                'suitable_days' => $request->suitable_days,
+                'suitable_times' => $request->suitable_times,
+                'sheikh_names' => $request->sheikh_names,
+                'memorizing' => $request->memorizing,
+                'female_question' => $request->female_question
+            ]);
+            $student_center_teacher = Students_Centers_Teachers::where('student_id',$id)->first();
+            
+            $student_center_teacher->update([
+                'user_id' => $request->teacher_id,
+                'center_id' => $request->center_id
+            ]);
+
+            if ($student->wasChanged() || $student_center_teacher->wasChanged()) {
+                return response([
+                    'message' => __('message.student_updated'),
+                    'success' => true
+                ]);
+            }else{
+                return response([
+                    'success' => false
+                ]);
+            }
+        }
     }
 
     /**

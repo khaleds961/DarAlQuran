@@ -134,9 +134,10 @@ function AddReciteRevision() {
   }
 
   const addrevision = () => {
+
     Api.post(`addrevision`, {
       session_id: id,
-      type: type,
+      type: rev_rec === 'recite' ? 'recite' : rev_rec === 'revsion' ? 'revsion' : 'absence' ,
       surah_from: fromsurah,
       surah_to: tosurah,
       ayyah_from: fromayya,
@@ -159,16 +160,9 @@ function AddReciteRevision() {
       }
     })
   }
-
+  console.log('type',type);
   useEffect(() => {
-    getSurahList()
-    if (rev_rec === 'recite') {
-      settype('recite')
-    } if (rev_rec === 'revsion') {
-      settype('revsion')
-    } else {
-      settype('absence')
-    }
+    getSurahList()    
   }, [])
 
   return (

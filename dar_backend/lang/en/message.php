@@ -1,11 +1,13 @@
 <?php
+
 return [
     //TEACHER
     'teacher_deleted' => 'تم حذف المستخدم بنجاح ',
     
     //STUDENT
-    'student_added'   => 'تم اضافة التلميذ',
-    'student_deleted' => 'تم حذف التلميذ',
+    'student_added'   => 'تم اضافة الطالب',
+    'student_deleted' => 'تم حذف الطالب',
+    'student_updated' => 'تم تعديل الطالب',
 
     //USERS
     'first_name_required'   => 'يرجي ادخال الاسم الاول',
@@ -36,6 +38,7 @@ return [
     'session_added' => 'تم اضافة الحصة',
     'session_exist' => 'هذه الحصة موجودة',
     'session_deleted' => 'تم حذف الحصة ',
+    'session_day_exist' => 'لا يحق للطالب ان يكون له اكثر من حصة باليوم',
 
     //Ring
     'ring_added' => 'تم اضافة الحلقة ',

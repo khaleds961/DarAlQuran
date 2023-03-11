@@ -15,6 +15,8 @@ function ShowSessions() {
     const [students, setstudents] = useState([])
     const [student_id, setstudent_id] = useState(0)
     const [loading, setloading] = useState(true)
+    const [start_date, setstart_date] = useState('')
+    const [end_date, setend_date] = useState('')
     const [page, setpage] = useState(1)
     const [total, settotal] = useState(1)
 
@@ -38,9 +40,12 @@ function ShowSessions() {
         ).catch(function (err) { console.log(err) })
     }
 
-    const getsessionbyids = (teacher_id, student_id,p) => {
+    const getsessionbyids = (teacher_id, student_id,start_date,end_date, p) => {
         setloading(true)
-        Api.get(`getsessionsbyids/${teacher_id}/${student_id}?page=${p}`).then(
+        Api.post(`getsessionsbyids/${teacher_id}/${student_id}?page=${p}`,{
+            start_date:start_date,
+            end_date:end_date
+        }).then(
             (res) => {
                 setsesions(res.data.data.data)
                 setstudent_teacher(res.data.student_teacher)
@@ -50,26 +55,34 @@ function ShowSessions() {
         )
     }
 
-    const changePage = (e,value) =>{
+    const changePage = (e, value) => {
         setloading(true)
         setpage(value)
-        if(student_id !== 0 ){
-            getsessionbyids(student_teacher['teacher_id'], student_id,value)
-        }else{
+        if (student_id !== 0) {
+            getsessionbyids(student_teacher['teacher_id'], student_id, value)
+        } else {
             getsessions(value)
         }
     }
+
+    const search = () => {
+        if (student_id !== 0 && start_date && end_date) {
+            setpage(1)
+            getsessionbyids(student_teacher['teacher_id'], student_id,start_date,end_date, 1)
+        }
+    }
+
     useEffect(() => {
         getsessions(1)
         getstudents()
     }, [])
 
-    useEffect(() => {
-        if (student_id !== 0) {
-            setpage(1)
-            getsessionbyids(student_teacher['teacher_id'], student_id,1)
-        }
-    }, [student_id])
+    // useEffect(() => {
+    //     if (student_id !== 0) {
+    //         setpage(1)
+    //         getsessionbyids(student_teacher['teacher_id'], student_id, 1)
+    //     }
+    // }, [student_id])
 
     return (
         <div className=' m-3'>
@@ -94,8 +107,10 @@ function ShowSessions() {
                                 </b>
                             </div>
                         </div>
+                    </div>
 
-                        <div>
+                    <div className='row '>
+                        <div className='col-md my-2'>
                             <span>
                                 <select name="" id="" className='form-control' value={student_id}
                                     onChange={(e) => setstudent_id(e.target.value)}>
@@ -103,6 +118,23 @@ function ShowSessions() {
                                     {students.map((st) => <option value={st.id}>{st.first_name} {st.middle_name} {st.last_name}</option>)}
                                 </select>
                             </span>
+                        </div>
+
+                        <div className='col-md my-2'>
+
+                            <input type="date" className='form-control'
+                                value={start_date}
+                                onChange={(e) => setstart_date(e.target.value)} />
+                        </div>
+
+                        <div className='col-md my-2 '>
+                            <input type="date" className='form-control'
+                                value={end_date}
+                                onChange={(e) => setend_date(e.target.value)} />
+                        </div>
+
+                        <div className='col-md my-2'>
+                            <button className='btn btn-dark px-4' onClick={search}>بحث</button>
                         </div>
 
                     </div>

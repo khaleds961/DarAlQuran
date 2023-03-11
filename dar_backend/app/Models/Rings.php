@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Rings extends Model
 {
@@ -15,4 +16,8 @@ class Rings extends Model
         'name',
         'is_activated'
     ];
+
+    public function teacher(){
+        return $this->belongsTo(Users::class,'teacher_id');
+    }
 }

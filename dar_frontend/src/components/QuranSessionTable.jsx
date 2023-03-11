@@ -21,6 +21,7 @@ function QuranSessionTable() {
 
     const { session: { user: { centers } } } = useContext(SessionContext);
     const { session: { user: { role_id } } } = useContext(SessionContext);
+    const { session: { user: { id } } } = useContext(SessionContext);
 
     const days = [
         { 'id': 1, 'value': 'الاثنين' },
@@ -69,13 +70,14 @@ function QuranSessionTable() {
         { 'id': 35, 'value': '22:00' },
     ]
 
-    const defaultValue = role_id === 3 ? centers[0]['center_id'] : 0;
+    const defaultValue = role_id === 3 || role_id === 4 ? centers[0]['center_id'] : 0;
+    const defaultValueTeacher =  role_id === 4 ? id : 0;
     const [id_center, setid_center] = useState(defaultValue)
     const [page, setPage] = useState(1)
     const [total, setTotal] = useState(1)
     const [isOpen, setIsOpen] = useState(false);
     const [teachers, setTeachers] = useState([])
-    const [teacher_id, setTeacher_id] = useState(0)
+    const [teacher_id, setTeacher_id] = useState(defaultValueTeacher)
     const [filterteacher_id, setfilterteacher_id] = useState(0)
     const [students, setStudents] = useState([])
     const [student_id, setStudent_id] = useState('')
@@ -109,7 +111,6 @@ function QuranSessionTable() {
         setStudents([])
         setSelected(0)
         const teacher_id = e.target.value;
-
         Api.get(`getStudentsByTeacher/${id_center}/${teacher_id}`).then(
             (res) => {
                 setStudents(res.data.data)
@@ -119,7 +120,12 @@ function QuranSessionTable() {
     }
 
     const addSession = () => {
-
+        console.log('id_center', id_center);
+        console.log('teacher_id', teacher_id);
+        console.log('student_id', student_id);
+        console.log('time', time);
+        console.log('day', day);
+        console.log('day_id', day_id);
         Api.post('addsession', {
             center_id: id_center,
             user_id: teacher_id,
@@ -130,7 +136,9 @@ function QuranSessionTable() {
         }).then((res) => {
             if (res.data.success) {
                 Swal.fire(res.data.message, '', 'success')
-                setTeacher_id(0)
+                if (role_id === 3) {
+                    setTeacher_id(0)
+                }
                 setStudent_id('')
                 setTime(0)
                 setDay(0)
@@ -153,10 +161,13 @@ function QuranSessionTable() {
 
     const hideModal = () => {
         setIsOpen(false);
-        setTeacher_id(0)
+        if (role_id === 3) {
+            setTeacher_id(0)
+        }
         setStudent_id('')
         setTime(0)
         setDay(0)
+        setDay_id(0)
         setSelected(0)
     };
 
@@ -168,19 +179,23 @@ function QuranSessionTable() {
 
     const getSessions = (p) => {
         setloading(true)
-        Api.get(`getsessions/${id_center}?page=${p}`).then(
-            (res) => {
-                setSessions(res.data.data.data)
-                setTotal(Math.ceil(res.data.data.total / 10))
-                setloading(false)
-            }
-        ).catch(function (err) { console.log(err) })
+        if (role_id === 4) {
+            getsessionsbyteacher(id, 1)
+        } else {
+            Api.get(`getsessions/${id_center}?page=${p}`).then(
+                (res) => {
+                    setSessions(res.data.data.data)
+                    setTotal(Math.ceil(res.data.data.total / 10))
+                    setloading(false)
+                }
+            ).catch(function (err) { console.log(err) })
+        }
     }
 
     const changePage = (e, value) => {
         setPage(value)
         if (filterteacher_id != 0) {
-            getsessionsbyteacher(filterteacher_id,value)
+            getsessionsbyteacher(filterteacher_id, value)
         } else {
             getSessions(value)
         }
@@ -195,7 +210,7 @@ function QuranSessionTable() {
         }).then((result) => {
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
-                Api.delete(`deletesession/${sess_id}/${st_ce_te}`).then(
+                Api.get(`deletesession/${sess_id}/${st_ce_te}`).then(
                     res => {
 
                         if (res.data.success) {
@@ -250,11 +265,10 @@ function QuranSessionTable() {
         setid_center(center_id)
     }
 
-    const getsessionsbyteacher = (teacher_id,p) => {
+    const getsessionsbyteacher = (teacher_id, p) => {
         setloading(true)
         Api.get(`getsessionsbyteacher/${id_center}/${teacher_id}?page=${p}`).then(
             (res) => {
-                // setPage(1)
                 setSessions(res.data.data.data)
                 setTotal(Math.ceil(res.data.data.total / 10))
                 setloading(false)
@@ -262,14 +276,28 @@ function QuranSessionTable() {
         ).catch(function (err) { console.log(err) })
     }
 
+    const callStudentsTeacher = (id) => {
+        console.log(id, 'teacher_id');
+        console.log(id_center, 'center_id');
+        Api.get(`getStudentsByTeacher/${id_center}/${id}`).then(
+            (res) => {
+                setStudents(res.data.data)
+                setTeacher_id(id)
+            }
+        ).catch(function (err) { console.log(err) })
+    }
+
     useEffect(() => {
         getTeachersByCenter(id_center)
         getSessions(page)
+        if (role_id === 4) {
+            callStudentsTeacher(id)
+        }
     }, [])
 
     useEffect(() => {
         if (filterteacher_id !== 0) {
-            getsessionsbyteacher(filterteacher_id,1)
+            getsessionsbyteacher(filterteacher_id, 1)
             setPage(1)
         }
     }, [filterteacher_id])
@@ -285,7 +313,7 @@ function QuranSessionTable() {
 
     return (
         <div>
-            {role_id === 3 ?
+            {role_id === 3 || role_id === 4 ?
                 <div className='d-flex justify-content-between'>
                     <button type="button" className="btn btn-dark my-2 d-flex align-items-center" onClick={showModal}>
                         <BsPlusCircle className='text-white' />
@@ -295,11 +323,8 @@ function QuranSessionTable() {
                     </button>
                     {
                         loading ? '' :
-                            <>
-                                <TeacherSelect teachers={teachers} teacher_id={getteacherid} tid={filterteacher_id} fromquransession={true} />
-                            </>
+                            <TeacherSelect teachers={teachers} teacher_id={getteacherid} tid={filterteacher_id} fromquransession={true} />
                     }
-
                 </div>
                 :
                 <div>
@@ -324,13 +349,17 @@ function QuranSessionTable() {
             <Modal show={isOpen} onHide={hideModal}>
                 <Modal.Body className='rtl'>
                     <div>
-                        <label >الاستاذ</label>
-                        <select className='form-control mb-3' value={teacher_id} onChange={callStudents}>
-                            <option disabled value='0'>اختر احد الاساتذة</option>
-                            {teachers ? teachers.map((teacher) =>
-                                <option key={teacher.id} value={teacher.id}>{teacher.first_name} {teacher.middle_name} {teacher.last_name}</option>
-                            ) : <option>تحميل...</option>}
-                        </select>
+                        {role_id !== 3 ? '' :
+                            <>
+                                <label >الاستاذ</label>
+                                <select className='form-control mb-3' value={teacher_id} onChange={callStudents}>
+                                    <option disabled value='0'>اختر احد الاساتذة</option>
+                                    {teachers ? teachers.map((teacher) =>
+                                        <option key={teacher.id} value={teacher.id}>{teacher.first_name} {teacher.middle_name} {teacher.last_name}</option>
+                                    ) : <option>تحميل...</option>}
+                                </select>
+                            </>
+                        }
 
                         {students.length !== 0 ?
                             <>

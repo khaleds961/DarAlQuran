@@ -18,6 +18,9 @@ import RingPage from './pages/RingPage'
 import AddReciteRevisionPage from './pages/AddReciteRevisionPage';
 import ShowSessionsPage from './pages/ShowSessionsPage';
 import TeacherSchedulePage from './pages/TeacherSchedulePage';
+import EditStudentPage from './pages/EditStudentPage';
+import RingStudentsPage from './pages/RingStudentsPage';
+import MonthlyTeacherReportPage from './pages/MonthlyTeacherReportPage';
 
 
 
@@ -49,6 +52,7 @@ export default function () {
         <Route element={<RequireAuth allowedRoles={[ROLES.supervisor, ROLES.teacher, ROLES.superadmin, ROLES.manager]} />}>
           <Route path="students" element={<Students />} />
           <Route path="addstudent/:id" element={<AddStudent />} />
+          <Route path="editstudent/:id" element={<EditStudentPage/>} />
         </Route>
 
         <Route element={<RequireAuth allowedRoles={[ROLES.superadmin, ROLES.manager]} />}>
@@ -67,11 +71,12 @@ export default function () {
 
         <Route element={<RequireAuth allowedRoles={[ROLES.supervisor, ROLES.teacher,ROLES.superadmin]} />}>
           <Route path="rings" element={<RingPage/>} />
-          {/* <Route path="addrecite/:id" element={<AddReciteRevision/>} /> */}
+          <Route path="ringstudents" element={<RingStudentsPage/>} />
         </Route>
 
         <Route element={<RequireAuth allowedRoles={[ROLES.supervisor, ROLES.teacher,ROLES.superadmin]} />}>
           <Route path="teacherschedule" element={<TeacherSchedulePage/>} />
+          <Route path="monthlyteachereport" element={<MonthlyTeacherReportPage/>} />
         </Route>
 
         <Route element={<RequireAuth allowedRoles={[ROLES.superadmin, ROLES.manager, ROLES.supervisor]} />}>

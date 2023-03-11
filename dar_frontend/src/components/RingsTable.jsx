@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { Spinner } from 'react-bootstrap';
 import Modal from "react-bootstrap/Modal";
+import { AiOutlineEye } from 'react-icons/ai';
 import { BsPlusCircle, BsTrash, BsPencil } from 'react-icons/bs';
 import Moment from 'react-moment';
 import { NavLink } from 'react-router-dom';
@@ -160,13 +161,22 @@ export default function RingsTable() {
 
   return (
     <div>
-      <div className='d-flex justify-content-between'>
+      <div className='d-flex'>
         <button type="button" className="btn btn-success mb-3 d-flex align-items-center" onClick={showModal}>
           <BsPlusCircle className='text-white' />
           <span className='px-2'>
             اضافة حلقة جديد
           </span>
         </button>
+
+        <NavLink to='/ringstudents'>
+        <button type="button" className="btn btn-primary mb-3 d-flex align-items-center mx-2">
+          <AiOutlineEye className='text-white' />
+          <span className='px-2'>
+            طلاب الحلقات
+          </span>
+        </button>
+        </NavLink>
 
         <Modal show={isOpen} onHide={hideModal}>
           <Modal.Body className='rtl'>
@@ -199,7 +209,7 @@ export default function RingsTable() {
         <tbody>
           {loading ?
             <tr>
-              <td colSpan={2}></td>
+              <td colSpan={3}></td>
               <td>
                 <Spinner animation="border" variant="primary" />
               </td>

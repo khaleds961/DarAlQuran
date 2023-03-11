@@ -23,6 +23,7 @@ class Students extends Model
         'major',
         'blood_type',
         'is_ring',
+        'ring_id',
         'gender',
         'nationality',
         'current_job',
@@ -48,15 +49,19 @@ class Students extends Model
 
     public function teachers()
     {
-        return $this->belongsToMany(Users::class,'students_centers_teachers','center_id','user_id')
-        ->where('role_id',4)
-        ->where('users.is_deleted',0)
-        ->distinct();
-     }
+        return $this->belongsToMany(Users::class, 'students_centers_teachers', 'center_id', 'user_id')
+            ->where('role_id', 4)
+            ->where('users.is_deleted', 0)
+            ->distinct();
+    }
 
-     public function centers()
-     {
-         return $this->belongsToMany(Centers::class, 'students_centers_teachers', 'student_id', 'center_id');
-     }
+    public function centers()
+    {
+        return $this->belongsToMany(Centers::class, 'students_centers_teachers', 'student_id', 'center_id');
+    }
 
+    public function sessions()
+    {
+        return $this->hasMany(Sessions::class);
+    }
 }

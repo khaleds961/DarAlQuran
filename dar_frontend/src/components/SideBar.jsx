@@ -3,10 +3,9 @@ import { NavLink } from 'react-router-dom'
 import { FaHome, FaSchool, FaUserGraduate, FaRing } from 'react-icons/fa';
 import { BiLogOutCircle } from "react-icons/bi";
 import { ImUserTie } from "react-icons/im";
-import { MdClass } from 'react-icons/md'
+import { MdCalendarToday, MdClass } from 'react-icons/md'
 import { AiFillSchedule } from 'react-icons/ai'
 import SessionContext from '../session/SessionContext';
-
 
 
 
@@ -123,6 +122,23 @@ function Navbar() {
                     <NavLink to='/teacherschedule' className='d-none d-md-flex align-items-center text-decoration-none text-dark py-2 px-2 hover'>
                         <AiFillSchedule className='text-dark' />
                         <span className='px-2 d-none d-md-block'>جدول الاستاذ</span>
+                    </NavLink>
+                </div>
+
+                {/* case 1: small screen Class */}
+                <div className='text-center'>
+                    <NavLink to='/monthlyteachereport' className='text-decoration-none'>
+                        <MdCalendarToday className='d-xs-block d-md-none text-dark' />
+                    </NavLink>
+                </div>
+
+                {/* case 2:md page and more */}
+                <div className='my-2'>
+                    <NavLink to='/monthlyteachereport' className='d-none d-md-flex align-items-center text-decoration-none text-dark py-2 px-2 hover'>
+                        <MdCalendarToday className='text-dark' />
+                        <span className='px-2 d-none d-md-block'>
+                            جدول الاستاذ الشهري
+                        </span>
                     </NavLink>
                 </div>
 

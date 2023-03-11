@@ -46,7 +46,10 @@ Route::get('/getStudentsByCenter/{center_id}', [StudentsController::class, 'getS
 Route::get('/getStudentsByTeacher/{center_id}/{user_id}', [StudentsController::class, 'getStudentsByTeacher']);
 Route::get('/getStudentsByTeacherPagination/{center_id}/{user_id}', [StudentsController::class, 'getStudentsByTeacherPagination']);
 Route::get('/getstudentsbystcete/{id}', [StudentsController::class, 'getstudentsbystcete']);
+Route::get('/getstudentsbyring/{ring_id}', [StudentsController::class, 'getstudentsbyring']);
+Route::get('/getstudentbyid/{id}', [StudentsController::class, 'show']);
 Route::post('/addstudent', [StudentsController::class, 'store']);
+Route::post('/editstudent/{id}', [StudentsController::class, 'update']);
 Route::delete('/deletestudent/{id}/{center_id}', [StudentsController::class, 'destroy']);
 
 
@@ -60,14 +63,14 @@ Route::post('/updatecenter/{id}', [CentersController::class, 'update']);
 
 //Sessions
 Route::get('/getsessions/{center_id}', [SessionsController::class, 'index']);
-Route::get('/getsessionsbyids/{teacher_id}/{student_id}', [SessionsController::class, 'getsessionsbyids']);
+Route::post('/getsessionsbyids/{teacher_id}/{student_id}', [SessionsController::class, 'getsessionsbyids']);
 Route::post('/addsession', [SessionsController::class, 'store']);
-Route::delete('/deletesession/{id}/{st_ce_te}', [SessionsController::class, 'destroy']);
+Route::get('/deletesession/{id}/{st_ce_te}', [SessionsController::class, 'destroy']);
 Route::get('/getsessionsbyid/{id}', [SessionsController::class, 'getSessionsById']);
 Route::get('/getsessionsbystcente/{id}', [SessionsController::class, 'getsessionsbystcente']);
 Route::get('/getsessionsbyteacher/{center_id}/{teacher_id}', [SessionsController::class, 'getsessionsbyteacher']);
 Route::get('/teacherschedule/{center_id}/{teacher_id}', [SessionsController::class, 'teacherschedule']);
-
+Route::post('/monthyteachereport/{center_id}/{teacher_id}', [SessionsController::class, 'MonthlyTeacherReport']);
 
 //Ring
 Route::get('/getrings/{center_id}', [RingsController::class, 'index']);

@@ -2,12 +2,10 @@ import React, { useState, useContext, useEffect } from 'react'
 import Api from '../Api'
 import SessionContext from '../session/SessionContext';
 
-function CenterSelect({ center_id, fromstudent = false, data, c_id }) {
+function CenterSelect({ center_id, fromstudent = false, data, c_id, monthlyreport = false }) {
 
     const { session: { user: { role_id } } } = useContext(SessionContext);
     const [allcenters, setAllCenters] = useState([]);
-    
-    console.log(c_id,'la la la la')
 
     useEffect(() => {
         getCenters()
@@ -30,7 +28,9 @@ function CenterSelect({ center_id, fromstudent = false, data, c_id }) {
                 <>
                     {!fromstudent ?
                         <>
-                            <label htmlFor="">المراكز المتاحة</label>
+                            {!monthlyreport ?
+                                <label htmlFor="">المراكز المتاحة</label> : ''
+                            }
                             <div>
                                 <select className="form-control col my-2" value={c_id} onChange={(e) => center_id(e.target.value)}>
                                     <option disabled="disabled" value={0}>اختر احد المراكز</option>
