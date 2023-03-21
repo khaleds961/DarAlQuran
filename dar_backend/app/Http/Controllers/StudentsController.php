@@ -109,18 +109,14 @@ class StudentsController extends Controller
                     'notes'             => $request->notes
                 ]);
             } else {
-                $filename = null;
+
                 $path = null;
-                if ($request->has('pdf')) {
-                    return response([
-                        'data' => $request->file('pdf')
-                    ]);
-                    $file = $request->file('pdf');
-                    if ($file !== null) {
-                        $filename = $file->getClientOriginalName();
-                        $file->move('files/',$filename);
-                    }
+
+                if ($request->hasFile('file')) {
+                    $file = $request->file('file');
+                    $path = $file->store('uploads');
                 }
+
                 $student = Students::create([
                     'first_name'        => $request->first_name,
                     'middle_name'       => $request->middle_name,
@@ -149,8 +145,8 @@ class StudentsController extends Controller
                     'skills'            => $request->skills,
                     'rate'              => $request->rate,
                     'notes'             => $request->notes,
-                    'filename'          => $filename,
-                    'path'              => $path
+                    'path'              => $path,
+                    'type_kiraat'       => $request->type_kiraat
                 ]);
                 if ($student->id) {
                     Students_Centers_Teachers::create([

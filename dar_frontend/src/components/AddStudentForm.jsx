@@ -200,43 +200,47 @@ export default function AddStudentForm() {
     }
     const addstudent = (e) => {
         e.preventDefault();
+
         const sheikh_names_arr = []
         value.map(v => sheikh_names_arr.push(v.value))
-        Api.post('addstudent', {
-            username: username,
-            password: password,
-            first_name: first_name,
-            middle_name: middle_name,
-            last_name: last_name,
-            mother_name: mothername,
-            place_of_birth: placeofbirth,
-            birthdate: birthday,
-            marital_status: martialstatus,
-            reading_level: reading_level,
-            school_uni_name: schooluni,
-            major: major,
-            blood_type: bloodtype,
-            gender: gender,
-            nationality: nationality,
-            current_job: current_job,
-            phone_number: phone_number,
-            work_number: work_number,
-            home_number: home_number,
-            student_level_status: student_level_status,
-            center_id: center_id,
-            teacher_id: teacher_id !== 0 ? teacher_id : null,
-            address: address,
-            suitable_times: suitabletimes.toString(),
-            suitable_days: suitabledays.toString(),
-            sheikh_names: sheikh_names_arr.toString(),
-            memorizing: memorizing,
-            female_question: female_question,
-            pdf: file,
+
+        const formData = new FormData();
+
+        formData.append('file', file);
+        formData.append('username', username);
+        formData.append('first_name', first_name);
+        formData.append('middle_name', middle_name);
+        formData.append('last_name', last_name);
+        formData.append('mother_name',mothername)
+        formData.append('place_of_birth', placeofbirth);
+        formData.append('birthdate', birthday);
+        formData.append('marital_status', martialstatus);
+        formData.append('reading_level', reading_level);
+        formData.append('school_uni_name', schooluni);
+        formData.append('major', major);
+        formData.append('blood_type', bloodtype);
+        formData.append('gender', gender);
+        formData.append('nationality', nationality);
+        formData.append('current_job', current_job);
+        formData.append('phone_number', phone_number);
+        formData.append('work_number', work_number);
+        formData.append('home_number', home_number);
+        formData.append('student_level_status', student_level_status);
+        formData.append('center_id', center_id);
+        formData.append('teacher_id', teacher_id !== 0 ? teacher_id : null);
+        formData.append('address', address);
+        formData.append('suitable_times', suitabletimes.toString());
+        formData.append('suitable_days', suitabledays.toString());
+        formData.append('memorizing', memorizing);
+        formData.append('sheikh_names', sheikh_names_arr.toString());
+        formData.append('female_question',female_question)
+        formData.append('type_kiraat',type_kiraat)
+
+        Api.post('addstudent',formData,{
             headers: {
                 'Content-Type': 'multipart/form-data',
-            },
-        }
-        ).then((res) => {
+              },
+        }).then((res) => {
             console.log(res);
             if (res.data.success) {
                 Swal.fire(res.data.message, '', 'success')
@@ -268,8 +272,81 @@ export default function AddStudentForm() {
                 setfemale_question(0)
                 setCenter_id(0)
                 setTeacher_id(0)
+                settype_kiraat('ifrad')
+                setFile(null)
             }
         }).catch(function (err) { console.log(err); })
+
+        // Api.post('addstudent', {
+        //     // username: username,
+        //     // password: password,
+        //     // first_name: first_name,
+        //     // middle_name: middle_name,
+        //     // last_name: last_name,
+        //     // mother_name: mothername,
+        //     // place_of_birth: placeofbirth,
+        //     // birthdate: birthday,
+        //     // marital_status: martialstatus,
+        //     // reading_level: reading_level,
+        //     // school_uni_name: schooluni,
+        //     // major: major,
+        //     // blood_type: bloodtype,
+        //     // gender: gender,
+        //     // nationality: nationality,
+        //     // current_job: current_job,
+        //     // phone_number: phone_number,
+        //     // work_number: work_number,
+        //     // home_number: home_number,
+        //     // student_level_status: student_level_status,
+        //     // center_id: center_id,
+        //     // teacher_id: teacher_id !== 0 ? teacher_id : null,
+        //     // address: address,
+        //     // suitable_times: suitabletimes.toString(),
+        //     suitable_days: suitabledays.toString(),
+        //     sheikh_names: sheikh_names_arr.toString(),
+        //     memorizing: memorizing,
+        //     female_question: female_question
+        // },
+        //     formData,
+        //     {
+        //         headers: {
+        //             'Content-Type': 'multipart/form-data',
+        //         },
+        //     }
+        // ).then((res) => {
+        //     console.log(res);
+        //     if (res.data.success) {
+        //         Swal.fire(res.data.message, '', 'success')
+        //         setUsername('')
+        //         setPassword('')
+        //         setFirst_name('')
+        //         setMiddle_name('')
+        //         setLast_name('')
+        //         setmothername('')
+        //         setnationality('')
+        //         setgender('male')
+        //         setaddress('')
+        //         setPhone_number('')
+        //         setwork_number('')
+        //         sethome_number('')
+        //         setcurrent_job('')
+        //         setschooluni('')
+        //         setmajor('')
+        //         setbirthday('')
+        //         setplaceofbirth('')
+        //         setreading_level('tilawa')
+        //         setstudent_level_status('beginner')
+        //         setbloodtype('A+')
+        //         setmartialstatus('single')
+        //         setsuitablesdays([])
+        //         setsuitablestimes([])
+        //         setValue([])
+        //         setmemorizing('')
+        //         setfemale_question(0)
+        //         setCenter_id(0)
+        //         setTeacher_id(0)
+        //     }
+        // }).catch(function (err) { console.log(err); })
     }
     const handleChange = (event) => {
         const {
