@@ -21,6 +21,10 @@ import TeacherSchedulePage from './pages/TeacherSchedulePage';
 import EditStudentPage from './pages/EditStudentPage';
 import RingStudentsPage from './pages/RingStudentsPage';
 import MonthlyTeacherReportPage from './pages/MonthlyTeacherReportPage';
+import EditRingStudentPage from './pages/EditRingStudentPage';
+import MonthlyRingReportPage from './pages/MonthlyRingReportPage';
+import { Spinner } from 'react-bootstrap';
+import Exam from './pages/Exam';
 
 
 
@@ -34,8 +38,7 @@ export default function () {
     'teacher': 4,
     'student': 5
   }
-
-  if (loading) return <p>loading........</p>
+  if (loading) return <div className='text-center mt-5'><Spinner variant='success' /></div>
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
@@ -52,7 +55,7 @@ export default function () {
         <Route element={<RequireAuth allowedRoles={[ROLES.supervisor, ROLES.teacher, ROLES.superadmin, ROLES.manager]} />}>
           <Route path="students" element={<Students />} />
           <Route path="addstudent/:id" element={<AddStudent />} />
-          <Route path="editstudent/:id" element={<EditStudentPage/>} />
+          <Route path="editstudent/:id" element={<EditStudentPage />} />
         </Route>
 
         <Route element={<RequireAuth allowedRoles={[ROLES.superadmin, ROLES.manager]} />}>
@@ -63,26 +66,33 @@ export default function () {
           <Route path="centers" element={<Centers />} />
         </Route>
 
-        <Route element={<RequireAuth allowedRoles={[ROLES.supervisor, ROLES.teacher,ROLES.superadmin]} />}>
-          <Route path="sessions" element={<QuranSession/>} />
-          <Route path="showsessions/:session_id" element={<ShowSessionsPage/>} />
-          <Route path="addrecite/:id/:rev_rec" element={<AddReciteRevisionPage/>} />
+        <Route element={<RequireAuth allowedRoles={[ROLES.supervisor, ROLES.teacher, ROLES.superadmin]} />}>
+          <Route path="sessions" element={<QuranSession />} />
+          <Route path="showsessions/:session_id" element={<ShowSessionsPage />} />
+          <Route path="addrecite/:id/:rev_rec" element={<AddReciteRevisionPage />} />
         </Route>
 
-        <Route element={<RequireAuth allowedRoles={[ROLES.supervisor, ROLES.teacher,ROLES.superadmin]} />}>
-          <Route path="rings" element={<RingPage/>} />
-          <Route path="ringstudents" element={<RingStudentsPage/>} />
+        <Route element={<RequireAuth allowedRoles={[ROLES.supervisor, ROLES.teacher, ROLES.superadmin]} />}>
+          <Route path="rings" element={<RingPage />} />
+          <Route path="ringstudents" element={<RingStudentsPage />} />
+          <Route path="editringstudent/:student_id" element={<EditRingStudentPage />} />
         </Route>
 
-        <Route element={<RequireAuth allowedRoles={[ROLES.supervisor, ROLES.teacher,ROLES.superadmin]} />}>
-          <Route path="teacherschedule" element={<TeacherSchedulePage/>} />
-          <Route path="monthlyteachereport" element={<MonthlyTeacherReportPage/>} />
+        <Route element={<RequireAuth allowedRoles={[ROLES.supervisor, ROLES.teacher, ROLES.superadmin]} />}>
+          <Route path="teacherschedule" element={<TeacherSchedulePage />} />
+          <Route path="monthlyteachereport" element={<MonthlyTeacherReportPage />} />
+          <Route path="monthlyringreport" element={<MonthlyRingReportPage />} />
         </Route>
+
 
         <Route element={<RequireAuth allowedRoles={[ROLES.superadmin, ROLES.manager, ROLES.supervisor]} />}>
           <Route path="teachers" element={<Teachers />} />
           <Route path="editteacher/:teacher_id" element={<EditTeacher />} />
-        </Route>  
+        </Route>
+
+        <Route element={<RequireAuth allowedRoles={[ROLES.superadmin, ROLES.manager, ROLES.supervisor]} />}>
+          <Route path="exam" element={<Exam />} />
+        </Route>
 
         {/* catch all */}
         <Route path="*" element={<Missing />} />

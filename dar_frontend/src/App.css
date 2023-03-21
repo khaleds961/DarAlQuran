@@ -35,3 +35,10 @@
         margin: auto;
     }
 }
+
+@font-face {
+    font-family: 'Amiri';
+    src: local('Amiri'), url('../src/fonts/Amiri-Bold.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+  }

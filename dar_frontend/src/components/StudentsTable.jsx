@@ -30,6 +30,8 @@ function StudentsTable() {
   const [loading, setLoading] = useState(false)
   const [teachers, setteachers] = useState([])
   const [filterteacher, setfilterteacher] = useState(0)
+  const [studentfilter, setstudentfilter] = useState('')
+  const [hidepagination, setHidePagination] = useState(false)
 
   const deleteStudent = (student_id, center_id) => {
     Swal.fire({
@@ -66,10 +68,14 @@ function StudentsTable() {
 
   const changePage = (e, value) => {
     setPage(value);
-    if (filterteacher !== 0) {
-      getstudentbyteacher(filterteacher, value)
+    if (role_id === 4) {
+      getstudentbyteacher(id, value)
     } else {
-      getStudentsByCenter(center_id, value)
+      if (filterteacher !== 0) {
+        getstudentbyteacher(filterteacher, value)
+      } else {
+        getStudentsByCenter(center_id, value)
+      }
     }
   };
 
@@ -113,10 +119,33 @@ function StudentsTable() {
       setteachers(res.data.data);
     })
   }
+  const searchforstudent = () => {
+
+    if (studentfilter) {
+      setLoading(true)
+      Api.post('searchforstudent', {
+        student_name: studentfilter,
+        center_id: center_id,
+        role_id: role_id,
+        teacher_id: id
+      }).then((res) => {
+        setStudents(res.data.data)
+        setHidePagination(true)
+        setLoading(false)
+      }
+      ).catch(function (err) { console.log(err) })
+    } else {
+      Swal.fire('ادخل الاسم قبل البحث', '', 'warning')
+    }
+  }
 
   useEffect(() => {
-    getStudentsByCenter(center_id, page)
-    getTeachersByCenter(center_id)
+    if (role_id === 4) {
+      getstudentbyteacher(id, 1)
+    } else {
+      getStudentsByCenter(center_id, page)
+      getTeachersByCenter(center_id)
+    }
   }, [])
 
   const data = (center_id) => {
@@ -148,6 +177,15 @@ function StudentsTable() {
               : ''}
           </div>
 
+        </div>
+
+        <div>
+          <div className='d-flex my-3 flex-row-reverse'>
+            <button className='btn btn-dark text-white mx-2' onClick={searchforstudent}>بحث عن طالب</button>
+            <input type="text" className='rounded border border-dark'
+              value={studentfilter}
+              onChange={(e) => setstudentfilter(e.target.value)} />
+          </div>
         </div>
         <>
           <table className="table table-dark table-hover text-center text-center">
@@ -183,10 +221,10 @@ function StudentsTable() {
                       <span className='mx-2 cursor_pointer' onClick={() => deleteStudent(student.id, student.center_id)}>
                         <BsTrash />
                       </span>
-                      <NavLink className='text-white'  to={`/editstudent/${student.id}`}>
-                      <span>
-                        <TbPencil />
-                      </span>
+                      <NavLink className='text-white' to={`/editstudent/${student.id}`}>
+                        <span>
+                          <TbPencil />
+                        </span>
                       </NavLink>
                     </td>
                   </tr>
@@ -194,13 +232,15 @@ function StudentsTable() {
               </tbody>
             }
           </table>
-          <Pagination
-            shape="rounded"
-            count={total}
-            page={page}
-            size="small"
-            onChange={changePage}
-            variant="outlined" />
+          {hidepagination ? '' :
+            <Pagination
+              shape="rounded"
+              count={total}
+              page={page}
+              size="small"
+              onChange={changePage}
+              variant="outlined" />
+          }
         </>
         {/* : <p><b>لا يوجد اي طالب بعد</b></p>} */}
       </div>

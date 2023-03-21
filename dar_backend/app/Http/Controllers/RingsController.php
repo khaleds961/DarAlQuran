@@ -76,6 +76,60 @@ class RingsController extends Controller
         }
     }
 
+    public function getringsbyteacher($teacher_id){
+        try {
+            $rings = Rings::join('users', 'users.id', '=', 'rings.teacher_id')
+            ->join('centers', 'centers.id', '=', 'rings.center_id')
+            ->where('teacher_id',$teacher_id)
+            ->select(
+                'rings.id',
+                'rings.name',
+                'rings.is_active',
+                'rings.created_at',
+                'users.id as teacher_id',
+                'users.first_name as teacher_fn',
+                'users.middle_name as teacher_mn',
+                'users.last_name as teacher_ln',
+                'centers.id as center_id',
+                'centers.name as center_name'
+            )
+            ->paginate(10);
+                return response([
+                    'data' => $rings,
+                    'success' => true
+                ]);
+        } catch (Exception $e) {
+            return response($e->getMessage());
+        }
+    }
+
+    public function getallringsbyteacher($teacher_id){
+        try {
+            $rings = Rings::join('users', 'users.id', '=', 'rings.teacher_id')
+            ->join('centers', 'centers.id', '=', 'rings.center_id')
+            ->where('teacher_id',$teacher_id)
+            ->where('is_active',1)
+            ->select(
+                'rings.id',
+                'rings.name',
+                'rings.is_active',
+                'rings.created_at',
+                'users.id as teacher_id',
+                'users.first_name as teacher_fn',
+                'users.middle_name as teacher_mn',
+                'users.last_name as teacher_ln',
+                'centers.id as center_id',
+                'centers.name as center_name'
+            )
+            ->get();
+                return response([
+                    'data' => $rings,
+                    'success' => true
+                ]);
+        } catch (Exception $e) {
+            return response($e->getMessage());
+        }
+    }
     /**
      * Show the form for creating a new resource.
      *

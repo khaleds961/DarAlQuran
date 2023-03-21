@@ -16,9 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-
-
-
+use Illuminate\Support\Facades\DB;
 
 class UsersController extends Controller
 {
@@ -336,6 +334,24 @@ class UsersController extends Controller
         ]);
     }
 
+    //get all teachers no pagination
+    public function allteachers()
+    {
+        try {
+            $teachers = Users::where('is_deleted', 0)
+                ->where('role_id', 4)
+                ->select(
+                    DB::raw('CONCAT (first_name," ",middle_name," ",last_name) as teacher_name'),
+                    'id'
+                )->get();
+            return response([
+                'data' => $teachers,
+                'success' => true
+            ]);
+        } catch (Exception $e) {
+            return response($e->getMessage());
+        }
+    }
     //without pagination
     public function getAllTeachersByCenter($center_id)
     {

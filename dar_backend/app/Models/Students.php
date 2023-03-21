@@ -44,7 +44,10 @@ class Students extends Model
         'address',
         'rate',
         'skills',
-        'notes'
+        'notes',
+        'type_kiraat',
+        'file_name',
+        'path'
     ];
 
     public function teachers()

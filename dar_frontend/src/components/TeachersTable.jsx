@@ -231,7 +231,7 @@ function TeachersTable() {
               ></input>
               {mname_error ? <p><b className='text-danger'>{mname_error}</b></p> : ''}
 
-              <label htmlFor="last_name">الاسم الاخير</label>
+              <label htmlFor="last_name">العائلة</label>
               <input type='text' id="last_name" className='form-control rtl my-2'
                 name='last_name'
                 onChange={(e) => setLname(e.target.value)}

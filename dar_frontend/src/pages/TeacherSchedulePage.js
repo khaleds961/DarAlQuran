@@ -8,7 +8,7 @@ function TeacherSchedulePage() {
       <div className="row flex-nowrap">
         <SideBar/>
         <div className="col py-3" style={{background:'#EEEEEE'}}>
-        <h3 className='mb-5 text-center'>الاساتذة</h3>
+        <h3 className='mb-5 text-center'>اوقات الطلاب</h3>
         <TeacherSchedule/>
         </div>
       </div>

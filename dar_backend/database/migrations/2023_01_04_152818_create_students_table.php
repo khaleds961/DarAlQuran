@@ -24,6 +24,9 @@ return new class extends Migration
             $table->date('birthdate')->format('Y.m.d');
             $table->enum('marital_status', ['single', 'married', 'divorced', 'widowed'])->nullable();
             $table->enum('reading_level', ['tilawa', 'hifz', 'kiraat']);
+            $table->enum('kiraat_type',['kobra','soghra','ifrad'])->nullable();
+            $table->string('file_name')->nullable();
+            $table->string('path')->nullable();
             $table->string('school_uni_name')->nullable();
             $table->string('major')->nullable();
             $table->string('rate')->nullable();

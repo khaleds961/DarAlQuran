@@ -48,4 +48,15 @@ return [
     
     //Revision 
     'revision_added' => 'تمت الاضافة',
+
+    //RingRevision
+    'ring_revision_added' => 'تمت الاضافة',
+    'ring_revision_exist' => 'هذه الجلسة موجودة سابقا',
+
+    //RingComment
+    'note_added' => 'تمت الاضافة',
+    'note_exist' => 'هذه الملاحظة موجودة مسبقا',
+
+    //Exam
+    'exam_added' => 'تمت الاضافة بنجاح'
 ];

@@ -1,8 +1,9 @@
+import { Pagination } from '@mui/material';
 import React, { useState, useEffect, useContext } from 'react'
 import { Spinner } from 'react-bootstrap';
 import Modal from "react-bootstrap/Modal";
 import { AiOutlineEye } from 'react-icons/ai';
-import { BsPlusCircle, BsTrash, BsPencil } from 'react-icons/bs';
+import { BsPlusCircle, BsPencil } from 'react-icons/bs';
 import Moment from 'react-moment';
 import { NavLink } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -10,6 +11,7 @@ import Api from '../Api'
 import SessionContext from '../session/SessionContext';
 import CenterSelect from './CenterSelect';
 import TeacherSelect from './TeacherSelect';
+
 
 
 export default function RingsTable() {
@@ -28,12 +30,17 @@ export default function RingsTable() {
   const [centerid, setcenterid] = useState(defaultvalue)
   const [editcenterid, seteditcenterid] = useState(null)
   const [selectcenterid, setselectcenterid] = useState(defaultvalue)
+  const [filtercenterid, setfiltercenterid] = useState(0)
   const [teacherid, setteacherid] = useState(null)
+  const [filterteacherid, setfilterteacherid] = useState(0)
   const [editteacherid, seteditteacherid] = useState(null)
   const [teachers, setteachers] = useState([])
+  const [teachers_filter, setteachers_filter] = useState([])
   const [loading, setLoading] = useState(false)
   const [insideloading, setinsideLoading] = useState(false)
   const [isactive, setisactive] = useState(null)
+  const [page, setpage] = useState(1)
+  const [total, settotal] = useState(1)
 
   const showModal = () => {
     setIsOpen(true);
@@ -46,6 +53,16 @@ export default function RingsTable() {
     setIsOpen(false);
     setEditModal(false)
   };
+
+  const getfiltercenter = (center_id) => {
+    setfiltercenterid(center_id)
+    setfilterteacherid(0)
+    getTeachersFilterByCenter(center_id)
+  }
+
+  const getfilterteacherid = (teacher_id) => {
+    setfilterteacherid(teacher_id)
+  }
 
   const getcenterid = (center_id) => {
     setselectcenterid(center_id)
@@ -72,6 +89,13 @@ export default function RingsTable() {
     })
   }
 
+  const getTeachersFilterByCenter = (center_id) => {
+    setteachers([])
+    Api.get(`getAllTeachersByCenter/${center_id}`).then((res) => {
+      setteachers_filter(res.data.data);
+    })
+  }
+
   const addRing = () => {
     Api.post(`addring`, {
       name: ringname,
@@ -83,15 +107,16 @@ export default function RingsTable() {
         setringname('')
         setteacherid(0)
         setselectcenterid(0)
-        getRings()
+        getRings(1)
       }
     }).catch(function (err) { console.log(err) })
   }
 
-  const getRings = () => {
+  const getRings = (p) => {
     setLoading(true)
-    Api.get(`getrings/${centerid}`).then((res) => {
+    Api.get(`getrings/${centerid}?page=${p}`).then((res) => {
       setrings(res.data.data.data)
+      settotal(Math.ceil(res.data.data.total / 10))
       setLoading(false)
     })
   }
@@ -114,16 +139,16 @@ export default function RingsTable() {
     Api.post(`editring/${ring_id}`, {
       name: editringname,
       is_active: isactive,
-      teacher_id:editteacherid
+      teacher_id: editteacherid
     }).then((res) => {
       if (res.data.success) {
         Swal.fire(res.data.message, '', 'success')
-        getRings()
+        getRings(1)
+        setpage(1)
         setEditModal(false)
       }
     })
   }
-
 
   const deletering = (ring_id) => {
     Swal.fire({
@@ -149,8 +174,25 @@ export default function RingsTable() {
     })
   }
 
+  const changePage = (e, value) => {
+    setpage(value)
+    if (filterteacherid !== 0) {
+      getringsbyteacher(filterteacherid, value)
+    } else {
+      getRings(value)
+    }
+  }
+
+  const getringsbyteacher = (teacher_id, p) => {
+    setLoading(true)
+    Api.get(`getringsbyteacher/${teacher_id}?page=${p}`).then((res) => {
+      setrings(res.data.data.data)
+      settotal(Math.ceil(res.data.data.total / 10))
+      setLoading(false)
+    }).catch(function (err) { console.log(err) })
+  }
   useEffect(() => {
-    getRings()
+    getRings(1)
   }, [])
 
   useEffect(() => {
@@ -158,6 +200,13 @@ export default function RingsTable() {
       getTeachersByCenter(ringbyid['center_id'])
     }
   }, [ringbyid['center_id']])
+
+  useEffect(() => {
+    if (filterteacherid) {
+      getringsbyteacher(filterteacherid, 1)
+      setpage(1)
+    }
+  }, [filterteacherid])
 
   return (
     <div>
@@ -170,30 +219,37 @@ export default function RingsTable() {
         </button>
 
         <NavLink to='/ringstudents'>
-        <button type="button" className="btn btn-primary mb-3 d-flex align-items-center mx-2">
-          <AiOutlineEye className='text-white' />
-          <span className='px-2'>
-            طلاب الحلقات
-          </span>
-        </button>
+          <button type="button" className="btn btn-primary mb-3 d-flex align-items-center mx-2">
+            <AiOutlineEye className='text-white' />
+            <span className='px-2'>
+              طلاب الحلقات
+            </span>
+          </button>
         </NavLink>
-
-        <Modal show={isOpen} onHide={hideModal}>
-          <Modal.Body className='rtl'>
-            <label htmlFor="center_name">اسم الحلقة</label>
-            <input type='text' className='form-control rtl my-2'
-              value={ringname}
-              onChange={(e) => setringname(e.target.value)}
-            ></input>
-            <CenterSelect center_id={getcenterid} c_id={selectcenterid} />
-            <TeacherSelect teachers={teachers} teacher_id={getteacherid} tid={teacherid} />
-          </Modal.Body>
-          <Modal.Footer>
-            <button type='button' className='btn btn-dark' onClick={hideModal}>الغاء</button>
-            <button type='button' className='btn btn-success' onClick={addRing} >اضافة</button>
-          </Modal.Footer>
-        </Modal>
       </div>
+
+      <div className='d-flex flex-row-reverse'>
+        <div className='mx-2'>
+          <TeacherSelect teachers={teachers_filter} teacher_id={getfilterteacherid} tid={filterteacherid} fromquransession={true} />
+        </div>
+        <CenterSelect c_id={filtercenterid} data={getfiltercenter} fromstudent={true} />
+      </div>
+
+      <Modal show={isOpen} onHide={hideModal}>
+        <Modal.Body className='rtl'>
+          <label htmlFor="center_name">اسم الحلقة</label>
+          <input type='text' className='form-control rtl my-2'
+            value={ringname}
+            onChange={(e) => setringname(e.target.value)}
+          ></input>
+          <CenterSelect center_id={getcenterid} c_id={selectcenterid} />
+          <TeacherSelect teachers={teachers} teacher_id={getteacherid} tid={teacherid} />
+        </Modal.Body>
+        <Modal.Footer>
+          <button type='button' className='btn btn-dark' onClick={hideModal}>الغاء</button>
+          <button type='button' className='btn btn-success' onClick={addRing} >اضافة</button>
+        </Modal.Footer>
+      </Modal>
 
       <table className="table table-dark table-responsive table-hover text-center">
         <thead>
@@ -230,7 +286,7 @@ export default function RingsTable() {
                 <td>
                   {/* <span className='cursor_pointer'
                     onClick={() => deletering(ring.id)}><BsTrash /></span> */}
-                  <span className='mx-2 cursor_pointer text-white'
+                  <span className='mx-2 text-white'
                     onClick={() => getringbyid(ring.id)}>
                     <BsPencil />
                   </span>
@@ -240,6 +296,18 @@ export default function RingsTable() {
           }
         </tbody>
       </table>
+
+      {rings && rings.length > 0 ?
+        <>
+          <Pagination
+            shape="rounded"
+            count={total}
+            page={page}
+            size="small"
+            onChange={changePage}
+            variant="outlined" />
+        </>
+        : ''}
       {/* Edit Modal  */}
 
       <Modal show={editModal} onHide={hideModal}>

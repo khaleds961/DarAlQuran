@@ -9,6 +9,7 @@ use App\Models\Students_Centers_Teachers;
 use App\Models\Users;
 use Exception;
 use Illuminate\Foundation\Auth\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class StudentsController extends Controller
@@ -31,20 +32,38 @@ class StudentsController extends Controller
         }
     }
 
-    public function getstudentsbyring($ring_id){
-        try{
-            $students = Students::where('ring_id',$ring_id)->paginate(10);
+    public function allstudents()
+    {
+        try {
+            $students = Students::where('is_deleted', 0)
+                ->select(
+                    'id',
+                    DB::raw('CONCAT(first_name," ",middle_name," ",last_name) as student_name')
+                )
+                ->get();
+            return response([
+                'data' => $students,
+                'success' => true
+            ]);
+        } catch (Exception $e) {
+            return response($e->getMessage());
+        }
+    }
+
+    public function getstudentsbyring($ring_id)
+    {
+        try {
+            $students = Students::where('ring_id', $ring_id)->paginate(10);
             $teacher_ring = Rings::with('teacher')->find($ring_id);
             return response([
                 'data'    => $students,
                 'teacher_ring' => $teacher_ring,
                 'success' => true
             ]);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return response($e->getMessage());
         }
-        
-        }
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -90,6 +109,18 @@ class StudentsController extends Controller
                     'notes'             => $request->notes
                 ]);
             } else {
+                $filename = null;
+                $path = null;
+                if ($request->has('pdf')) {
+                    return response([
+                        'data' => $request->file('pdf')
+                    ]);
+                    $file = $request->file('pdf');
+                    if ($file !== null) {
+                        $filename = $file->getClientOriginalName();
+                        $file->move('files/',$filename);
+                    }
+                }
                 $student = Students::create([
                     'first_name'        => $request->first_name,
                     'middle_name'       => $request->middle_name,
@@ -117,9 +148,11 @@ class StudentsController extends Controller
                     'female_question'   => $request->female_question,
                     'skills'            => $request->skills,
                     'rate'              => $request->rate,
-                    'notes'             => $request->notes
+                    'notes'             => $request->notes,
+                    'filename'          => $filename,
+                    'path'              => $path
                 ]);
-                if ($student) {
+                if ($student->id) {
                     Students_Centers_Teachers::create([
                         'student_id' => $student['id'],
                         'center_id' => $request['center_id'],
@@ -127,7 +160,7 @@ class StudentsController extends Controller
                     ]);
                 }
             }
-            if ($student) {
+            if ($student->id) {
                 return response([
                     'message' => __('message.student_added'),
                     'success' => true
@@ -149,12 +182,34 @@ class StudentsController extends Controller
     public function show($id)
     {
         try {
-            $student = Students::where('is_deleted', 0)->where('ring_id', null)->find($id);
+            $student = Students::where('is_deleted', 0)->find($id);
             $teacher_id = Students_Centers_Teachers::where('student_id', $id)->first()->user_id;
             $center_id = Students_Centers_Teachers::where('student_id', $id)
                 ->where('user_id', $teacher_id)->first()->center_id;
             $student->teacher_id = $teacher_id;
             $student->center_id = $center_id;
+            return response([
+                'data' => $student,
+                'success' => true
+            ]);
+        } catch (Exception $e) {
+            return response($e->getMessage());
+        }
+    }
+
+    public function showRingStudent($id)
+    {
+        try {
+            $student = Students::where('is_deleted', 0)->find($id);
+            $ring_id = $student->ring_id;
+            $center_id = Rings::where('id', $ring_id)->first()->center_id;
+            $student->center_id = $center_id;
+            $check_student = Students_Centers_Teachers::where('student_id', $id)->first();
+            if ($check_student) {
+                $student->teacher_id = $check_student->user_id;
+            } else {
+                $student->teacher_id = 0;
+            }
             return response([
                 'data' => $student,
                 'success' => true
@@ -185,7 +240,70 @@ class StudentsController extends Controller
     public function update(Request $request, $id)
     {
         $student = Students::find($id);
-        if ($request->is_ring) { } else {
+        if ($request->is_ring) {
+            $new_record = false;
+            $student->update([
+                'first_name' => $request->first_name,
+                'middle_name' => $request->middle_name,
+                'last_name' => $request->last_name,
+                'mother_name' => $request->mother_name,
+                'address' => $request->address,
+                'place_of_birth' => $request->place_of_birth,
+                'birthdate' => $request->birthdate,
+                'marital_status' => $request->marital_status,
+                'reading_level' => $request->reading_level,
+                'school_uni_name' => $request->school_uni_name,
+                'major' => $request->major,
+                'blood_type' => $request->blood_type,
+                'gender' => $request->gender,
+                'nationality' => $request->nationality,
+                'current_job' => $request->current_job,
+                'mother_work' => $request->mother_work,
+                'father_work' => $request->father_work,
+                'father_number' => $request->father_number,
+                'mother_number' => $request->mother_number,
+                'work_number' => $request->work_number,
+                'home_number' => $request->home_number,
+                'student_level_status' => $request->student_level_status,
+                'suitable_days' => $request->suitable_days,
+                'suitable_times' => $request->suitable_times,
+                'sheikh_names' => $request->sheikh_names,
+                'memorizing' => $request->memorizing,
+                'skills' => $request->skills,
+                'ring_id' => $request->ring_id
+            ]);
+            $student_center_teacher = Students_Centers_Teachers::where('student_id', $id)->first();
+            if ($student_center_teacher) {
+                if ($request->center_id != 0 && $request->teacher_id != 0) {
+                    $student_center_teacher->update([
+                        'center_id' => $request->center_id,
+                        'user_id'   => $request->teacher_id
+                    ]);
+                }
+            } else {
+                if ($request->center_id != 0 && $request->teacher_id != 0) {
+                    $add_student = new Students_Centers_Teachers([
+                        'center_id' => $request->center_id,
+                        'student_id' => $request->id,
+                        'user_id' => $request->teacher_id
+                    ]);
+                    if ($add_student->save()) {
+                        $new_record = true;
+                    }
+                }
+            }
+
+            if ($student->wasChanged() || $new_record || $student_center_teacher->wasChanged()) {
+                return response([
+                    'message' => __('message.student_updated'),
+                    'success' => true
+                ]);
+            } else {
+                return response([
+                    'success' => false
+                ]);
+            }
+        } else {
             $student->update([
                 'first_name' => $request->first_name,
                 'middle_name' => $request->middle_name,
@@ -211,8 +329,8 @@ class StudentsController extends Controller
                 'memorizing' => $request->memorizing,
                 'female_question' => $request->female_question
             ]);
-            $student_center_teacher = Students_Centers_Teachers::where('student_id',$id)->first();
-            
+            $student_center_teacher = Students_Centers_Teachers::where('student_id', $id)->first();
+
             $student_center_teacher->update([
                 'user_id' => $request->teacher_id,
                 'center_id' => $request->center_id
@@ -223,11 +341,39 @@ class StudentsController extends Controller
                     'message' => __('message.student_updated'),
                     'success' => true
                 ]);
-            }else{
+            } else {
                 return response([
                     'success' => false
                 ]);
             }
+        }
+    }
+
+    public function searchforstudent(Request $request)
+    {
+        try {
+            if ($request->student_name) {
+                $name = $request->student_name;
+                if ($request->role_id === 1 || $request->role_id === 2) {
+                    $students = Students::where(DB::raw('CONCAT(first_name, " ", middle_name, " ", last_name)'), 'LIKE', '%' . $name . '%')
+                        ->get();
+                } elseif ($request->role_id === 3) {
+                    $center = Centers::find($request->center_id);
+                    $students = $center->students()->where(DB::raw('CONCAT(first_name, " ", middle_name, " ", last_name)'), 'LIKE', '%' . $name . '%')
+                        ->get();
+                } else {
+                    $teacher = Users::find($request->teacher_id);
+                    $students = $teacher->students()->where(DB::raw('CONCAT(first_name, " ", middle_name, " ", last_name)'), 'LIKE', '%' . $name . '%')
+                        ->get();
+                }
+
+                return response([
+                    'data' => $students,
+                    'success' => true
+                ]);
+            }
+        } catch (Exception $e) {
+            return response($e->getMessage());
         }
     }
 

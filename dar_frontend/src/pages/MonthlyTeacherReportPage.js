@@ -9,7 +9,7 @@ export default function MonthlyTeacherReportPage() {
       <div className="row flex-nowrap">
         <SideBar />
         <div className="col py-3" style={{background:'#EEEEEE'}}>
-        <h3 className='mb-5 text-center'>جدول الاستاذ الشهري</h3>
+        <h3 className='mb-5 text-center'>البيان الشهري للحفظ والمراجعة والتسميع</h3>
         <MonthlyTeacherReport/>
         </div>
       </div>

@@ -1,12 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { FaHome, FaSchool, FaUserGraduate, FaRing } from 'react-icons/fa';
+import { FaHome, FaSchool, FaUserGraduate, FaRing,FaBuromobelexperte } from 'react-icons/fa';
 import { BiLogOutCircle } from "react-icons/bi";
 import { ImUserTie } from "react-icons/im";
 import { MdCalendarToday, MdClass } from 'react-icons/md'
-import { AiFillSchedule } from 'react-icons/ai'
+import { AiFillSchedule, AiOutlineAreaChart } from 'react-icons/ai'
 import SessionContext from '../session/SessionContext';
-
 
 
 function Navbar() {
@@ -154,6 +153,40 @@ function Navbar() {
                     <NavLink to='/rings' className='d-none d-md-flex align-items-center text-decoration-none text-dark py-2 px-2 hover'>
                         <FaRing className='text-dark' />
                         <span className='px-2 d-none d-md-block'>الحلقات</span>
+                    </NavLink>
+                </div>
+
+                {/* case 1: small screen Class */}
+                <div className='text-center'>
+                    <NavLink to='/monthlyringreport' className='text-decoration-none'>
+                        <AiOutlineAreaChart className='d-xs-block d-md-none text-dark' />
+                    </NavLink>
+                </div>
+
+                {/* case 2:md page and more */}
+                <div className='my-2'>
+                    <NavLink to='/monthlyringreport' className='d-none d-md-flex align-items-center text-decoration-none text-dark py-2 px-2 hover'>
+                        <AiOutlineAreaChart className='text-dark' />
+                        <span className='px-2 d-none d-md-block'>
+                            البيان الشهري للحلقات
+                        </span>
+                    </NavLink>
+                </div>
+
+                {/* case 1: small screen Class */}
+                <div className='text-center'>
+                    <NavLink to='/exam' className='text-decoration-none'>
+                        <FaBuromobelexperte className='d-xs-block d-md-none text-dark' />
+                    </NavLink>
+                </div>
+
+                {/* case 2:md page and more */}
+                <div className='my-2'>
+                    <NavLink to='/exam' className='d-none d-md-flex align-items-center text-decoration-none text-dark py-2 px-2 hover'>
+                        <FaBuromobelexperte className='text-dark' />
+                        <span className='px-2 d-none d-md-block'>
+                            جلسة الاختبار
+                        </span>
                     </NavLink>
                 </div>
 

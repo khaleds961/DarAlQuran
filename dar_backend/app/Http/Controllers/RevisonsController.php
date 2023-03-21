@@ -60,7 +60,9 @@ class RevisonsController extends Controller
                     $request->surah_from && $request->surah_to &&
                     $request->ayyah_from && $request->ayyah_to &&
                     $request->type &&
-                    $request->date
+                    $request->date &&
+                    $request->page_from &&
+                    $request->page_to
                 ) {
                     Revisions::create([
                         'session_id' => $request->session_id,
@@ -68,6 +70,8 @@ class RevisonsController extends Controller
                         'surah_to'   => $request->surah_to,
                         'ayyah_from' => $request->ayyah_from,
                         'ayyah_to'   => $request->ayyah_to,
+                        'page_from'  => $request->page_from,
+                        'page_to'    => $request->page_to,
                         'notes'      => $request->notes,
                         'type'       => $request->type,
                         'riwayahname'  => $request->riwayahname,

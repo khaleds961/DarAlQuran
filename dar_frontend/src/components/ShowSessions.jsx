@@ -148,9 +148,11 @@ function ShowSessions() {
                                 <th>النوع</th>
                                 <th>نوع الغياب</th>
                                 <th>من سورة</th>
-                                <th>الى سورة</th>
                                 <th>من ايه</th>
+                                <th>من صفحة</th>
+                                <th>الى سورة</th>
                                 <th>الى ايه</th>
+                                <th>الى صفحة</th>
                                 <th>القراءة</th>
                                 <th>ملاحظات</th>
                             </tr>
@@ -170,9 +172,11 @@ function ShowSessions() {
                                             session.absence_type === 'unexcused' ? 'غ' :
                                                 session.absence_type === 'teacher_excused' ? 'ش' : ''}</td>
                                         <td>{session.surah_from}</td>
-                                        <td>{session.surah_to}</td>
                                         <td>{session.ayyah_from}</td>
+                                        <td>{session.page_from}</td>
+                                        <td>{session.surah_to}</td>
                                         <td>{session.ayyah_to}</td>
+                                        <td>{session.page_to}</td>
                                         <td>{session.riwayahname === '0' ? '' : session.riwayahname}</td>
                                         <td>{session.notes}</td>
                                     </tr>

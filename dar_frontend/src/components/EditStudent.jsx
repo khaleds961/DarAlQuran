@@ -196,8 +196,6 @@ export default function EditStudent() {
       sheikh_names: sheikh_names_arr.toString(),
       memorizing: memorizing,
       female_question: female_question,
-      teacher_id: teacher_id,
-      center_id: center_id,
     }).then(
       (res) => {
         if (res.data.success) {
@@ -291,7 +289,7 @@ export default function EditStudent() {
           {/* first middle last name */}
           <div className='row'>
             <div className="col-md">
-              <label htmlFor="f_name my-2">الاسم الاول</label>
+              <label htmlFor="f_name my-2">الاسم</label>
               <input type="text" name='first_name' className="form-control my-2"
                 value={first_name}
                 onChange={(e) => setFirst_name(e.target.value)}
@@ -299,7 +297,7 @@ export default function EditStudent() {
             </div>
 
             <div className="col-md">
-              <label htmlFor="l_name">الاسم الاوسط</label>
+              <label htmlFor="l_name">اسم الاب</label>
               <input type="text" className="form-control my-2"
                 value={middle_name}
                 onChange={(e) => setMiddle_name(e.target.value)}
@@ -307,7 +305,7 @@ export default function EditStudent() {
             </div>
 
             <div className="col-md">
-              <label htmlFor="l_name">الاسم الاخير</label>
+              <label htmlFor="l_name">العائلة</label>
               <input type="text" name='last_name' className="form-control my-2"
                 value={last_name}
                 onChange={(e) => setLast_name(e.target.value)}
@@ -532,7 +530,7 @@ export default function EditStudent() {
                 </div>
 
                 <div className='col-md'>
-                  <label>المستوى الذي يود ان يقرأ فيه</label>
+                  <label>المستوى الذي تود ان يقرأ فيه</label>
                   <select className="form-control my-2" value={reading_level}
                     onChange={(e) => setreading_level(e.target.value)}>
                     <option value="tilawa">تلاوة</option>

@@ -1,12 +1,15 @@
 import { Pagination } from '@mui/material'
+import moment from 'moment'
 import React, { useEffect, useState, useContext } from 'react'
-import { Spinner } from 'react-bootstrap'
+import { Button, Modal, Spinner } from 'react-bootstrap'
+import { AiFillPlusCircle } from 'react-icons/ai'
 import { BsFillPencilFill, BsTrash } from 'react-icons/bs'
+import { NavLink } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import Api from '../Api'
 import SessionContext from '../session/SessionContext';
 import CenterSelect from './CenterSelect';
-
+import StudentModal from './StudentModal'
 
 
 export default function RingStudents() {
@@ -24,7 +27,15 @@ export default function RingStudents() {
     const [total, settotal] = useState(1)
     const [loading, setloading] = useState(false)
     const [centerid, setcenterid] = useState(default_center_id)
+    const [smShow, setSmShow] = useState(false);
+    const [notedate, setnotedate] = useState('')
+    const [note, setnote] = useState('')
 
+    const handleClose = () => {
+        setSmShow(false)
+        setnote('')
+        setnotedate('')
+    }
 
     const getfiltercenter = (c_id) => {
         setcenterid(c_id)
@@ -51,6 +62,35 @@ export default function RingStudents() {
         }).catch(function (err) { console.log(err) })
     }
 
+    const addnewnote = () => {
+        console.log(note, 'note');
+        console.log(notedate, 'notedate');
+        console.log(ring_id, 'ring_id');
+        if (ring_id !== 0) {
+            if (note && notedate) {
+                Api.post(`addcommentring`, {
+                    ring_id: ring_id,
+                    comment: note,
+                    date: notedate
+                }).then((res) => {
+                    if (res.data.success) {
+                        Swal.fire(res.data.message, '', 'success')
+                        setnote('')
+                        setnotedate('')
+                    } else {
+                        Swal.fire(res.data.message, '', 'alert')
+
+                    }
+                })
+            } else {
+                Swal.fire('ادخل الملاحظة والتاريخ', '', 'warning')
+            }
+        } else {
+            Swal.fire('تأكد من انك اخترت الحلقة')
+        }
+
+    }
+
     const deleteStudent = (student_id) => {
         Swal.fire({
             title: 'هل انت متأكد من حذف الطالب؟',
@@ -70,6 +110,7 @@ export default function RingStudents() {
             }
         })
     }
+
 
     const changePage = (e, value) => {
         setpage(value)
@@ -109,6 +150,7 @@ export default function RingStudents() {
                     <>
                         <table className='table table-dark table-hover text-center'>
                             <thead>
+
                                 <tr className='bg-info'>
                                     <td className='bg-info'>
                                         <span>الاستاذ: </span>
@@ -119,7 +161,7 @@ export default function RingStudents() {
                                         </span>
                                     </td>
 
-                                    <td className='bg-primary'>
+                                    <td className='bg-primary' colSpan={2}>
                                         <span>الحلقة: </span>
                                         <span>
                                             <b>
@@ -130,18 +172,64 @@ export default function RingStudents() {
                                 </tr>
                                 <tr>
                                     <th> اسم الطالب</th>
+                                    <th>عمر الطالب</th>
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {students.length > 0 ?
-                                    students.map((student) => <tr key={student.id}>
-                                        <td>{student.first_name} {student.middle_name} {student.last_name}</td>
-                                        <td>
-                                            <span className='cursor_pointer'><BsFillPencilFill /></span>
-                                            <span className='mx-2 cursor_pointer' onClick={() => deleteStudent(student.id)}><BsTrash /></span>
+                                    <tr>
+                                        <td colSpan={3} className='bg-success'>
+                                            <div className='cursor_pointer' onClick={() => setSmShow(true)}>
+                                                <span><AiFillPlusCircle /></span>
+                                                <span className='mx-2'>
+                                                    اضافة ملاحظة للادارة
+                                                </span>
+                                            </div>
+                                            <>
+                                                <Modal
+                                                    show={smShow}
+                                                    onHide={handleClose}
+                                                    aria-labelledby="example-modal-sizes-title-sm"
+                                                >
+                                                    <Modal.Header className='rtl'>
+                                                        <Modal.Title id="example-modal-sizes-title-sm">
+                                                            اضافة ملاحظة جديدة عن الحلقة
+                                                        </Modal.Title>
+                                                    </Modal.Header>
+                                                    <Modal.Body >
+                                                        <div className='rtl'>
+                                                            <div>
+                                                                <label htmlFor="" className='my-1'>التاريخ</label>
+                                                                <input type="date" className='form-control' value={notedate}
+                                                                    onChange={(e) => setnotedate(e.target.value)} />
+                                                            </div>
+                                                            <div>
+                                                                <label htmlFor="" className='my-1'>الملاحظة</label>
+                                                                <input type="text" className='form-control' value={note}
+                                                                    onChange={(e) => setnote(e.target.value)} />
+                                                            </div>
+                                                            <div className='my-2'>
+                                                                <button className='btn btn-success' onClick={addnewnote}>اضافة</button>
+                                                                <button className='btn btn-dark mx-2' onClick={handleClose}>الغاء</button>
+                                                            </div>
+                                                        </div>
+                                                    </Modal.Body>
+                                                </Modal>
+                                            </>
                                         </td>
-                                    </tr>)
+                                    </tr> : ''}
+                                {students.length > 0 ?
+                                    students.map((student) =>
+                                        <tr key={student.id}>
+                                            <td>{student.first_name} {student.middle_name} {student.last_name}</td>
+                                            <td>{moment().diff(student.birthdate, 'years')}</td>
+                                            <td>
+                                                <NavLink className='text-white' to={`/editringstudent/${student.id}`}><BsFillPencilFill /></NavLink>
+                                                <span className='mx-2 cursor_pointer' onClick={() => deleteStudent(student.id)}><BsTrash /></span>
+                                                <StudentModal student={student} />
+                                            </td>
+                                        </tr>)
                                     : <tr>
                                         <td colSpan={4}>لا يوجد اي تلميذ بعد</td>
                                     </tr>

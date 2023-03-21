@@ -105,6 +105,8 @@ class SessionsController extends Controller
                 'revisions.absence_type',
                 'revisions.ayyah_from',
                 'revisions.ayyah_to',
+                'revisions.page_from',
+                'revisions.page_to',
                 'revisions.riwayahname'
             )
             ->orderBy('date', 'desc')
@@ -364,8 +366,7 @@ class SessionsController extends Controller
                 ->where('center_id', $center_id)
                 ->where('user_id', $teacher_id)
                 ->paginate(5);
-            // ->get();
-            // ->getCollection()
+
             $students->getCollection()->map(function ($item) use ($request) {
                 $item->sessions = Sessions::join('revisions', 'revisions.session_id', '=', 'quran_sessions.id')
                     ->where('center_student_teacher_id', $item->st_ct_te_id)
@@ -377,6 +378,8 @@ class SessionsController extends Controller
                         'revisions.surah_to',
                         'revisions.ayyah_from',
                         'revisions.ayyah_to',
+                        'revisions.page_from',
+                        'revisions.page_to',
                         'revisions.notes',
                         'revisions.type',
                         'revisions.absence_type',

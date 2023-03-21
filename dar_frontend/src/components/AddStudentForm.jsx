@@ -73,6 +73,8 @@ export default function AddStudentForm() {
     const [rings, setrings] = useState([])
     const [ringid, setringid] = useState(0)
     const [notes, setnotes] = useState('')
+    const [type_kiraat, settype_kiraat] = useState('ifrad')
+    const [file, setFile] = useState(null);
     const theme = useTheme();
 
 
@@ -229,8 +231,14 @@ export default function AddStudentForm() {
             sheikh_names: sheikh_names_arr.toString(),
             memorizing: memorizing,
             female_question: female_question,
-        }).then(
-            (res) => {
+            pdf: file,
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        }
+        ).then((res) => {
+            console.log(res);
+            if (res.data.success) {
                 Swal.fire(res.data.message, '', 'success')
                 setUsername('')
                 setPassword('')
@@ -257,13 +265,11 @@ export default function AddStudentForm() {
                 setsuitablestimes([])
                 setValue([])
                 setmemorizing('')
-                female_question(0)
+                setfemale_question(0)
                 setCenter_id(0)
                 setTeacher_id(0)
             }
-        ).catch(function (error) {
-            console.log(error)
-        })
+        }).catch(function (err) { console.log(err); })
     }
     const handleChange = (event) => {
         const {
@@ -368,7 +374,7 @@ export default function AddStudentForm() {
                 {/* first middle last name */}
                 <div className='row'>
                     <div className="col-md">
-                        <label htmlFor="f_name my-2">الاسم الاول</label>
+                        <label htmlFor="f_name my-2">الاسم</label>
                         <input type="text" name='first_name' className="form-control my-2"
                             value={first_name}
                             onChange={(e) => setFirst_name(e.target.value)}
@@ -376,7 +382,7 @@ export default function AddStudentForm() {
                     </div>
 
                     <div className="col-md">
-                        <label htmlFor="l_name">الاسم الاوسط</label>
+                        <label htmlFor="l_name">اسم الاب</label>
                         <input type="text" className="form-control my-2"
                             value={middle_name}
                             onChange={(e) => setMiddle_name(e.target.value)}
@@ -384,7 +390,7 @@ export default function AddStudentForm() {
                     </div>
 
                     <div className="col-md">
-                        <label htmlFor="l_name">الاسم الاخير</label>
+                        <label htmlFor="l_name">العائلة</label>
                         <input type="text" name='last_name' className="form-control my-2"
                             value={last_name}
                             onChange={(e) => setLast_name(e.target.value)}
@@ -609,7 +615,7 @@ export default function AddStudentForm() {
                             </div>
 
                             <div className='col-md'>
-                                <label>المستوى الذي يود ان يقرأ فيه</label>
+                                <label>المستوى الذي تود القراءة فيه</label>
                                 <select className="form-control my-2" value={reading_level}
                                     onChange={(e) => setreading_level(e.target.value)}>
                                     <option value="tilawa">تلاوة</option>
@@ -618,6 +624,25 @@ export default function AddStudentForm() {
                                 </select>
                             </div>
                         </div>
+
+                        {reading_level === 'kiraat' ?
+                            <div className='row'>
+                                <div className='col-md'>
+                                    <label>نوع الجمع في القراءات</label>
+                                    <select className="form-control my-2" value={type_kiraat}
+                                        onChange={(e) => settype_kiraat(e.target.value)}>
+                                        <option value="ifrad">افراد</option>
+                                        <option value="kobra">القراءات العشر الكبرى</option>
+                                        <option value="soghra">القراءات العشر الصغرى</option>
+                                    </select>
+                                </div>
+
+                                <div className='col-md'>
+                                    <label>نوع الجمع في القراءات</label>
+                                    <input className='form-control' type="file" accept=".pdf" onChange={e => setFile(e.target.files[0])} />
+                                </div>
+                            </div>
+                            : ''}
 
                         <div className='row'>
 

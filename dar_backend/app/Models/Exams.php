@@ -13,6 +13,9 @@ class Exams extends Model
         'teacher_id_1',
         'teacher_id_2',
         'teacher_id_3',
+        'teacher_student',
+        'student_id',
+        'center_id',
         'center_student_teacher_id',
         'b',
         'tarik',
@@ -20,6 +23,7 @@ class Exams extends Model
         'jizie_from',
         'jizie_to',
         'decision',
-        'note'
+        'note',
+        'date'
     ];
 }

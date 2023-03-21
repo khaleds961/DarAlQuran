@@ -20,4 +20,8 @@ class Rings extends Model
     public function teacher(){
         return $this->belongsTo(Users::class,'teacher_id');
     }
+
+    public function students(){
+        return $this->hasMany(Students::class,'ring_id','id');
+    }
 }

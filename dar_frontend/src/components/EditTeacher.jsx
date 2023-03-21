@@ -115,7 +115,7 @@ export default function EditTeacher() {
 
                             <div className="form-group row">
                                 <div className='col'>
-                                    <label className='my-2'>الاسم الاول</label>
+                                    <label className='my-2'>الاسم</label>
                                     <input type="text" className="form-control item" defaultValue={newfirst_name}
                                         onChange={(e) => setnewfirst_name(e.target.value)} />
                                 </div>
@@ -123,7 +123,7 @@ export default function EditTeacher() {
 
                             <div className="form-group row">
                                 <div className='col'>
-                                    <label className='my-2'>الاسم الاوسط</label>
+                                    <label className='my-2'>اسم الاب</label>
                                     <input type="text" className="form-control item" defaultValue={newmiddle_name}
                                         onChange={(e) => setnewmiddle_name(e.target.value)} />
                                 </div>
@@ -131,7 +131,7 @@ export default function EditTeacher() {
 
                             <div className="form-group row">
                                 <div className='col'>
-                                    <label className='my-2'>الاسم الاخير</label>
+                                    <label className='my-2'>العائلة</label>
                                     <input type="text" className="form-control item" defaultValue={newlast_name}
                                         onChange={(e) => setnewlast_name(e.target.value)} />
                                 </div>

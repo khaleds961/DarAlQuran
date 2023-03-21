@@ -5,6 +5,7 @@ import SessionContext from '../session/SessionContext'
 import CenterSelect from './CenterSelect'
 import TeacherSelect from './TeacherSelect'
 import { Pagination } from '@mui/material'
+import Swal from 'sweetalert2'
 
 
 
@@ -68,7 +69,9 @@ export default function MonthlyTeacherReport() {
         setpage(1)
         if (centerid !== 0 && teacher_id !== 0 && startdate && enddate) {
             getsessions(centerid, teacher_id, startdate, enddate, 1)
-        }
+        }else{
+            Swal.fire('!ادخل كل المعلومات قبل البحث')
+          }
     }
 
     useEffect(() => {
@@ -119,7 +122,7 @@ export default function MonthlyTeacherReport() {
                                     <table className='table table-secondary text-center'>
                                         <thead>
                                             <tr>
-                                                <td colSpan={8} className='bg-info text-white'>
+                                                <td colSpan={10} className='bg-info text-white'>
                                                     {session.full_name}
                                                 </td>
                                             </tr>
@@ -128,9 +131,11 @@ export default function MonthlyTeacherReport() {
                                                 <th>الجلسة</th>
                                                 <th>حضور / غياب</th>
                                                 <th>من السورة</th>
-                                                <th>الى السورة</th>
                                                 <th>من الاية</th>
+                                                <th>من صفحة</th>
+                                                <th>الى السورة</th>
                                                 <th>الى الاية</th>
+                                                <th>الى صفحة</th>
                                                 <th>ملاحظات</th>
                                             </tr>
                                         </thead>
@@ -141,9 +146,11 @@ export default function MonthlyTeacherReport() {
                                                     <td>{s.type === 'recite' ? 'تسميع' : s.type === 'revision' ? 'مراجعة' : 'غياب'}</td>
                                                     <td>{s.absence_type === 'excused' ? 'أ' : s.absence_type === 'unexcused' ? 'غ' : s.absence_type === 'teacher_excused' ? 'ش' : 'ح'}</td>
                                                     <td>{s.surah_from}</td>
-                                                    <td>{s.surah_to}</td>
                                                     <td>{s.ayyah_from}</td>
+                                                    <td>{s.page_from}</td>
+                                                    <td>{s.surah_to}</td>
                                                     <td>{s.ayyah_to}</td>
+                                                    <td>{s.page_to}</td>
                                                     <td>{s.notes}</td>
                                                 </tr>
                                             </tbody>

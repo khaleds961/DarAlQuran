@@ -111,7 +111,31 @@ function AddReciteRevision() {
     , {
       name: '  ابن جماز عن أبي جعفر',
       id: 20
-    }
+    },
+    {
+      name: 'القراءات العشر من طريقي الشاطبية والدرة',
+      id: 21
+    },
+    {
+      name: 'القراءات العشر من طريق طيبة النشر',
+      id: 22
+    },
+    {
+      name: 'ورش من طريق الازرق',
+      id: 23
+    },
+    {
+      name: 'ورش من طريق الاصبهاني',
+      id: 24
+    },
+    {
+      name: 'الكوفيين',
+      id: 25
+    },
+    {
+      name: 'حفص عن عاصم من طريق الشاطبية  ',
+      id: 26
+    },
   ]
   const [riwayahname, setriwayahname] = useState(0)
   const [surahs, setSurahs] = useState([])
@@ -119,6 +143,8 @@ function AddReciteRevision() {
   const [tosurah, settosurah] = useState(0)
   const [fromayya, setfromayya] = useState('')
   const [toayya, settoayya] = useState('')
+  const [frompage,setfrompage] = useState('')
+  const [topage,settopage] = useState('')
   const [notes, setnotes] = useState('')
   const [type, settype] = useState('revision')
   const [absence_type, setabsence_type] = useState(0)
@@ -137,15 +163,17 @@ function AddReciteRevision() {
 
     Api.post(`addrevision`, {
       session_id: id,
-      type: rev_rec === 'recite' ? 'recite' : rev_rec === 'revsion' ? 'revsion' : 'absence' ,
+      type: rev_rec === 'recite' ? 'recite' : rev_rec === 'revsion' ? 'revsion' : 'absence',
       surah_from: fromsurah,
       surah_to: tosurah,
       ayyah_from: fromayya,
       ayyah_to: toayya,
+      page_from:frompage,
+      page_to:topage,
       notes: notes,
       riwayahname: riwayahname,
       date: date,
-      absence_type:absence_type
+      absence_type: absence_type
     }).then((res) => {
       if (res.data.success) {
         Swal.fire(res.data.message, '', 'success')
@@ -160,9 +188,9 @@ function AddReciteRevision() {
       }
     })
   }
-  console.log('type',type);
+  console.log('type', type);
   useEffect(() => {
-    getSurahList()    
+    getSurahList()
   }, [])
 
   return (
@@ -240,6 +268,22 @@ function AddReciteRevision() {
               <input className='form-control' type="text" name="toayya"
                 value={toayya}
                 onChange={(e) => settoayya(e.target.value)} />
+            </div>
+          </div>
+
+          <div className='row'>
+            <div className='col-md'>
+              <label className='my-2'>من صفحة</label>
+              <input className="form-control" type="text" value={frompage}
+                onChange={(e) => setfrompage(e.target.value)} />
+
+            </div>
+
+            <div className='col-md'>
+              <label className='my-2'>الى صفحة</label>
+              <input className='form-control' type="text" name="toayya"
+                value={topage}
+                onChange={(e) => settopage(e.target.value)} />
             </div>
           </div>
         </>
