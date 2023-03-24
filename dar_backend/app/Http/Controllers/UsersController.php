@@ -390,7 +390,6 @@ class UsersController extends Controller
                 ->groupBy('id')
                 ->paginate(10);
         } else {
-            // $data = Users::where('is_deleted', 0)->where('role_id', 4)->paginate(10);
             $data = Users::join('students_centers_teachers', 'students_centers_teachers.user_id', '=', 'users.id')
                 ->join('centers', 'centers.id', '=', 'students_centers_teachers.center_id')
                 ->select(

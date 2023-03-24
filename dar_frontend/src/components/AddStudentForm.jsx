@@ -195,9 +195,7 @@ export default function AddStudentForm() {
     const getcenterid = (id) => {
         setCenter_id(id)
     }
-    const getteacherid = (id) => {
-        setTeacher_id(id)
-    }
+
     const addstudent = (e) => {
         e.preventDefault();
 
@@ -276,77 +274,6 @@ export default function AddStudentForm() {
                 setFile(null)
             }
         }).catch(function (err) { console.log(err); })
-
-        // Api.post('addstudent', {
-        //     // username: username,
-        //     // password: password,
-        //     // first_name: first_name,
-        //     // middle_name: middle_name,
-        //     // last_name: last_name,
-        //     // mother_name: mothername,
-        //     // place_of_birth: placeofbirth,
-        //     // birthdate: birthday,
-        //     // marital_status: martialstatus,
-        //     // reading_level: reading_level,
-        //     // school_uni_name: schooluni,
-        //     // major: major,
-        //     // blood_type: bloodtype,
-        //     // gender: gender,
-        //     // nationality: nationality,
-        //     // current_job: current_job,
-        //     // phone_number: phone_number,
-        //     // work_number: work_number,
-        //     // home_number: home_number,
-        //     // student_level_status: student_level_status,
-        //     // center_id: center_id,
-        //     // teacher_id: teacher_id !== 0 ? teacher_id : null,
-        //     // address: address,
-        //     // suitable_times: suitabletimes.toString(),
-        //     suitable_days: suitabledays.toString(),
-        //     sheikh_names: sheikh_names_arr.toString(),
-        //     memorizing: memorizing,
-        //     female_question: female_question
-        // },
-        //     formData,
-        //     {
-        //         headers: {
-        //             'Content-Type': 'multipart/form-data',
-        //         },
-        //     }
-        // ).then((res) => {
-        //     console.log(res);
-        //     if (res.data.success) {
-        //         Swal.fire(res.data.message, '', 'success')
-        //         setUsername('')
-        //         setPassword('')
-        //         setFirst_name('')
-        //         setMiddle_name('')
-        //         setLast_name('')
-        //         setmothername('')
-        //         setnationality('')
-        //         setgender('male')
-        //         setaddress('')
-        //         setPhone_number('')
-        //         setwork_number('')
-        //         sethome_number('')
-        //         setcurrent_job('')
-        //         setschooluni('')
-        //         setmajor('')
-        //         setbirthday('')
-        //         setplaceofbirth('')
-        //         setreading_level('tilawa')
-        //         setstudent_level_status('beginner')
-        //         setbloodtype('A+')
-        //         setmartialstatus('single')
-        //         setsuitablesdays([])
-        //         setsuitablestimes([])
-        //         setValue([])
-        //         setmemorizing('')
-        //         setfemale_question(0)
-        //         setCenter_id(0)
-        //         setTeacher_id(0)
-        //     }
-        // }).catch(function (err) { console.log(err); })
     }
     const handleChange = (event) => {
         const {
@@ -855,7 +782,6 @@ export default function AddStudentForm() {
                 <CenterSelect center_id={getcenterid} c_id={center_id} />
                 {student_isring === 'no' ?
                     <TeacherSelect teachers={teachers} teacher_id={geteditteacherid} tid={teacher_id} />
-
                     : ''
                 }
                 {student_isring === 'yes' ?

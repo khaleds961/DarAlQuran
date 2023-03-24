@@ -7,7 +7,9 @@ import Swal from 'sweetalert2';
 import SessionContext from '../session/SessionContext';
 import { Pagination } from '@mui/material'
 import { Spinner } from 'react-bootstrap';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { AES } from 'crypto-js';
+import CryptoJS from 'crypto-js';
 
 
 function TeachersTable() {
@@ -17,6 +19,12 @@ function TeachersTable() {
   const { session: { user: { id } } } = useContext(SessionContext);
 
   const default_center_id = role_id === 3 ? centers[0]['center_id'] : 0;
+
+  const navigate = useNavigate();
+
+  const handleNavigate = (teacher_id) => {
+    navigate(`/students`,{ state: { teacher_id: teacher_id } })
+  }
 
   const [teachers, setTeachers] = useState([]);
   const [fname, setFname] = useState('');
@@ -98,7 +106,7 @@ function TeachersTable() {
         setTotal(Math.ceil(res.data.data.total / 10))
         setLoading(false)
         setoutloading(false)
-        if(res.data.data.data.length === 0 ){
+        if (res.data.data.data.length === 0) {
           setnoteacher(true)
         }
       }
@@ -168,7 +176,7 @@ function TeachersTable() {
       {/*  */}
 
       {!outloading ?
-        <div>
+        <div className="table-responsive">
           <div className='d-flex justify-content-between'>
             <button type="button" className="btn btn-success mb-3 d-flex align-items-center" onClick={showModal}>
               <BsPlusCircle className='text-white' />
@@ -299,7 +307,11 @@ function TeachersTable() {
                 </tr>
                 : teachers.length > 0 ? teachers.map(teacher =>
                   <tr key={teacher.id}>
-                    <th>{teacher.first_name} {teacher.middle_name} {teacher.last_name}</th>
+                    <th>
+                      <span className='cursor_pointer' onClick={() => handleNavigate(teacher.id)}>
+                        {teacher.first_name} {teacher.middle_name} {teacher.last_name}
+                      </span>
+                    </th>
                     <td>{teacher.phone_number}</td>
                     <td>{teacher.center_name}</td>
                     <td>

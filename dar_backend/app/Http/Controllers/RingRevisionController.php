@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\RingComments;
 use App\Models\RingRevision;
 use App\Models\Rings;
 use Exception;
@@ -78,6 +79,8 @@ class RingRevisionController extends Controller
     {
         try {
             if ($request->ring_id && $request->start && $request->end) {
+                $report_comment = RingComments::where('ring_id',$request->ring_id)
+                    ->whereBetween('date', [$request->start, $request->end])->first();
                 $studentsByRings = Rings::find($request->ring_id)
                     ->students()
                     ->join('ring_revisions', 'ring_revisions.student_id', '=', 'students.id')
@@ -87,6 +90,7 @@ class RingRevisionController extends Controller
                     )
                     ->groupBy('student_id')
                     ->paginate(5);
+
 
                 $studentsByRings->getCollection()->map(function ($item) use ($request) {
                     $item->sessions = RingRevision::where('student_id', $item->student_id)
@@ -105,6 +109,7 @@ class RingRevisionController extends Controller
                 });
                 return response([
                     'data' => $studentsByRings,
+                    'report_comment' => $report_comment,
                     'success' => true
                 ]);
             }

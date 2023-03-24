@@ -412,7 +412,7 @@ export default function Exam() {
     }, [])
 
     return (
-        <div style={{ width: '50%', margin: 'auto' }}>
+        <div className='responsive_exam ok'>
             <div className='row mb-5'>
                 <div>
                     <p className='h6 my-3'>عقدت اللجنة العلمية في دار القرآن الكريم المؤلفة من :</p>
@@ -557,14 +557,16 @@ export default function Exam() {
                     </div>
                 </div>
 
-                <div>
+                <div className='mx-1'>
                     <p className='h6 my-3'>وبلغ مجموع الدرجات :
-                        <input className='mx-2 my-2 py-2 text-dark text-center'
+                        <input className='my-2 py-2 mx-md-2 text-dark text-center'
                             value={grade}
                             onChange={(e) => setgrade(e.target.value)}
                             type="text"
                             style={{ border: '0', outline: '0' }} />
-                        من 100.
+                        <span className='mx-2'>
+                            من 100.
+                        </span>
                     </p>
                 </div>
 
@@ -618,7 +620,7 @@ export default function Exam() {
                         </div>
 
                     </div> : ''}
-                <div className=' my-4 row'>
+                <div className=' my-4 mx-2 row'>
                     <button className='btn btn-success' onClick={handleSubmit}>اضافة</button>
                 </div>
             </div>

@@ -71,7 +71,7 @@ function QuranSessionTable() {
     ]
 
     const defaultValue = role_id === 3 || role_id === 4 ? centers[0]['center_id'] : 0;
-    const defaultValueTeacher =  role_id === 4 ? id : 0;
+    const defaultValueTeacher = role_id === 4 ? id : 0;
     const [id_center, setid_center] = useState(defaultValue)
     const [page, setPage] = useState(1)
     const [total, setTotal] = useState(1)
@@ -422,73 +422,75 @@ function QuranSessionTable() {
                 <>
                     {sessions.length > 0 ?
                         <>
-                            <table className="table table-dark table-responsive table-hover">
-                                <thead>
-                                    <tr className='text-center'>
-                                        <th scope="col">الطالب</th>
-                                        <th scope="col">الاستاذ</th>
-                                        <th scope="col">التاريخ</th>
-                                        <th scope="col">عرض الجدول</th>
-                                    </tr>
-
-                                </thead>
-
-                                <tbody>
-                                    {sessions?.map(session =>
-                                        <tr key={session.session_id} className='text-center'>
-                                            <td>{session.student_fn} {session.student_mn} {session.student_ln}</td>
-                                            <td>{session.teacher_fn} {session.teacher_mn} {session.teacher_ln}</td>
-                                            <td>
-                                                <div ref={ref}>
-
-                                                    <Button variant="success" onClick={(e) => handleClick(e, session.session_id)}>جلسة</Button>
-
-                                                    <Overlay
-                                                        show={show}
-                                                        target={target}
-                                                        placement="bottom"
-                                                        container={ref}
-                                                        containerPadding={20}
-                                                    >
-                                                        <Popover id="popover-contained">
-                                                            <Popover.Body>
-                                                                <table className='table table-responsive'>
-                                                                    <tbody>
-                                                                        {day_time.length > 0 ? day_time.map((dt) =>
-                                                                            <tr key={dt.id}>
-                                                                                <td>{dt.weekday}</td>
-                                                                                <td>{dt.session_time}</td>
-                                                                                <td>
-                                                                                    <span className='cursor_pointer mx-2' onClick={() => deleteSession(dt.id, dt.center_student_teacher_id)}>
-                                                                                        <BsTrash />
-                                                                                    </span>
-
-                                                                                    <Link onClick={() => popup(dt.id)}>
-                                                                                        <span className='cursor_pointer mx-2'>
-                                                                                            <BsPlusCircle />
-                                                                                        </span>
-                                                                                    </Link>
-                                                                                </td>
-                                                                            </tr>
-                                                                        ) : <tr><td>تحميل...</td></tr>}
-                                                                    </tbody>
-                                                                </table>
-                                                            </Popover.Body>
-                                                        </Popover>
-                                                    </Overlay>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <NavLink to={`/showsessions/${session.session_id}`} className='text-white'>
-                                                    <span className=''>
-                                                        <BsEyeFill />
-                                                    </span>
-                                                </NavLink>
-                                            </td>
+                            <div className='table-responsive'>
+                                <table className="table table-dark table-hover">
+                                    <thead>
+                                        <tr className='text-center'>
+                                            <th scope="col">التسميع والمراجعة</th>
+                                            <th scope="col">الطالب</th>
+                                            <th scope="col">الاستاذ</th>
+                                            <th scope="col">عرض التسميعات</th>
                                         </tr>
-                                    )}
-                                </tbody>
-                            </table>
+
+                                    </thead>
+
+                                    <tbody>
+                                        {sessions?.map(session =>
+                                            <tr key={session.session_id} className='text-center'>
+                                                <td>
+                                                    <div ref={ref}>
+
+                                                        <Button variant="success" onClick={(e) => handleClick(e, session.session_id)}>جلسة</Button>
+
+                                                        <Overlay
+                                                            show={show}
+                                                            target={target}
+                                                            placement="bottom"
+                                                            container={ref}
+                                                            containerPadding={20}
+                                                        >
+                                                            <Popover id="popover-contained">
+                                                                <Popover.Body>
+                                                                    <table className='table table-responsive'>
+                                                                        <tbody>
+                                                                            {day_time.length > 0 ? day_time.map((dt) =>
+                                                                                <tr key={dt.id}>
+                                                                                    <td>{dt.weekday}</td>
+                                                                                    <td>{dt.session_time}</td>
+                                                                                    <td>
+                                                                                        <span className='cursor_pointer mx-2' onClick={() => deleteSession(dt.id, dt.center_student_teacher_id)}>
+                                                                                            <BsTrash />
+                                                                                        </span>
+
+                                                                                        <Link onClick={() => popup(dt.id)}>
+                                                                                            <span className='cursor_pointer mx-2'>
+                                                                                                <BsPlusCircle />
+                                                                                            </span>
+                                                                                        </Link>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            ) : <tr><td>تحميل...</td></tr>}
+                                                                        </tbody>
+                                                                    </table>
+                                                                </Popover.Body>
+                                                            </Popover>
+                                                        </Overlay>
+                                                    </div>
+                                                </td>
+                                                <td>{session.student_fn} {session.student_mn} {session.student_ln}</td>
+                                                <td>{session.teacher_fn} {session.teacher_mn} {session.teacher_ln}</td>
+                                                <td>
+                                                    <NavLink to={`/showsessions/${session.session_id}`} className='text-white'>
+                                                        <span className=''>
+                                                            <BsEyeFill />
+                                                        </span>
+                                                    </NavLink>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
 
                             <Pagination
                                 shape="rounded"

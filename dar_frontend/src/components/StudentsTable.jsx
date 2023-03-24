@@ -4,12 +4,15 @@ import Api from '../Api'
 import Form from 'react-bootstrap/Form';
 import { BsPlusCircle, BsTrash } from 'react-icons/bs';
 import { TbPencil } from 'react-icons/tb'
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Pagination } from '@mui/material'
 import SessionContext from '../session/SessionContext';
 import CenterSelect from './CenterSelect';
 import Spinner from 'react-bootstrap/Spinner'
 import TeacherSelect from './TeacherSelect';
+import { AES } from 'crypto-js';
+import CryptoJS from 'crypto-js';
+import Table from 'react-bootstrap/Table';
 
 
 function StudentsTable() {
@@ -23,6 +26,7 @@ function StudentsTable() {
 
   const defualt_center_id = role_id === 1 || role_id === 2 ? 0 : centers[0]?.center_id;
 
+  // const [teacherid, setteacherid] = useState(null)
   const [students, setStudents] = useState(null);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(1);
@@ -32,6 +36,11 @@ function StudentsTable() {
   const [filterteacher, setfilterteacher] = useState(0)
   const [studentfilter, setstudentfilter] = useState('')
   const [hidepagination, setHidePagination] = useState(false)
+
+  const location = useLocation()
+  const default_teacher_id = location?.state?.teacher_id ?? null
+
+  const [teacherid, setteacherid] = useState(default_teacher_id)
 
   const deleteStudent = (student_id, center_id) => {
     Swal.fire({
@@ -74,7 +83,11 @@ function StudentsTable() {
       if (filterteacher !== 0) {
         getstudentbyteacher(filterteacher, value)
       } else {
-        getStudentsByCenter(center_id, value)
+        if (teacherid !== null) {
+          getstudentbyteacher(teacherid, value)
+        } else {
+          getStudentsByCenter(center_id, value)
+        }
       }
     }
   };
@@ -102,6 +115,7 @@ function StudentsTable() {
   }
 
   const getstudentbyteacher = (teacher_id, p) => {
+
     setLoading(true)
     Api.get(`getStudentsByTeacherPagination/${center_id}/${teacher_id}?page=${p}`).then(
       (res) => {
@@ -119,8 +133,8 @@ function StudentsTable() {
       setteachers(res.data.data);
     })
   }
-  const searchforstudent = () => {
 
+  const searchforstudent = () => {
     if (studentfilter) {
       setLoading(true)
       Api.post('searchforstudent', {
@@ -139,12 +153,21 @@ function StudentsTable() {
     }
   }
 
+  const handleNavigate = (id) => {
+    const encrypted = AES.encrypt(id.toString(), 'secretKey').toString().replace(/\//g, '_');
+    navigate(`/editstudent/${encrypted}`)
+  }
+
   useEffect(() => {
     if (role_id === 4) {
       getstudentbyteacher(id, 1)
     } else {
-      getStudentsByCenter(center_id, page)
-      getTeachersByCenter(center_id)
+      if (teacherid !== null) {
+        getstudentbyteacher(teacherid, 1)
+      } else {
+        getStudentsByCenter(center_id, page)
+        getTeachersByCenter(center_id)
+      }
     }
   }, [])
 
@@ -152,6 +175,7 @@ function StudentsTable() {
     setPage(1)
     setCenter_id(center_id)
     setfilterteacher(0)
+    setteacherid(null)
     getTeachersByCenter(center_id)
     getStudentsByCenter(center_id, 1)
   }
@@ -160,7 +184,8 @@ function StudentsTable() {
     <div>
 
       <div>
-        <div className='d-flex justify-content-between'>
+        <div className='d-md-flex justify-content-between'>
+
           <button type="button" onClick={popup} className="btn btn-success mb-3 d-flex align-items-center">
             <BsPlusCircle className='text-white' />
             <span className='px-2 text-center'>
@@ -169,26 +194,29 @@ function StudentsTable() {
           </button>
 
           <div className='d-flex'>
-            <div className='mx-2'>
+            <div className='mx-md-2'>
               <CenterSelect fromstudent={true} data={data} c_id={center_id} />
             </div>
+
             {center_id !== 0 ?
-              <TeacherSelect teachers={teachers} teacher_id={getfilterteacherid} tid={filterteacher} fromquransession={true} />
+              <div className='mx-2 mx-sm-2 mx-md-0'>
+                <TeacherSelect teachers={teachers} teacher_id={getfilterteacherid} tid={filterteacher} fromquransession={true} />
+              </div>
               : ''}
           </div>
 
         </div>
 
         <div>
-          <div className='d-flex my-3 flex-row-reverse'>
-            <button className='btn btn-dark text-white mx-2' onClick={searchforstudent}>بحث عن طالب</button>
-            <input type="text" className='rounded border border-dark'
+          <div className='d-flex my-3 flex-md-row-reverse'>
+            <button className='btn btn-dark text-white mx-md-2' onClick={searchforstudent}>بحث عن طالب</button>
+            <input type="text" className='rounded border border-dark mx-2 mx-sm-2 mx-md-0'
               value={studentfilter}
               onChange={(e) => setstudentfilter(e.target.value)} />
           </div>
         </div>
         <>
-          <table className="table table-dark table-hover text-center text-center">
+          <Table responsive='sm' className="table table-dark table-hover text-center">
             <thead>
               <tr>
                 <th scope="col">الاسم</th>
@@ -212,26 +240,25 @@ function StudentsTable() {
               <tbody>
                 {students?.map(student =>
                   <tr key={student.id}>
-                    <th scope="row">{student.first_name} {student.last_name}</th>
+                    <th scope="row">{student.first_name} {student.middle_name} {student.last_name}</th>
                     <td>{student.nationality}</td>
                     <td>{student.phone_number}</td>
                     <td>{student.teacher_fn} {student.teacher_mn} {student.teacher_ln}</td>
                     <td>{student.center_name}</td>
-                    <td >
+                    <td>
                       <span className='mx-2 cursor_pointer' onClick={() => deleteStudent(student.id, student.center_id)}>
                         <BsTrash />
                       </span>
-                      <NavLink className='text-white' to={`/editstudent/${student.id}`}>
-                        <span>
-                          <TbPencil />
-                        </span>
-                      </NavLink>
+                      <span className='text-white cursor_pointer' onClick={() => handleNavigate(student.id)}>
+                        <TbPencil />
+                      </span>
                     </td>
+                    
                   </tr>
                 )}
               </tbody>
             }
-          </table>
+          </Table>
           {hidepagination ? '' :
             <Pagination
               shape="rounded"

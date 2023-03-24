@@ -4,25 +4,31 @@ import React, { useEffect, useState, useContext } from 'react'
 import { Button, Modal, Spinner } from 'react-bootstrap'
 import { AiFillPlusCircle } from 'react-icons/ai'
 import { BsFillPencilFill, BsTrash } from 'react-icons/bs'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import Api from '../Api'
 import SessionContext from '../session/SessionContext';
 import CenterSelect from './CenterSelect';
 import StudentModal from './StudentModal'
-
+import { AES } from 'crypto-js';
+import CryptoJS from 'crypto-js';
 
 export default function RingStudents() {
 
     const { session: { user: { role_id } } } = useContext(SessionContext);
     const { session: { user: { centers } } } = useContext(SessionContext);
 
+    const navigate = useNavigate()
+
+    const location = useLocation()
+    const default_ring_id = location?.state?.ringid ?? 0;
+
     const default_center_id = role_id === 3 ? centers[0]['center_id'] : 0
     const [students, setstudents] = useState([])
     const [teacher, setteacher] = useState([])
     const [ring, setring] = useState([])
     const [ring_name, setring_name] = useState('')
-    const [ring_id, setring_id] = useState(0)
+    const [ring_id, setring_id] = useState(default_ring_id)
     const [page, setpage] = useState(1)
     const [total, settotal] = useState(1)
     const [loading, setloading] = useState(false)
@@ -30,6 +36,12 @@ export default function RingStudents() {
     const [smShow, setSmShow] = useState(false);
     const [notedate, setnotedate] = useState('')
     const [note, setnote] = useState('')
+
+
+    const handleNavigate = (id) => {
+        const encrypted = AES.encrypt(id.toString(), 'secretKey').toString().replace(/\//g, '_');
+        navigate(`/editringstudent/${encrypted}`)
+    }
 
     const handleClose = () => {
         setSmShow(false)
@@ -225,7 +237,9 @@ export default function RingStudents() {
                                             <td>{student.first_name} {student.middle_name} {student.last_name}</td>
                                             <td>{moment().diff(student.birthdate, 'years')}</td>
                                             <td>
-                                                <NavLink className='text-white' to={`/editringstudent/${student.id}`}><BsFillPencilFill /></NavLink>
+                                                <span className='cursor_pointer text-white' onClick={() => handleNavigate(student.id)}>
+                                                    <BsFillPencilFill />
+                                                </span>
                                                 <span className='mx-2 cursor_pointer' onClick={() => deleteStudent(student.id)}><BsTrash /></span>
                                                 <StudentModal student={student} />
                                             </td>

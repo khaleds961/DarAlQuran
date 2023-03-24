@@ -11,15 +11,18 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import CreatableSelect from 'react-select/creatable';
-import { NavLink, useParams } from 'react-router-dom';
+import { NavLink, useLocation, useParams } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
+import { AES } from 'crypto-js';
+import CryptoJS from 'crypto-js';
 
 
 
 export default function EditStudent() {
 
-  const { id } = useParams()
+  const { id: encrypt } = useParams()
 
+  const id = AES.decrypt(encrypt.replace(/_/g, '/'), 'secretKey').toString(CryptoJS.enc.Utf8);
 
   const { session: { user: { role_id } } } = useContext(SessionContext);
   const { session: { user: { centers } } } = useContext(SessionContext);

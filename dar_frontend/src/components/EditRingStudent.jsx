@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import Api from '../Api'
 import SessionContext from '../session/SessionContext';
@@ -14,13 +14,17 @@ import Select from '@mui/material/Select';
 import CreatableSelect from 'react-select/creatable';
 import { NavLink } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
+import { AES } from 'crypto-js';
+import CryptoJS from 'crypto-js';
 
 export default function EditRingStudent() {
-  const { student_id } = useParams()
+  const { student_id: id } = useParams()
 
   const { session: { user: { role_id } } } = useContext(SessionContext);
   const { session: { user: { centers } } } = useContext(SessionContext);
   const defaultvalue = role_id === 3 || role_id === 4 ? centers[0]['center_id'] : 0;
+
+  const student_id = AES.decrypt(id.replace(/_/g, '/'), 'secretKey').toString(CryptoJS.enc.Utf8);
 
   const arraybloodtypes = [
     { 'id': 1, 'value': 'A+' },
@@ -202,9 +206,9 @@ export default function EditRingStudent() {
       skills: skills_arr.toString(),
       memorizing: memorizing,
       center_id: student_centerid,
-      ring_id:ringid,
+      ring_id: ringid,
       is_ring: true,
-      sheikh_names:sheikh_arr.toString()
+      sheikh_names: sheikh_arr.toString()
     }).then(
       (res) => {
         if (res.data.success) {
@@ -248,34 +252,34 @@ export default function EditRingStudent() {
   const getRingStudent = (student_id) => {
     Api.get(`getringstudentbyid/${student_id}`).then((res) => {
       console.log({ res }, 'jjjkkjjk');
-      setFirst_name(res.data.data['first_name'])
+      setFirst_name(res.data.data['first_name'] )
       setMiddle_name(res.data.data['middle_name'])
       setLast_name(res.data.data['last_name'])
       setmothername(res.data.data['mother_name'])
       setnationality(res.data.data['nationality'])
       setgender(res.data.data['gender'])
       setaddress(res.data.data['address'])
-      setcurrent_job(res.data.data['current_job'])
+      setcurrent_job(res.data.data['current_job'] ?? '')
       setschooluni(res.data.data['school_uni_name'])
       setmajor(res.data.data.major)
       setbirthday(res.data.data['birthdate'])
-      setplaceofbirth(res.data.data['place_of_birth'])
+      setplaceofbirth(res.data.data['place_of_birth'] ?? '')
       const reading = res.data.data.reading_level === null ? '' : res.data.data.reading_level
       setreading_level(reading)
       const level_status = res.data.data.student_level_status === null ? '' : res.data.data.student_level_status
       setstudent_level_status(level_status)
-      setmemorizing(res.data.data['memorizing'])
+      setmemorizing(res.data.data['memorizing'] ?? '')
       const blood = res.data.data.blood_type === null ? '' : res.data.data.blood_type
       setbloodtype(blood)
       const martial = res.data.data.marital_status === null ? '' : res.data.data.marital_status
       setmartialstatus(martial)
-      setPhone_number(res.data.data['phone_number'])
-      setmotherphonenumber(res.data.data.mother_number)
-      setfatherphonenumber(res.data.data.father_number)
-      setmotherjob(res.data.data.mother_work)
-      setfatherjob(res.data.data.father_work)
-      setwork_number(res.data.data['work_number'])
-      sethome_number(res.data.data['home_number'])
+      setPhone_number(res.data.data['phone_number'] ?? '')
+      setmotherphonenumber(res.data.data.mother_number ?? '')
+      setfatherphonenumber(res.data.data.father_number ?? '')
+      setmotherjob(res.data.data.mother_work ?? '')
+      setfatherjob(res.data.data.father_work ?? '')
+      setwork_number(res.data.data['work_number'] ?? '')
+      sethome_number(res.data.data['home_number'] ?? '')
       setringid(res.data.data.ring_id)
       setrate(res.data.data.rate)
       setnotes(res.data.data.rate)

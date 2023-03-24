@@ -5,7 +5,7 @@ import Modal from "react-bootstrap/Modal";
 import { AiOutlineEye } from 'react-icons/ai';
 import { BsPlusCircle, BsPencil } from 'react-icons/bs';
 import Moment from 'react-moment';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import Api from '../Api'
 import SessionContext from '../session/SessionContext';
@@ -20,6 +20,8 @@ export default function RingsTable() {
   const { session: { user: { role_id } } } = useContext(SessionContext);
   const { session: { user: { centers } } } = useContext(SessionContext);
   const defaultvalue = role_id === 3 || role_id === 4 ? centers[0]['center_id'] : 0;
+
+  const navigate = useNavigate()
 
   const [isOpen, setIsOpen] = useState(false);
   const [editModal, setEditModal] = useState(false);
@@ -191,6 +193,11 @@ export default function RingsTable() {
       setLoading(false)
     }).catch(function (err) { console.log(err) })
   }
+
+  const handleNavigate = (ring_id) => {
+    navigate('/ringstudents', { state: { ringid: ring_id } })
+  }
+
   useEffect(() => {
     getRings(1)
   }, [])
@@ -274,7 +281,11 @@ export default function RingsTable() {
             :
             rings.length > 0 ? rings.map(ring =>
               <tr key={ring.id}>
-                <th>{ring.name}</th>
+                <th>
+                  <span className='cursor_pointer' onClick={() => handleNavigate(ring.id)}>
+                    {ring.name}
+                  </span>
+                </th>
                 <td>{ring.center_name}</td>
                 <td>{ring.teacher_fn} {ring.teacher_mn} {ring.teacher_ln}</td>
                 <td>{ring.is_active ? 'نشط' : 'غير نشط'}</td>
@@ -284,8 +295,6 @@ export default function RingsTable() {
                   </Moment>
                 </td>
                 <td>
-                  {/* <span className='cursor_pointer'
-                    onClick={() => deletering(ring.id)}><BsTrash /></span> */}
                   <span className='mx-2 text-white'
                     onClick={() => getringbyid(ring.id)}>
                     <BsPencil />

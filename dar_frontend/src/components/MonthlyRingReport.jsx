@@ -23,6 +23,7 @@ export default function MonthlyRingReport() {
   const [enddate, setenddate] = useState('')
   const [total, settotal] = useState(1)
   const [page, setpage] = useState(1)
+  const [reportComment, setReportComment] = useState('')
   const [loading, setloading] = useState(false)
 
 
@@ -35,6 +36,8 @@ export default function MonthlyRingReport() {
     }).then(
       (res) => {
         console.log({ res });
+        console.log(res.data.report_comment);
+        setReportComment(res.data.report_comment)
         const sessions = res.data.data.data
         setsesions(sessions)
         settotal(Math.ceil(res.data.data.total / 5))
@@ -42,7 +45,6 @@ export default function MonthlyRingReport() {
       }
     )
   }
-
 
   const changePage = (e, value) => {
     setpage(value)
@@ -147,6 +149,10 @@ export default function MonthlyRingReport() {
       {loading ? <div className='mt-5 text-center'><Spinner /></div> :
         sessions.length > 0 ?
           <>
+            <div className='my-4 px-2 py-3 border rounded' style={{ backgroundColor: 'DodgerBlue' }}>
+              <div className='text-center text-white h5'>تعليق الادارة : </div>
+              <span className='text-white' key={reportComment.id}>{reportComment?.comment}</span>
+            </div>
             {sessions.map((session) =>
               <>
                 <div key={session.student_id}>

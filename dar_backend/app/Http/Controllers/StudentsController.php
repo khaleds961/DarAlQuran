@@ -350,16 +350,55 @@ class StudentsController extends Controller
         try {
             if ($request->student_name) {
                 $name = $request->student_name;
-                if ($request->role_id === 1 || $request->role_id === 2) {
-                    $students = Students::where(DB::raw('CONCAT(first_name, " ", middle_name, " ", last_name)'), 'LIKE', '%' . $name . '%')
+                if ($request->role_id == 1 || $request->role_id == 2) {
+                    $students = Students::join('students_centers_teachers', 'students_centers_teachers.student_id', '=', 'students.id')
+                        ->join('users', 'users.id', '=', 'students_centers_teachers.user_id')
+                        ->join('centers', 'centers.id', '=', 'students_centers_teachers.center_id')
+                        ->where(DB::raw('CONCAT(students.first_name, " ", students.middle_name, " ", students.last_name)'), 'LIKE', '%' . $name . '%')
+                        ->select(
+                            'students.*',
+                            'users.id as teacher_id',
+                            'users.first_name as teacher_fn',
+                            'users.middle_name as teacher_mn',
+                            'users.last_name as teacher_ln',
+                            'centers.id as center_id',
+                            'centers.name as center_name'
+                        )
+                        ->orderBy('id', 'desc')
                         ->get();
-                } elseif ($request->role_id === 3) {
+                } elseif ($request->role_id == 3) {
                     $center = Centers::find($request->center_id);
-                    $students = $center->students()->where(DB::raw('CONCAT(first_name, " ", middle_name, " ", last_name)'), 'LIKE', '%' . $name . '%')
+                    $students = $center->students()
+                        ->join('users', 'users.id', '=', 'students_centers_teachers.user_id')
+                        ->join('centers', 'centers.id', '=', 'students_centers_teachers.center_id')
+                        ->where(DB::raw('CONCAT(students.first_name, " ", students.middle_name, " ", students.last_name)'), 'LIKE', '%' . $name . '%')
+                        ->select(
+                            'students.*',
+                            'users.id as teacher_id',
+                            'users.first_name as teacher_fn',
+                            'users.middle_name as teacher_mn',
+                            'users.last_name as teacher_ln',
+                            'centers.id as center_id',
+                            'centers.name as center_name'
+                        )
+                        ->orderBy('id', 'desc')
                         ->get();
                 } else {
-                    $teacher = Users::find($request->teacher_id);
-                    $students = $teacher->students()->where(DB::raw('CONCAT(first_name, " ", middle_name, " ", last_name)'), 'LIKE', '%' . $name . '%')
+                    // $teacher = Users::find($request->teacher_id);
+                    $students = Students::join('students_centers_teachers', 'students_centers_teachers.student_id', '=', 'students.id')
+                        ->join('centers', 'centers.id', '=', 'students_centers_teachers.center_id')
+                        ->join('users', 'users.id', '=', 'students_centers_teachers.user_id')
+                        ->where(DB::raw('CONCAT(students.first_name, " ", students.middle_name, " ", students.last_name)'), 'LIKE', '%' . $name . '%')
+                        ->select(
+                            'students.*',
+                            'users.id as teacher_id',
+                            'users.first_name as teacher_fn',
+                            'users.middle_name as teacher_mn',
+                            'users.last_name as teacher_ln',
+                            'centers.id as center_id',
+                            'centers.name as center_name'
+                        )->orderBy('id', 'desc')
+                        ->where('users.id', $request->teacher_id)
                         ->get();
                 }
 
@@ -413,12 +452,14 @@ class StudentsController extends Controller
                         'centers.id as center_id',
                         'centers.name as center_name'
                     )
+                    ->orderBy('id', 'desc')
                     ->paginate(10);
             } else {
                 $students = Students::join('students_centers_teachers', 'students_centers_teachers.student_id', '=', 'students.id')
                     ->join('centers', 'centers.id', '=', 'students_centers_teachers.center_id')
                     ->join('users', 'users.id', '=', 'students_centers_teachers.user_id')
                     ->select(
+                        'students.id as student_id',
                         'students.*',
                         'users.id as teacher_id',
                         'users.first_name as teacher_fn',
@@ -427,6 +468,7 @@ class StudentsController extends Controller
                         'centers.id as center_id',
                         'centers.name as center_name'
                     )
+                    ->orderby('student_id', 'desc')
                     ->where('students.is_deleted', 0)
                     ->paginate(10);
             }
@@ -469,11 +511,12 @@ class StudentsController extends Controller
                     'users.first_name as teacher_fn',
                     'users.middle_name as teacher_mn',
                     'users.last_name as teacher_ln',
+                    'students.id as student_id',
                     'students.*',
                     'centers.id as center_id',
                     'centers.name as center_name',
                 )
-                ->where('centers.id', $center_id)
+                ->orderBy('student_id', 'desc')
                 ->where('users.id', $user_id)
                 ->paginate(10);
             return response([
