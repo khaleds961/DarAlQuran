@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react'
-import Api from '../Api'
+import React, { useState } from 'react'
 import SideBar from '../components/SideBar'
 import StudentsTable from '../components/StudentsTable'
 import { GiHamburgerMenu } from 'react-icons/gi'
@@ -13,11 +12,10 @@ function Students() {
   };
 
   return (
-    <div className="container-fluid rtl" style={{ background: '#EEEEEE' }}>
+    <div className="container-fluid rtl min-vh-100" style={{ background: '#EEEEEE' }}>
       <div className='mx-2 mb-2'>
         <span className='cursor_pointer' onClick={handleClick}>
           <GiHamburgerMenu size={20} />
-          {/* <span className='mx-2'>اغلاق الشريط</span> */}
         </span>
       </div>
       <div className="row flex-nowrap">

@@ -253,13 +253,12 @@ class SessionsController extends Controller
                 ->first();
 
             $check_student_day = Sessions::join('students_centers_teachers', 'students_centers_teachers.id', '=', 'quran_sessions.center_student_teacher_id')
-                ->where('center_id', $center_id)
-                ->where('user_id', $teacher_id)
+                ->where('center_student_teacher_id',$st_ct_te_id)
                 ->where('weekday', $day)
                 ->where('student_id', $student_id)
                 ->first();
 
-            if ($check_student_day) {
+            if (($check_student_day)) {
                 return response([
                     'message' => __('message.session_day_exist'),
                     'success' => false

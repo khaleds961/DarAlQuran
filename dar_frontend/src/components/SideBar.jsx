@@ -26,7 +26,8 @@ function Navbar() {
 
     const { actions: { logout } } = useContext(SessionContext);
     const { session: { user: { centers } } } = useContext(SessionContext);
-    const [hidemenu, sethidemenu] = useState(true)
+    const { session: { user: { role_id } } } = useContext(SessionContext);
+
     return (
 
         <>
@@ -40,7 +41,7 @@ function Navbar() {
                     {/* case 1: small screen Dashboard */}
                     <div className='text-center'>
                         <div>
-                            <NavLink to='/' className='text-decoration-none'
+                            <NavLink to='/' className='text-decoration-none p-1 p-md-0'
                                 style={({ isActive }) =>
                                     isActive ?
                                         { backgroundColor: '#EEEEEE' }
@@ -71,63 +72,68 @@ function Navbar() {
                         </div>
                     </div>
 
-                    {/* case 1: small screen Centers */}
-                    <div className='text-center'>
-                        <NavLink to='/centers' className='text-decoration-none'
-                            style={({ isActive }) =>
-                                isActive ?
-                                    { backgroundColor: '#EEEEEE' }
-                                    :
-                                    { backgroundColor: 'white' }
-                            }>
-                            <FaSchool className='d-xs-block d-md-none text-dark' />
-                        </NavLink>
-                    </div>
+                    {role_id === 4 || role_id === 5 ? ''
+                        :
+                        <>
+                            {/* case 1: small screen Centers */}
+                            <div className='text-center'>
+                                <NavLink to='/centers' className='text-decoration-none p-1 p-md-0'
+                                    style={({ isActive }) =>
+                                        isActive ?
+                                            { backgroundColor: '#EEEEEE' }
+                                            :
+                                            { backgroundColor: 'white' }
+                                    }>
+                                    <FaSchool className='d-xs-block d-md-none text-dark' />
+                                </NavLink>
+                            </div>
 
-                    {/* case 2:md page and more Centers */}
-                    <div className='my-2'>
-                        <NavLink to='/centers' className='d-none d-md-flex align-items-center text-decoration-none text-dark hover py-2 px-2'
-                            style={({ isActive }) =>
-                                isActive ?
-                                    { backgroundColor: '#EEEEEE' }
-                                    :
-                                    { backgroundColor: 'white' }
-                            }>
-                            <FaSchool className='text-dark' />
-                            <span className='px-2 d-none d-md-block'>المراكز</span>
-                        </NavLink>
-                    </div>
+                            {/* case 2:md page and more Centers */}
+                            <div className='my-2'>
+                                <NavLink to='/centers' className='d-none d-md-flex align-items-center text-decoration-none text-dark hover py-2 px-2'
+                                    style={({ isActive }) =>
+                                        isActive ?
+                                            { backgroundColor: '#EEEEEE' }
+                                            :
+                                            { backgroundColor: 'white' }
+                                    }>
+                                    <FaSchool className='text-dark' />
+                                    <span className='px-2 d-none d-md-block'>المراكز</span>
+                                </NavLink>
+                            </div>
 
-                    {/* case 1: small screen TEACHERS */}
-                    <div className='text-center'>
-                        <NavLink to='/teachers' className='text-decoration-none'
-                            style={({ isActive }) =>
-                                isActive ?
-                                    { backgroundColor: '#EEEEEE' }
-                                    :
-                                    { backgroundColor: 'white' }
-                            }>
-                            <ImUserTie className='d-xs-block d-md-none text-dark' />
-                        </NavLink>
-                    </div>
+                            {/* case 1: small screen TEACHERS */}
+                            <div className='text-center'>
+                                <NavLink to='/teachers' className='text-decoration-none p-1 p-md-0'
+                                    style={({ isActive }) =>
+                                        isActive ?
+                                            { backgroundColor: '#EEEEEE' }
+                                            :
+                                            { backgroundColor: 'white' }
+                                    }>
+                                    <ImUserTie className='d-xs-block d-md-none text-dark' />
+                                </NavLink>
+                            </div>
 
-                    {/* case 2:md page and more TEACHERS */}
-                    <div className='my-2'>
-                        <NavLink to='/teachers' className='d-none d-md-flex align-items-center text-decoration-none text-dark py-2 px-2 hover'
-                            style={({ isActive }) =>
-                                isActive ?
-                                    { backgroundColor: '#EEEEEE' }
-                                    :
-                                    { backgroundColor: 'white' }
-                            }>
-                            <ImUserTie className='text-dark' />
-                            <span className='px-2 d-none d-md-block'>الاساتذة</span>
-                        </NavLink>
-                    </div>
+                            {/* case 2:md page and more TEACHERS */}
+                            <div className='my-2'>
+                                <NavLink to='/teachers' className='d-none d-md-flex align-items-center text-decoration-none text-dark py-2 px-2 hover'
+                                    style={({ isActive }) =>
+                                        isActive ?
+                                            { backgroundColor: '#EEEEEE' }
+                                            :
+                                            { backgroundColor: 'white' }
+                                    }>
+                                    <ImUserTie className='text-dark' />
+                                    <span className='px-2 d-none d-md-block'>الاساتذة</span>
+                                </NavLink>
+                            </div>
+                        </>
+                    }
 
                     {/* case 1: small screen Students */}
                     <div className='text-center'>
-                        <NavLink to='/students' className='text-decoration-none'
+                        <NavLink to='/students' className='text-decoration-none p-1 p-md-0'
                             style={({ isActive }) =>
                                 isActive ?
                                     { backgroundColor: '#EEEEEE' }
@@ -155,7 +161,7 @@ function Navbar() {
 
                     {/* case 1: small screen Class */}
                     <div className='text-center'>
-                        <NavLink to='/sessions' className='text-decoration-none'
+                        <NavLink to='/sessions' className='text-decoration-none p-1 p-md-0'
                             style={({ isActive }) =>
                                 isActive ?
                                     { backgroundColor: '#EEEEEE' }
@@ -182,7 +188,7 @@ function Navbar() {
 
                     {/* case 1: small screen Class */}
                     <div className='text-center'>
-                        <NavLink to='/teacherschedule' className='text-decoration-none'
+                        <NavLink to='/teacherschedule' className='text-decoration-none p-1 p-md-0'
                             style={({ isActive }) =>
                                 isActive ?
                                     { backgroundColor: '#EEEEEE' }
@@ -209,7 +215,7 @@ function Navbar() {
 
                     {/* case 1: small screen Class */}
                     <div className='text-center'>
-                        <NavLink to='/monthlyteachereport' className='text-decoration-none'
+                        <NavLink to='/monthlyteachereport' className='text-decoration-none p-1 p-md-0'
                             style={({ isActive }) =>
                                 isActive ?
                                     { backgroundColor: '#EEEEEE' }
@@ -238,7 +244,7 @@ function Navbar() {
 
                     {/* case 1: small screen Class */}
                     <div className='text-center'>
-                        <NavLink to='/rings' className='text-decoration-none'
+                        <NavLink to='/rings' className='text-decoration-none p-1 p-md-0'
                             style={({ isActive }) =>
                                 isActive ?
                                     { backgroundColor: '#EEEEEE' }
@@ -267,7 +273,7 @@ function Navbar() {
                     <div className='text-center'>
                         <div
                         >
-                            <NavLink to='/monthlyringreport' className='text-decoration-none'
+                            <NavLink to='/monthlyringreport' className='text-decoration-none p-1 p-md-0'
                                 style={({ isActive }) =>
                                     isActive ?
                                         { backgroundColor: '#EEEEEE' }
@@ -300,34 +306,39 @@ function Navbar() {
                         </div>
                     </div>
 
-                    {/* case 1: small screen Class */}
-                    <div className='text-center'>
-                        <NavLink to='/exam' className='text-decoration-none'
-                            style={({ isActive }) =>
-                                isActive ?
-                                    { backgroundColor: '#EEEEEE' }
-                                    :
-                                    { backgroundColor: 'white' }
-                            }>
-                            <FaBuromobelexperte className='d-xs-block d-md-none text-dark' />
-                        </NavLink>
-                    </div>
+                    {role_id === 4 || role_id === 5 ? ''
+                        :
+                        <>
+                            {/* case 1: small screen Class */}
+                            <div className='text-center'>
+                                <NavLink to='/exam' className='text-decoration-none p-1 p-md-0'
+                                    style={({ isActive }) =>
+                                        isActive ?
+                                            { backgroundColor: '#EEEEEE' }
+                                            :
+                                            { backgroundColor: 'white' }
+                                    }>
+                                    <FaBuromobelexperte className='d-xs-block d-md-none text-dark' />
+                                </NavLink>
+                            </div>
 
-                    {/* case 2:md page and more */}
-                    <div className='my-2'>
-                        <NavLink to='/exam' className='d-none d-md-flex align-items-center text-decoration-none text-dark py-2 px-2 hover'
-                            style={({ isActive }) =>
-                                isActive ?
-                                    { backgroundColor: '#EEEEEE' }
-                                    :
-                                    { backgroundColor: 'white' }
-                            }>
-                            <FaBuromobelexperte className='text-dark' />
-                            <span className='px-2 d-none d-md-block'>
-                                جلسة الاختبار
-                            </span>
-                        </NavLink>
-                    </div>
+                            {/* case 2:md page and more */}
+                            <div className='my-2'>
+                                <NavLink to='/exam' className='d-none d-md-flex align-items-center text-decoration-none text-dark py-2 px-2 hover'
+                                    style={({ isActive }) =>
+                                        isActive ?
+                                            { backgroundColor: '#EEEEEE' }
+                                            :
+                                            { backgroundColor: 'white' }
+                                    }>
+                                    <FaBuromobelexperte className='text-dark' />
+                                    <span className='px-2 d-none d-md-block'>
+                                        جلسة الاختبار
+                                    </span>
+                                </NavLink>
+                            </div>
+                        </>
+                    }
 
                     {/*case1: md and more logout button */}
                     <div className='d-xs-block d-md-none mt-5 py-2 px-2 text-center' onClick={logout}>

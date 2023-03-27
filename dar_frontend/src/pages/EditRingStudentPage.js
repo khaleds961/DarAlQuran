@@ -1,18 +1,33 @@
-import React from 'react'
+import React, { useState } from 'react'
 import EditRingStudent from '../components/EditRingStudent'
 import SideBar from '../components/SideBar'
-
+import { GiHamburgerMenu } from 'react-icons/gi'
 
 export default function EditRingStudentPage() {
+
+  const [clicked, setClicked] = useState(false)
+
+  const handleClick = () => {
+    setClicked(!clicked);
+  };
+
   return (
-    <div className="container-fluid rtl">
-    <div className="row flex-nowrap">
-      <SideBar />
-      <div className="col py-3" style={{background:'#EEEEEE'}}>
-      <h3 className='mb-5 text-center'>تعديل طالب الحلقة</h3>
-      <EditRingStudent/>
+
+    <div className="container-fluid rtl min-vh-100" style={{ background: '#EEEEEE' }}>
+      <div className='mx-2 mb-2'>
+        <span className='cursor_pointer' onClick={handleClick}>
+          <GiHamburgerMenu size={20} />
+        </span>
+      </div>
+      <div className="row flex-nowrap">
+        {clicked ? '' :
+          <SideBar />
+        }
+        <div className="col py-3" style={{ background: '#EEEEEE' }}>
+          <h3 className='mb-5 text-center'>تعديل طالب الحلقة</h3>
+          <EditRingStudent />
+        </div>
       </div>
     </div>
-  </div>
   )
 }

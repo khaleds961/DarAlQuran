@@ -73,7 +73,7 @@ export default function AddStudentForm() {
     const [rings, setrings] = useState([])
     const [ringid, setringid] = useState(0)
     const [notes, setnotes] = useState('')
-    const [type_kiraat, settype_kiraat] = useState('ifrad')
+    const [type_kiraat, settype_kiraat] = useState(0)
     const [file, setFile] = useState(null);
     const theme = useTheme();
 
@@ -209,7 +209,7 @@ export default function AddStudentForm() {
         formData.append('first_name', first_name);
         formData.append('middle_name', middle_name);
         formData.append('last_name', last_name);
-        formData.append('mother_name',mothername)
+        formData.append('mother_name', mothername)
         formData.append('place_of_birth', placeofbirth);
         formData.append('birthdate', birthday);
         formData.append('marital_status', martialstatus);
@@ -231,13 +231,14 @@ export default function AddStudentForm() {
         formData.append('suitable_days', suitabledays.toString());
         formData.append('memorizing', memorizing);
         formData.append('sheikh_names', sheikh_names_arr.toString());
-        formData.append('female_question',female_question)
-        formData.append('type_kiraat',type_kiraat)
+        formData.append('female_question', female_question)
+        const type = type_kiraat !== 0 ? type_kiraat : ''
+        formData.append('type_kiraat', type)
 
-        Api.post('addstudent',formData,{
+        Api.post('addstudent', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
-              },
+            },
         }).then((res) => {
             console.log(res);
             if (res.data.success) {
@@ -270,7 +271,7 @@ export default function AddStudentForm() {
                 setfemale_question(0)
                 setCenter_id(0)
                 setTeacher_id(0)
-                settype_kiraat('ifrad')
+                settype_kiraat(0)
                 setFile(null)
             }
         }).catch(function (err) { console.log(err); })
@@ -635,6 +636,7 @@ export default function AddStudentForm() {
                                     <label>نوع الجمع في القراءات</label>
                                     <select className="form-control my-2" value={type_kiraat}
                                         onChange={(e) => settype_kiraat(e.target.value)}>
+                                        <option value={0} disabled>اختر احد الخيارات</option>
                                         <option value="ifrad">افراد</option>
                                         <option value="kobra">القراءات العشر الكبرى</option>
                                         <option value="soghra">القراءات العشر الصغرى</option>

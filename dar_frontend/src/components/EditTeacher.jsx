@@ -69,7 +69,7 @@ export default function EditTeacher() {
     }
 
     const editTeacher = (teacher_id) => {
-        console.log(newphone_number)
+
         Api.post(`/editteacherbyid/${teacher_id}`, {
             first_name: newfirst_name,
             middle_name: newmiddle_name,
@@ -78,18 +78,17 @@ export default function EditTeacher() {
             password: newpassword,
             phone_number: newphone_number
         }).then((res) => {
-            console.log(res)
             if (res.data.success) {
-                console.log(res.data.message)
                 Swal.fire(res.data.message, '', 'success')
                 checkteacher()
+                navigate('/teachers')
             }
         }
 
         )
     }
 
-    const getnewcenterid = (center_id) =>{
+    const getnewcenterid = (center_id) => {
         setnewcenterid(center_id)
     }
 
@@ -161,7 +160,7 @@ export default function EditTeacher() {
                                 </div>
                             </div>
 
-                            <CenterSelect c_id={newcenterid} center_id={getnewcenterid}/>
+                            <CenterSelect c_id={newcenterid} center_id={getnewcenterid} />
 
                             <div>
                                 <button className='btn btn-success mt-3 px-3' onClick={() => editTeacher(teacher.id)}>تعديل</button>

@@ -88,6 +88,7 @@ export default function RingsTable() {
     setteachers([])
     Api.get(`getAllTeachersByCenter/${center_id}`).then((res) => {
       setteachers(res.data.data);
+      console.log({ res });
     })
   }
 
@@ -200,6 +201,9 @@ export default function RingsTable() {
 
   useEffect(() => {
     getRings(1)
+    if (role_id === 3) {
+      getTeachersByCenter(centerid)
+    }
   }, [])
 
   useEffect(() => {
@@ -237,7 +241,11 @@ export default function RingsTable() {
 
       <div className='d-flex flex-row-reverse'>
         <div className='mx-2'>
-          <TeacherSelect teachers={teachers_filter} teacher_id={getfilterteacherid} tid={filterteacherid} fromquransession={true} />
+          {role_id === 3 ?
+            <TeacherSelect teachers={teachers } teacher_id={getfilterteacherid} tid={filterteacherid} fromquransession={true} />
+            :
+            <TeacherSelect teachers={teachers_filter} teacher_id={getfilterteacherid} tid={filterteacherid} fromquransession={true} />
+          }
         </div>
         <CenterSelect c_id={filtercenterid} data={getfiltercenter} fromstudent={true} />
       </div>

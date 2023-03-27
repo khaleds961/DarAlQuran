@@ -90,6 +90,7 @@ function QuranSessionTable() {
     const [show, setShow] = useState(false);
     const [target, setTarget] = useState(null);
     const [loading, setloading] = useState(true)
+    const [loadingdays, setdaysloading] = useState(true)
     const ref = useRef(null);
 
     const dayandid = (e) => {
@@ -173,6 +174,7 @@ function QuranSessionTable() {
 
     const handleClick = (event, st_ct_te_id) => {
         setShow(!show);
+        setdaysloading(true)
         setTarget(event.target);
         getTimes(st_ct_te_id)
     };
@@ -233,11 +235,15 @@ function QuranSessionTable() {
     const getTimes = (st_ct_te_id) => {
         setDay_time([])
         Api.get(`getsessionsbyid/${st_ct_te_id}`).then(
-            (res) => setDay_time(res.data.data))
+            (res) => {
+                setDay_time(res.data.data)
+                setdaysloading(false)
+            })
             .catch(function (err) { console.log(err); })
     }
 
     const popup = (sess_id) => {
+        setShow(false)
         Swal.fire({
             title: 'هل تقوم باضافة مراجعة او تسميع؟',
             showCancelButton: true,
@@ -453,23 +459,27 @@ function QuranSessionTable() {
                                                                 <Popover.Body>
                                                                     <table className='table table-responsive'>
                                                                         <tbody>
-                                                                            {day_time.length > 0 ? day_time.map((dt) =>
-                                                                                <tr key={dt.id}>
-                                                                                    <td>{dt.weekday}</td>
-                                                                                    <td>{dt.session_time}</td>
-                                                                                    <td>
-                                                                                        <span className='cursor_pointer mx-2' onClick={() => deleteSession(dt.id, dt.center_student_teacher_id)}>
-                                                                                            <BsTrash />
-                                                                                        </span>
+                                                                            {loadingdays ? <tr><td>تحميل ...</td></tr> :
+                                                                                <>
+                                                                                    {day_time.length > 0 ? day_time.map((dt) =>
+                                                                                        <tr key={dt.id}>
+                                                                                            <td>{dt.weekday}</td>
+                                                                                            <td>{dt.session_time}</td>
+                                                                                            <td>
+                                                                                                <span className='cursor_pointer mx-2' onClick={() => deleteSession(dt.id, dt.center_student_teacher_id)}>
+                                                                                                    <BsTrash />
+                                                                                                </span>
 
-                                                                                        <Link onClick={() => popup(dt.id)}>
-                                                                                            <span className='cursor_pointer mx-2'>
-                                                                                                <BsPlusCircle />
-                                                                                            </span>
-                                                                                        </Link>
-                                                                                    </td>
-                                                                                </tr>
-                                                                            ) : <tr><td>تحميل...</td></tr>}
+                                                                                                <Link onClick={() => popup(dt.id)}>
+                                                                                                    <span className='cursor_pointer mx-2'>
+                                                                                                        <BsPlusCircle />
+                                                                                                    </span>
+                                                                                                </Link>
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                    ) : <tr><td>لا يوجد اي موعد</td></tr>}
+                                                                                </>
+                                                                            }
                                                                         </tbody>
                                                                     </table>
                                                                 </Popover.Body>

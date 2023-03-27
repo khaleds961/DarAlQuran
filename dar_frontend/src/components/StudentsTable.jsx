@@ -216,11 +216,12 @@ function StudentsTable() {
           </div>
         </div>
         <>
-          <Table responsive='sm' className="table table-dark table-hover text-center">
+        <div className='table-responsive'>
+          <table className="table table-dark table-hover text-center">
             <thead>
               <tr>
                 <th scope="col">الاسم</th>
-                <th scope="col">الجنسية</th>
+                <th scope="col" className="d-none d-md-table-cell">الجنسية</th>
                 <th scope="col">رقم الهاتف</th>
                 <th scope="col">الاستاذ</th>
                 <th scope="col">المركز</th>
@@ -241,7 +242,7 @@ function StudentsTable() {
                 {students?.map(student =>
                   <tr key={student.id}>
                     <th scope="row">{student.first_name} {student.middle_name} {student.last_name}</th>
-                    <td>{student.nationality}</td>
+                    <td className="d-none d-md-table-cell">{student.nationality}</td>
                     <td>{student.phone_number}</td>
                     <td>{student.teacher_fn} {student.teacher_mn} {student.teacher_ln}</td>
                     <td>{student.center_name}</td>
@@ -258,7 +259,8 @@ function StudentsTable() {
                 )}
               </tbody>
             }
-          </Table>
+          </table>
+          </div> 
           {hidepagination ? '' :
             <Pagination
               shape="rounded"

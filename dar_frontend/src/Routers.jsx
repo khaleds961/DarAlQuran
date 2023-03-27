@@ -3,7 +3,6 @@ import Login from './components/Login';
 import { Route, Routes } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import Students from './pages/Students';
-import StudentProfile from './pages/StudentProfile';
 import SessionContext from './session/SessionContext';
 import Centers from './pages/Centers';
 import Unauthorized from './components/Unauthorized';
@@ -56,10 +55,6 @@ export default function () {
           <Route path="students" element={<Students />} />
           <Route path="addstudent/:id" element={<AddStudent />} />
           <Route path="editstudent/:id" element={<EditStudentPage />} />
-        </Route>
-
-        <Route element={<RequireAuth allowedRoles={[ROLES.superadmin, ROLES.manager]} />}>
-          <Route path="studentprofile" element={<StudentProfile />} />
         </Route>
 
         <Route element={<RequireAuth allowedRoles={[ROLES.superadmin, ROLES.manager]} />}>

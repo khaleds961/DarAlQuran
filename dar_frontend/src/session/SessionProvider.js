@@ -67,6 +67,7 @@ export default function SessionProvider({ children }) {
         }
     }
     function logout() {
+        Api.post(`logout`)
         localStorage.removeItem("token")
         updateSession({user:null,roles:null})
     }

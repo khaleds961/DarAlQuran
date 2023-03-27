@@ -11,7 +11,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import CreatableSelect from 'react-select/creatable';
-import { NavLink, useLocation, useParams } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import { AES } from 'crypto-js';
 import CryptoJS from 'crypto-js';
@@ -20,6 +20,7 @@ import CryptoJS from 'crypto-js';
 
 export default function EditStudent() {
 
+  const navigate = useNavigate()
   const { id: encrypt } = useParams()
 
   const id = AES.decrypt(encrypt.replace(/_/g, '/'), 'secretKey').toString(CryptoJS.enc.Utf8);
@@ -167,6 +168,7 @@ export default function EditStudent() {
     setTeacher_id(id)
   }
   const editstudent = (e) => {
+
     e.preventDefault();
     const sheikh_names_arr = []
     value.map(v => sheikh_names_arr.push(v.value))
@@ -202,6 +204,7 @@ export default function EditStudent() {
     }).then(
       (res) => {
         if (res.data.success) {
+          navigate('/students')
           Swal.fire(res.data.message, '', 'success')
         }
       }
@@ -366,7 +369,7 @@ export default function EditStudent() {
               : ''}
           </div>
 
-          {student_isring === 'yes' ?
+          {/* {student_isring === 'yes' ?
             <>
               <div className='row'>
                 <div className="col-md">
@@ -393,7 +396,7 @@ export default function EditStudent() {
                 </div>
               </div>
             </>
-            : ''}
+            : ''} */}
 
           {student_isring === 'yes' ? '' :
             gender === 'female' ?

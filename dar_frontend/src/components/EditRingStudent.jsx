@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { useLocation, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import Api from '../Api'
 import SessionContext from '../session/SessionContext';
@@ -19,7 +19,7 @@ import CryptoJS from 'crypto-js';
 
 export default function EditRingStudent() {
   const { student_id: id } = useParams()
-
+  const navigate = useNavigate()
   const { session: { user: { role_id } } } = useContext(SessionContext);
   const { session: { user: { centers } } } = useContext(SessionContext);
   const defaultvalue = role_id === 3 || role_id === 4 ? centers[0]['center_id'] : 0;
@@ -212,6 +212,7 @@ export default function EditRingStudent() {
     }).then(
       (res) => {
         if (res.data.success) {
+          navigate('/ringstudents')
           Swal.fire(res.data.message, '', 'success')
         }
       }
