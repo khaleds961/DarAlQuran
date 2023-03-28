@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('mother_name');
             $table->string('address');
-            $table->string('place_of_birth');
+            $table->string('place_of_birth')->nullable();
             $table->date('birthdate')->format('Y.m.d');
             $table->enum('marital_status', ['single', 'married', 'divorced', 'widowed'])->nullable();
             $table->enum('reading_level', ['tilawa', 'hifz', 'kiraat']);

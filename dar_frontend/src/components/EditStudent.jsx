@@ -163,6 +163,8 @@ export default function EditStudent() {
 
   const getcenterid = (id) => {
     setCenter_id(id)
+    setTeacher_id(0)
+    getTeachersByCenter(id)
   }
   const getteacherid = (id) => {
     setTeacher_id(id)
