@@ -155,7 +155,7 @@ export default function EditStudent() {
 
   const getTeachersByCenter = () => {
     setTeachers([])
-    setTeacher_id(0)
+    // setTeacher_id(0)
     Api.get(`getAllTeachersByCenter/${center_id}`).then((res) => {
       setTeachers(res.data.data);
     })
@@ -286,7 +286,7 @@ export default function EditStudent() {
     { 'id': 34, 'value': '21:30' },
     { 'id': 35, 'value': '22:00' },
   ]
-
+  console.log(teacher_id,'hon from editstudent');
   return (
     <>
       {loading ? <div className='mt-5 text-center'><Spinner /></div> :

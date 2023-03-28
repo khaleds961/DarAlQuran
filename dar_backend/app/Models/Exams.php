@@ -24,6 +24,13 @@ class Exams extends Model
         'jizie_to',
         'decision',
         'note',
-        'date'
+        'date',
+        'has_receive_ijaza',
+        'recieve_ijaza_date',
+        'ijaza_copy_file'
     ];
+
+    public function students(){
+        return $this->hasMany(Students::class,'id','student_id');
+    }
 }

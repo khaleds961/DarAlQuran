@@ -6,6 +6,7 @@ import Api from '../Api'
 import SessionContext from '../session/SessionContext';
 import CenterSelect from './CenterSelect';
 import TeacherSelect from './TeacherSelect';
+import AddSessionModal from './AddSessionModal'
 
 
 function TeacherSchedule() {
@@ -48,6 +49,13 @@ function TeacherSchedule() {
   const getfiltercenterid = (center_id) => {
     setid_center(center_id)
   }
+  const is_session_added = (bo) =>{
+    if(bo){
+      if(id_center !== 0 && filterteacher_id !== 0){
+        getSchedule(filterteacher_id)
+      }
+    }
+  }
 
   useEffect(() => {
     if (id_center !== 0) {
@@ -64,10 +72,18 @@ function TeacherSchedule() {
 
   return (
     <div>
-      <div className='d-flex flex-row-reverse' style={{gap:10}}>
-      <TeacherSelect teachers={teachers} teacher_id={getteacherid} tid={filterteacher_id} fromquransession={true} />
-      <CenterSelect c_id={id_center} data={getfiltercenterid} fromstudent={true} />
+      <div className='d-flex justify-content-between'>
+
+        <div>
+          <AddSessionModal addsession={is_session_added} />
+        </div>
+
+        <div className='d-flex flex-row-reverse' style={{ gap: 10 }}>
+          <TeacherSelect teachers={teachers} teacher_id={getteacherid} tid={filterteacher_id} fromquransession={true} />
+          <CenterSelect c_id={id_center} data={getfiltercenterid} fromstudent={true} />
+        </div>
       </div>
+
       {loading ? <div className='mt-5 text-center'><Spinner /></div> :
         <table className='table table-bordered '>
           <thead>

@@ -24,6 +24,7 @@ import EditRingStudentPage from './pages/EditRingStudentPage';
 import MonthlyRingReportPage from './pages/MonthlyRingReportPage';
 import { Spinner } from 'react-bootstrap';
 import Exam from './pages/Exam';
+import ExamTablePage from './pages/ExamTablePage';
 
 
 
@@ -86,6 +87,7 @@ export default function () {
         </Route>
 
         <Route element={<RequireAuth allowedRoles={[ROLES.superadmin, ROLES.manager, ROLES.supervisor]} />}>
+          <Route path="examtable" element={<ExamTablePage />} />
           <Route path="exam" element={<Exam />} />
         </Route>
 

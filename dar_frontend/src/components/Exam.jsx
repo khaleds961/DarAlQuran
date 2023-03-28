@@ -37,7 +37,8 @@ export default function Exam() {
     const [answers, setAnswers] = useState([])
     const [date, setdate] = useState('')
     const [grade, setgrade] = useState('')
-
+    const [has_receive_ijaza, setHas_receive_ijaza] = useState('')
+    const [recieve_ijaza_date, setrecieve_ijaza_date] = useState('')
 
     const riwayat = [
         {
@@ -374,7 +375,9 @@ export default function Exam() {
                 jizie_to: to,
                 decision: get_ijaza,
                 note: answers.length > 0 ? answers.toString() : null,
-                date: date
+                date: date,
+                recieve_ijaza_date: recieve_ijaza_date,
+                has_receive_ijaza: has_receive_ijaza
             }).then((res) => {
                 if (res.data.success) {
                     Swal.fire(res.data.message, '', 'success')
@@ -396,6 +399,8 @@ export default function Exam() {
                     setget_ijaza('yes')
                     setAnswers([])
                     setdate('')
+                    setrecieve_ijaza_date('')
+                    setHas_receive_ijaza('')
                 }
             })
         } else {
@@ -619,7 +624,34 @@ export default function Exam() {
                             <button className='btn btn-primary mx-2' onClick={handleAddAnswer}>اضافة سبب</button>
                         </div>
 
-                    </div> : ''}
+                    </div> :
+
+                    <div className='my-3'>
+                        <label htmlFor="has_receive_ijaza my-2" />
+                        <b>هل استلم اجازته؟</b>
+                        <select id="has_receive_ijaza" name='ijaza_info' className='form-control my-2'
+                            value={has_receive_ijaza}
+                            onChange={(e) => setHas_receive_ijaza(e.target.value)}>
+                            <option value="" disabled>-- اختر احد الخيارات --</option>
+                            <option value={0}>كلا</option>
+                            <option value={1}>نعم</option>
+                        </select>
+
+                        {has_receive_ijaza == 1 ?
+                            <div className='my-2'>
+                                <label htmlFor="receive_ijaza_date" className='my-2'>
+                                    <b>  تاريخ الاستلام</b>
+                                </label>
+                                <input type="date" className='form-control' id='receive_ijaza_date'
+                                    value={recieve_ijaza_date}
+                                    onChange={(e) => setrecieve_ijaza_date(e.target.value)} />
+                            </div>
+                            : ''}
+                    </div>
+
+
+                }
+
                 <div className=' my-4 mx-2 row'>
                     <button className='btn btn-success' onClick={handleSubmit}>اضافة</button>
                 </div>

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Exams;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ExamController extends Controller
 {
@@ -62,14 +64,43 @@ class ExamController extends Controller
                 'jizie_to'          => $request->jizie_to,
                 'decision'          => $request->decision,
                 'date'              => $request->date,
-                'note'              => $request->note
+                'note'              => $request->note,
+                'has_receive_ijaza' => $request->has_receive_ijaza,
+                'recieve_ijaza_date' => $request->recieve_ijaza_date
             ]);
-            if($exam->id){
+            if ($exam->id) {
                 return response([
                     'message' => __('message.exam_added'),
                     'success' => true
                 ]);
             }
+        }
+    }
+
+    public function moujazstudents()
+    {
+        try {
+            // Retrieve exams with related students and select only first_name and last_name fields
+            $exams = Exams::join('students', 'students.id', '=', 'exams.student_id')
+                ->join('users', 'users.id', '=', 'exams.teacher_student')
+                ->select(
+                    'students.id as student_id',
+                    'users.id as teacher_id',
+                    'exams.id as exam_id',
+                    'exams.decision as exam_decision',
+                    'exams.has_receive_ijaza',
+                    DB::raw('CONCAT(students.first_name," ",students.middle_name," ",students.last_name) as student_name'),
+                    DB::raw('CONCAT(users.first_name," ",users.middle_name," ",users.last_name) as teacher_name')
+                )
+                ->paginate(10);
+            return response([
+                'data' => $exams,
+                'success' => true
+            ]);
+
+            // return $exams;
+        } catch (Exception $e) {
+            return response($e->getMessage());
         }
     }
 

@@ -165,28 +165,32 @@ export default function AddStudentForm() {
             is_ring: 1
         }).then(
             (res) => {
-                Swal.fire(res.data.message, '', 'success')
-                setFirst_name('')
-                setMiddle_name('')
-                setLast_name('')
-                setmothername('')
-                setnationality('')
-                setgender('male')
-                setaddress('')
-                setPhone_number('')
-                setmotherphonenumber('')
-                setfatherphonenumber('')
-                setschooluni('')
-                setmajor('')
-                setbirthday('')
-                setValue([])
-                setmemorizing('')
-                setnotes('')
-                setmotherjob('')
-                setfatherjob('')
-                setrate('')
-                setringid(0)
-                setCenter_id(0)
+                if (res.data.success) {
+                    Swal.fire(res.data.message, '', 'success')
+                    setFirst_name('')
+                    setMiddle_name('')
+                    setLast_name('')
+                    setmothername('')
+                    setnationality('')
+                    setgender('male')
+                    setaddress('')
+                    setPhone_number('')
+                    setmotherphonenumber('')
+                    setfatherphonenumber('')
+                    setschooluni('')
+                    setmajor('')
+                    setbirthday('')
+                    setValue([])
+                    setmemorizing('')
+                    setnotes('')
+                    setmotherjob('')
+                    setfatherjob('')
+                    setrate('')
+                    setringid(0)
+                    setCenter_id(0)
+                }else{
+                    console.log({res});
+                }
             }
         ).catch(function (error) {
             console.log(error)
@@ -240,7 +244,6 @@ export default function AddStudentForm() {
                 'Content-Type': 'multipart/form-data',
             },
         }).then((res) => {
-            console.log(res);
             if (res.data.success) {
                 Swal.fire(res.data.message, '', 'success')
                 setUsername('')

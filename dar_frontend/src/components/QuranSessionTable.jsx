@@ -12,6 +12,7 @@ import Popover from 'react-bootstrap/Popover';
 import { Link, NavLink, useNavigate, useParams } from 'react-router-dom';
 import TeacherSelect from './TeacherSelect';
 import CenterSelect from './CenterSelect';
+import AddSessionModal from './AddSessionModal';
 
 
 function QuranSessionTable() {
@@ -293,6 +294,12 @@ function QuranSessionTable() {
         ).catch(function (err) { console.log(err) })
     }
 
+    const is_session_added = (bo) => {
+        if (bo) {
+            getSessions(page)
+        }
+    }
+
     useEffect(() => {
         getTeachersByCenter(id_center)
         getSessions(page)
@@ -319,14 +326,16 @@ function QuranSessionTable() {
 
     return (
         <div>
+            <AddSessionModal addSession={is_session_added} />
+
             {role_id === 3 || role_id === 4 ?
                 <div className='d-flex justify-content-between'>
-                    <button type="button" className="btn btn-dark my-2 d-flex align-items-center" onClick={showModal}>
+                    {/* <button type="button" className="btn btn-dark my-2 d-flex align-items-center" onClick={showModal}>
                         <BsPlusCircle className='text-white' />
                         <span className='px-2'>
                             اضافة حصة جديدة
                         </span>
-                    </button>
+                    </button> */}
                     {
                         loading ? '' :
                             <TeacherSelect teachers={teachers} teacher_id={getteacherid} tid={filterteacher_id} fromquransession={true} />

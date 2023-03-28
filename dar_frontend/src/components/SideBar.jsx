@@ -311,7 +311,7 @@ function Navbar() {
                         <>
                             {/* case 1: small screen Class */}
                             <div className='text-center'>
-                                <NavLink to='/exam' className='text-decoration-none p-1 p-md-0'
+                                <NavLink to='/examtable' className='text-decoration-none p-1 p-md-0'
                                     style={({ isActive }) =>
                                         isActive ?
                                             { backgroundColor: '#EEEEEE' }
@@ -324,7 +324,7 @@ function Navbar() {
 
                             {/* case 2:md page and more */}
                             <div className='my-2'>
-                                <NavLink to='/exam' className='d-none d-md-flex align-items-center text-decoration-none text-dark py-2 px-2 hover'
+                                <NavLink to='/examtable' className='d-none d-md-flex align-items-center text-decoration-none text-dark py-2 px-2 hover'
                                     style={({ isActive }) =>
                                         isActive ?
                                             { backgroundColor: '#EEEEEE' }

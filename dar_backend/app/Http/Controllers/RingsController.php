@@ -210,17 +210,13 @@ class RingsController extends Controller
             $ring = Rings::find($id);
             if ($ring) {
                 $ring->name = $request->name;
-                // $ring->center_id = $request->center_id;
                 $ring->teacher_id = $request->teacher_id;
                 $ring->is_active = $request->is_active;
-                // $check_student = Students::where('ring_id',$id)
-                // ->where('is_ring',1)
-                // ->get();
                 $ring->save();
                 $check_update = count($ring->getChanges());
                 if ($check_update > 0) {
                     return response([
-                        'message' => __('message.teacher_updated'),
+                        'message' => __('message.ring_updated'),
                         'success' => true
                     ]);
                 }

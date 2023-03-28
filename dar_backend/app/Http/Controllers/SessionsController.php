@@ -250,12 +250,14 @@ class SessionsController extends Controller
                 ->where('user_id', $teacher_id)
                 ->where('weekday', $day)
                 ->where('session_time', $time)
+                ->where('quran_sessions.is_deleted',0)
                 ->first();
 
             $check_student_day = Sessions::join('students_centers_teachers', 'students_centers_teachers.id', '=', 'quran_sessions.center_student_teacher_id')
                 ->where('center_student_teacher_id',$st_ct_te_id)
                 ->where('weekday', $day)
                 ->where('student_id', $student_id)
+                ->where('quran_sessions.is_deleted',0)
                 ->first();
 
             if (($check_student_day)) {
