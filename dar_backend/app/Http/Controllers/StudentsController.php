@@ -151,17 +151,23 @@ class StudentsController extends Controller
                     'type_kiraat'       => $request->type_kiraat
                 ]);
                 if ($student->id) {
-                    Students_Centers_Teachers::create([
+                   $student_center_teacher =  Students_Centers_Teachers::create([
                         'student_id' => $student['id'],
                         'center_id' => $request['center_id'],
                         'user_id' => $request['teacher_id']
                     ]);
                 }
             }
-            if ($student->id) {
+            if ($student->id && $student_center_teacher->id) {
                 return response([
                     'message' => __('message.student_added'),
                     'success' => true
+                ]);
+            }else{
+                $student->delete();
+                return response([
+                    'message' => 'failed',
+                    'success' => false
                 ]);
             }
         } catch (Exception $e) {

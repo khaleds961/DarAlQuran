@@ -142,7 +142,7 @@ export default function AddStudentForm() {
         const skills_arr = []
         value.map(v => skills_arr.push(v.value))
         Api.post('addstudent', {
-            registration_date:registration_date,
+            registration_date: registration_date,
             first_name: first_name,
             middle_name: middle_name,
             last_name: last_name,
@@ -189,7 +189,9 @@ export default function AddStudentForm() {
                     setfatherjob('')
                     setrate('')
                     setringid(0)
-                    setCenter_id(0)
+                    if (role_id === 1 || role_id === 2) {
+                        setCenter_id(0)
+                    }
                 } else {
                     console.log({ res });
                 }
@@ -275,7 +277,9 @@ export default function AddStudentForm() {
                 setValue([])
                 setmemorizing('')
                 setfemale_question(0)
-                setCenter_id(0)
+                if(role_id === 1 || role_id === 2){
+                    setCenter_id(0)
+                }
                 setTeacher_id(0)
                 settype_kiraat(0)
                 setFile(null)
