@@ -4,6 +4,7 @@ import { AiFillPlusCircle } from 'react-icons/ai'
 import { BsTrash } from 'react-icons/bs'
 import { TbPencil } from 'react-icons/tb'
 import { NavLink } from 'react-router-dom'
+import Swal from 'sweetalert2'
 import Api from '../Api'
 
 export default function ExamTable() {
@@ -16,6 +17,29 @@ export default function ExamTable() {
             setstudents(res.data.data.data)
             setloading(false)
         })
+    }
+
+    const deleteexam = (exam_id) => {
+        Swal.fire({
+            title: 'هل انت متأكد من حذف هذه الجلسة',
+            showCancelButton: true,
+            cancelButtonText: 'الغاء',
+            confirmButtonText: 'حذف',
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                Api.delete(`deleteexam/${exam_id}`).then((res) => {
+                    if (res.data.success) {
+                        console.log('shu');
+                        const newList = students.filter((student) => student.exam_id !== exam_id);
+                        setstudents(newList);
+                        Swal.fire(res.data.message, '', 'success')
+                    }
+                })
+
+            }
+        })
+
     }
 
     useEffect(() => {
@@ -48,8 +72,10 @@ export default function ExamTable() {
                             <tr>
                                 <td colSpan={2}>
                                 </td>
-                                <td colSpan={2}>
+                                <td>
                                     <Spinner />
+                                </td>
+                                <td colSpan={2}>
                                 </td>
                             </tr>
                             :
@@ -61,7 +87,7 @@ export default function ExamTable() {
                                         <td>{student.exam_decision === 'yes' ? 'منح اجازة' : 'لم يمنح'}</td>
                                         <td>{student.has_receive_ijaza === 1 ? 'استلم' : 'لم يستلم'}</td>
                                         <td>
-                                            <span className='mx-2 cursor_pointer'>
+                                            <span className='mx-2 cursor_pointer' onClick={() => deleteexam(student.exam_id)}>
                                                 <BsTrash />
                                             </span>
                                             <span className='text-white cursor_pointer'>
@@ -69,7 +95,11 @@ export default function ExamTable() {
                                             </span>
                                         </td>
                                     </tr>) :
-                                ''
+                                <tr>
+                                    <td colSpan={2}></td>
+                                    <td className='text-center'>لا يوجد اي اختبار بعد</td>
+                                    <td colSpan={2}></td>
+                                </tr>
                         }
                     </tbody>
                 </table>

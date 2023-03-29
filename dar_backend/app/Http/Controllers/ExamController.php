@@ -40,14 +40,12 @@ class ExamController extends Controller
         if (
             $request->teacher_id_1 &&
             $request->teacher_id_2 &&
-            $request->teacher_id_3 &&
             $request->teacher_student &&
             $request->center_id &&
             $request->student_id &&
             $request->tarik &&
             $request->grade &&
-            $request->jizie_from &&
-            $request->jizie_to &&
+            $request->ijaza_in &&
             $request->decision &&
             $request->date
         ) {
@@ -60,8 +58,7 @@ class ExamController extends Controller
                 'student_id'        => $request->student_id,
                 'tarik'             => $request->tarik,
                 'grade'             => $request->grade,
-                'jizie_from'        => $request->jizie_from,
-                'jizie_to'          => $request->jizie_to,
+                'ijaza_in'          => $request->ijaza_in,
                 'decision'          => $request->decision,
                 'date'              => $request->date,
                 'note'              => $request->note,
@@ -92,6 +89,7 @@ class ExamController extends Controller
                     DB::raw('CONCAT(students.first_name," ",students.middle_name," ",students.last_name) as student_name'),
                     DB::raw('CONCAT(users.first_name," ",users.middle_name," ",users.last_name) as teacher_name')
                 )
+                ->orderBy('exam_id', 'desc')
                 ->paginate(10);
             return response([
                 'data' => $exams,
@@ -146,6 +144,17 @@ class ExamController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $exam = Exams::find($id);
+            $exam->delete();
+            if (!$exam->exists()) {
+                return response([
+                    'message' => __('message.exam_deleted'),
+                    'success' => true
+                ]);
+            }
+        } catch (Exception $e) {
+            return response($e->getMessage());
+        }
     }
 }

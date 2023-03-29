@@ -37,7 +37,8 @@ export default function EditStudent() {
     { 'id': 5, 'value': 'AB-' },
     { 'id': 6, 'value': 'AB+' },
     { 'id': 7, 'value': 'O+' },
-    { 'id': 8, 'value': 'O-' }
+    { 'id': 8, 'value': 'O-' },
+    { 'id': 9, 'value': 'NA' }
   ]
 
   const [username, setUsername] = useState('')
@@ -166,6 +167,7 @@ export default function EditStudent() {
     setTeacher_id(0)
     getTeachersByCenter(id)
   }
+
   const getteacherid = (id) => {
     setTeacher_id(id)
   }

@@ -23,7 +23,7 @@ function TeachersTable() {
   const navigate = useNavigate();
 
   const handleNavigate = (teacher_id) => {
-    navigate(`/students`,{ state: { teacher_id: teacher_id } })
+    navigate(`/students`, { state: { teacher_id: teacher_id } })
   }
 
   const [teachers, setTeachers] = useState([]);
@@ -47,7 +47,7 @@ function TeachersTable() {
   const [loading, setLoading] = useState(false);
   const [outloading, setoutloading] = useState(true)
   const [noteacher, setnoteacher] = useState(false)
-
+  const [filterCenterId,setFilterCenterId] = useState(0)
 
   const changePage = (e, value) => {
     setPage(value);
@@ -66,6 +66,8 @@ function TeachersTable() {
     setMname_error('')
     setLname_error('')
     setPhone_error('')
+    setFilterCenterId(0)
+    setUser_role(0)
   };
 
   const addTeacher = () => {
@@ -78,13 +80,25 @@ function TeachersTable() {
       last_name: lname,
       role_id: role_id === 3 ? 4 : user_role,
       phone_number: phone_number,
-      center_id: role_id === 3 ? centers[0]['center_id'] : center_id
+      center_id: role_id === 3 ? centers[0]['center_id'] : filterCenterId
     })
       .then((response) => {
-        hideModal()
-        Swal.fire(response.data.message, '', 'success')
-        getTeachers()
-        setCenter_id(0)
+        if (response.data.success) {
+          hideModal()
+          Swal.fire(response.data.message, '', 'success')
+          if (role_id === 3) {
+            console.log(center_id, page, 'herererer');
+            getTeachersByCenter(center_id, 1)
+          } else {
+            getTeachers(1)
+          }
+          if (role_id === 1 || role_id === 2) {
+            setFilterCenterId(0)
+            setUser_role(0)
+          }
+        } else {
+          console.log(response);
+        }
       })
       .catch(function (error) {
         console.log(error.response);
@@ -257,7 +271,7 @@ function TeachersTable() {
                 <>
                   <label htmlFor="">المراكز المتاحة</label>
                   <div className='my-2'>
-                    <Form.Select defaultValue={center_id} onChange={(e) => setCenter_id(e.currentTarget.value)}>
+                    <Form.Select defaultValue={filterCenterId} onChange={(e) => setFilterCenterId(e.currentTarget.value)}>
                       <option disabled="disabled" value='0'>اختر احد المراكز</option>
                       {allcenters ? allcenters.map((center) =>
                         <option key={center.id} value={center.id}>{center.name}</option>) :

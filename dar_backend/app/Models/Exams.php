@@ -27,7 +27,8 @@ class Exams extends Model
         'date',
         'has_receive_ijaza',
         'recieve_ijaza_date',
-        'ijaza_copy_file'
+        'ijaza_copy_file',
+        'ijaza_in'
     ];
 
     public function students(){

@@ -72,8 +72,7 @@ function Navbar() {
                         </div>
                     </div>
 
-                    {role_id === 4 || role_id === 5 ? ''
-                        :
+                    {role_id === 1 || role_id === 2 ?
                         <>
                             {/* case 1: small screen Centers */}
                             <div className='text-center'>
@@ -101,9 +100,14 @@ function Navbar() {
                                     <span className='px-2 d-none d-md-block'>المراكز</span>
                                 </NavLink>
                             </div>
+                        </> : ''
+                    }
 
+                    {role_id !== 4 ?
+
+                        <>
                             {/* case 1: small screen TEACHERS */}
-                            <div className='text-center'>
+                            < div className='text-center'>
                                 <NavLink to='/teachers' className='text-decoration-none p-1 p-md-0'
                                     style={({ isActive }) =>
                                         isActive ?
@@ -129,6 +133,7 @@ function Navbar() {
                                 </NavLink>
                             </div>
                         </>
+                        : ''
                     }
 
                     {/* case 1: small screen Students */}

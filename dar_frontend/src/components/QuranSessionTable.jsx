@@ -223,15 +223,19 @@ function QuranSessionTable() {
                         const newList = day_time.filter((dt) => dt.id !== sess_id);
                         setDay_time(newList);
 
-                        if (res.data.check === 0) {
-                            const list = sessions.filter(session => session.session_id !== st_ce_te)
-                            setSessions(list)
-                        }
+                        // if (res.data.check === 0) {
+                        //     const list = sessions.filter(session => session.session_id !== st_ce_te)
+                        //     setSessions(list)
+                        // }
                     }
                 )
             }
         })
     }
+
+    // const deletetasmie = (sess_id) => {
+    //     console.log(sess_id, 'id');
+    // }
 
     const getTimes = (st_ct_te_id) => {
         setDay_time([])
@@ -329,7 +333,7 @@ function QuranSessionTable() {
             <AddSessionModal addSession={is_session_added} />
 
             {role_id === 3 || role_id === 4 ?
-                <div className='d-flex justify-content-between'>
+                <div>
                     {/* <button type="button" className="btn btn-dark my-2 d-flex align-items-center" onClick={showModal}>
                         <BsPlusCircle className='text-white' />
                         <span className='px-2'>
@@ -338,7 +342,9 @@ function QuranSessionTable() {
                     </button> */}
                     {
                         loading ? '' :
-                            <TeacherSelect teachers={teachers} teacher_id={getteacherid} tid={filterteacher_id} fromquransession={true} />
+                            <div className='d-flex flex-row-reverse'>
+                                <TeacherSelect teachers={teachers} teacher_id={getteacherid} tid={filterteacher_id} fromquransession={true} />
+                            </div>
                     }
                 </div>
                 :
@@ -445,6 +451,7 @@ function QuranSessionTable() {
                                             <th scope="col">الطالب</th>
                                             <th scope="col">الاستاذ</th>
                                             <th scope="col">عرض التسميعات</th>
+                                            {/* <th></th> */}
                                         </tr>
 
                                     </thead>
@@ -505,6 +512,11 @@ function QuranSessionTable() {
                                                         </span>
                                                     </NavLink>
                                                 </td>
+                                                {/* <td>
+                                                    <span className='cursor_pointer' onClick={() => deletetasmie(session.session_id)}>
+                                                        <BsTrash />
+                                                    </span>
+                                                </td> */}
                                             </tr>
                                         )}
                                     </tbody>

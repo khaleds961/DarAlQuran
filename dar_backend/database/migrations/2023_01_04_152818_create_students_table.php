@@ -37,9 +37,9 @@ return new class extends Migration
             $table->string('current_job')->nullable();
             $table->string('mother_work')->nullable();
             $table->string('father_work')->nullable();
-            $table->integer('phone_number')->nullable();
-            $table->integer('work_number')->nullable();
-            $table->integer('home_number')->nullable();
+            $table->string('phone_number')->nullable();
+            $table->string('work_number')->nullable();
+            $table->string('home_number')->nullable();
             $table->enum('student_level_status', ['beginner', 'reader', 'hafez', 'moujaz']);
             $table->string('suitable_days')->nullable();
             $table->string('suitable_times')->nullable();

@@ -388,6 +388,7 @@ class UsersController extends Controller
                 ->where('center_id', $center_id)
                 ->where('role_id', 4)
                 ->groupBy('id')
+                ->orderBy('id','desc')
                 ->paginate(10);
         } else {
             $data = Users::join('students_centers_teachers', 'students_centers_teachers.user_id', '=', 'users.id')
@@ -404,6 +405,7 @@ class UsersController extends Controller
                 )
                 ->where('role_id', 4)
                 ->groupBy('id')
+                ->orderBy('id','desc')
                 ->paginate(10);
         }
         return response([

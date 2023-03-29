@@ -29,16 +29,13 @@ export default function Exam() {
     const [centers, setcenters] = useState([])
     const [selectedcenter, setselectedcenter] = useState(null)
     const [centerid, setcenterid] = useState('')
-    const [from_jiz, setfrom_jizz] = useState(null)
-    const [from, setfrom] = useState('')
-    const [to_jiz, setto_jiz] = useState(null)
-    const [to, setto] = useState('')
     const [get_ijaza, setget_ijaza] = useState('yes')
     const [answers, setAnswers] = useState([])
     const [date, setdate] = useState('')
     const [grade, setgrade] = useState('')
     const [has_receive_ijaza, setHas_receive_ijaza] = useState('')
     const [recieve_ijaza_date, setrecieve_ijaza_date] = useState('')
+    const [ijaza_in, setijaza_in] = useState('')
 
     const riwayat = [
         {
@@ -323,26 +320,6 @@ export default function Exam() {
         setcenterid('');
     };
 
-    const handleChangeFrom = (event, value) => {
-        if (value) {
-            setfrom_jizz(value)
-            setfrom(value.id);
-        } else {
-            setfrom_jizz(null)
-            setfrom('');
-        }
-    }
-
-    const handleChangeTo = (event, value) => {
-        if (value) {
-            setto_jiz(value)
-            setto(value.id);
-        } else {
-            setto_jiz(null)
-            setto('');
-        }
-    }
-
     const handleAddAnswer = () => {
         setAnswers([...answers, '']);
     };
@@ -361,19 +338,18 @@ export default function Exam() {
 
     const handleSubmit = () => {
 
-        if (teacher_id.length === 3 && selectedRiwaya_id && teacher_student_id && from_jiz && to_jiz && get_ijaza && date) {
+        if (teacher_id.length === 2 || teacher_id.length === 3 && selectedRiwaya_id && teacher_student_id && ijaza_in && get_ijaza && date && ijaza_in) {
             Api.post(`addexam`, {
                 teacher_id_1: teacher_id[0],
                 teacher_id_2: teacher_id[1],
-                teacher_id_3: teacher_id[2],
+                teacher_id_3: teacher_id.length === 2 ? '' : teacher_id[2],
                 tarik: selectedRiwaya_id,
                 grade: grade,
                 teacher_student: teacher_student_id,
                 student_id: selected_student_id,
                 center_id: centerid,
-                jizie_from: from,
-                jizie_to: to,
                 decision: get_ijaza,
+                ijaza_in: ijaza_in,
                 note: answers.length > 0 ? answers.toString() : null,
                 date: date,
                 recieve_ijaza_date: recieve_ijaza_date,
@@ -392,15 +368,12 @@ export default function Exam() {
                     setgrade('')
                     setteacher_student(null)
                     setteacher_student_id([])
-                    setfrom_jizz(null)
-                    setfrom('')
-                    setto_jiz(null)
-                    setto('')
                     setget_ijaza('yes')
                     setAnswers([])
                     setdate('')
                     setrecieve_ijaza_date('')
                     setHas_receive_ijaza('')
+                    setijaza_in('')
                 }
             })
         } else {
@@ -532,32 +505,16 @@ export default function Exam() {
                 </div>
 
                 <div>
-                    <p className='h6 my-3'>وكان الاختبار في الاجزاء :  </p>
+                    <p className='h6 my-3'>وكان الاختبار في :  </p>
                     <div className='row'>
-                        <div className='col my-2'>
-                            <Autocomplete
-                                disablePortal
-                                id="combo-box-demo"
-                                options={ajzaa}
-                                // sx={{ width: 400 }}
-                                getOptionLabel={(option) => option.name}
-                                renderInput={(params) => <TextField {...params} label="من الجزء" />}
-                                value={from_jiz}
-                                onChange={handleChangeFrom}
-                            />
-                        </div>
-
-                        <div className='col my-2'>
-                            <Autocomplete
-                                disablePortal
-                                id="combo-box-demo"
-                                options={ajzaa}
-                                // sx={{ width: 400 }}
-                                getOptionLabel={(option) => option.name}
-                                renderInput={(params) => <TextField {...params} label="الى الجزء" />}
-                                value={to_jiz}
-                                onChange={handleChangeTo}
-                            />
+                        <div className='col'>
+                            <select name="" id="" className='form-control' value={ijaza_in}
+                                onChange={(e) => setijaza_in(e.target.value)}>
+                                <option value="" disabled>-- ضع خيارا -- </option>
+                                <option value="full_quran">القرآن كاملا</option>
+                                <option value="last_ten">العشر الاواخر</option>
+                                <option value="albaqara">سورة البقرة</option>
+                            </select>
                         </div>
                     </div>
                 </div>

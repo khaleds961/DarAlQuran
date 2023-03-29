@@ -19,7 +19,6 @@ return new class extends Migration
             $table->integer('teacher_id_2');
             $table->integer('teacher_id_3');
             $table->integer('teacher_student');
-            $table->integer('center_student_teacher_id');
             $table->index('teacher_id_1', 'teacher_id_1');
             $table->index('teacher_id_2', 'teacher_id_2');
             $table->index('teacher_id_3', 'teacher_id_3');
@@ -32,8 +31,6 @@ return new class extends Migration
             $table->string('b')->nullable();
             $table->string('tarik')->nullable();
             $table->string('grade')->nullable();
-            $table->string('jizie_from');
-            $table->string('jizie_to');
             $table->enum('decision', ['yes', 'no']);
             $table->text('note')->nullable();
             $table->date('date')->format('Y-m-d');

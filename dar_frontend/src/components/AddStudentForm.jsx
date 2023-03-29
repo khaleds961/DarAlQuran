@@ -31,7 +31,8 @@ export default function AddStudentForm() {
         { 'id': 5, 'value': 'AB-' },
         { 'id': 6, 'value': 'AB+' },
         { 'id': 7, 'value': 'O+' },
-        { 'id': 8, 'value': 'O-' }
+        { 'id': 8, 'value': 'O-' },
+        { 'id': 9, 'value': 'NA' }
     ]
 
     const [username, setUsername] = useState('')
@@ -188,8 +189,8 @@ export default function AddStudentForm() {
                     setrate('')
                     setringid(0)
                     setCenter_id(0)
-                }else{
-                    console.log({res});
+                } else {
+                    console.log({ res });
                 }
             }
         ).catch(function (error) {

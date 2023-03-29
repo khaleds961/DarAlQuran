@@ -34,7 +34,8 @@ export default function EditRingStudent() {
     { 'id': 5, 'value': 'AB-' },
     { 'id': 6, 'value': 'AB+' },
     { 'id': 7, 'value': 'O+' },
-    { 'id': 8, 'value': 'O-' }
+    { 'id': 8, 'value': 'O-' },
+    { 'id': 9, 'value': 'NA'}
   ]
 
 

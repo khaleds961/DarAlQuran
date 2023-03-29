@@ -107,5 +107,5 @@ Route::post('/addcommentring', [RingCommentsController::class, 'store']);
 //Exams
 Route::post('/addexam', [ExamController::class, 'store']);
 Route::get('/moujazstudents', [ExamController::class, 'moujazstudents']);
-
+Route::delete('/deleteexam/{exam_id}',[ExamController::class,'destroy']);
 
