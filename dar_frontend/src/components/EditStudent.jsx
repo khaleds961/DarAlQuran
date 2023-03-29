@@ -15,7 +15,7 @@ import { NavLink, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import { AES } from 'crypto-js';
 import CryptoJS from 'crypto-js';
-
+import moment from 'moment';
 
 
 export default function EditStudent() {
@@ -82,11 +82,14 @@ export default function EditStudent() {
   const [notes, setnotes] = useState('')
   const theme = useTheme();
   const [student, setstudent] = useState([])
+  const [registration_date, setRegistrationDate] = useState('')
   const [loading, setloading] = useState(true)
 
   const getStudentById = (student_id) => {
     Api.get(`getstudentbyid/${student_id}`).then((res) => {
+      console.log({res});
       setstudent(res.data.data)
+      setRegistrationDate(res.data.data.registration_date)
       setFirst_name(res.data.data['first_name'])
       setMiddle_name(res.data.data['middle_name'])
       setLast_name(res.data.data['last_name'])
@@ -205,6 +208,7 @@ export default function EditStudent() {
       sheikh_names: sheikh_names_arr.toString(),
       memorizing: memorizing,
       female_question: female_question,
+      registration_date:registration_date
     }).then(
       (res) => {
         if (res.data.success) {
@@ -290,11 +294,21 @@ export default function EditStudent() {
     { 'id': 34, 'value': '21:30' },
     { 'id': 35, 'value': '22:00' },
   ]
-  console.log(teacher_id,'hon from editstudent');
+  console.log(teacher_id, 'hon from editstudent');
   return (
     <>
       {loading ? <div className='mt-5 text-center'><Spinner /></div> :
         <div className='container' style={{ width: '80%' }}>
+
+          <div className='row'>
+            <div className='col'>
+              <label htmlFor='registration_date' className='my-2'>تاريخ تعبئة الاستبانة</label>
+              <input type="date" max={moment().format('YYYY-MM-DD')}
+                className='form-control my-2'
+                id='registration_date'
+                value={registration_date} onChange={(e) => setRegistrationDate(e.target.value)} />
+            </div>
+          </div>
 
           {/* first middle last name */}
           <div className='row'>

@@ -12,6 +12,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import CreatableSelect from 'react-select/creatable';
 import { NavLink, useParams } from 'react-router-dom';
+import moment from 'moment';
 
 
 
@@ -76,6 +77,7 @@ export default function AddStudentForm() {
     const [notes, setnotes] = useState('')
     const [type_kiraat, settype_kiraat] = useState(0)
     const [file, setFile] = useState(null);
+    const [registration_date, setRegistrationDate] = useState(moment().format('YYYY-MM-DD'))
     const theme = useTheme();
 
 
@@ -98,7 +100,6 @@ export default function AddStudentForm() {
     }, [center_id])
 
     useEffect(() => {
-        console.log(id,'userId')
         if (id === '1') {
             setstudent_isring('yes')
         } else {
@@ -141,6 +142,7 @@ export default function AddStudentForm() {
         const skills_arr = []
         value.map(v => skills_arr.push(v.value))
         Api.post('addstudent', {
+            registration_date:registration_date,
             first_name: first_name,
             middle_name: middle_name,
             last_name: last_name,
@@ -208,7 +210,7 @@ export default function AddStudentForm() {
         value.map(v => sheikh_names_arr.push(v.value))
 
         const formData = new FormData();
-
+        formData.append('registration_date', registration_date);
         formData.append('file', file);
         formData.append('username', username);
         formData.append('first_name', first_name);
@@ -378,6 +380,16 @@ export default function AddStudentForm() {
                         </span>
                     </div>
                 </div> */}
+
+                <div className='row'>
+                    <div className='col'>
+                        <label htmlFor='registration_date' className='my-2'>تاريخ تعبئة الاستبانة</label>
+                        <input type="date" max={moment().format('YYYY-MM-DD')}
+                            className='form-control my-2'
+                            id='registration_date'
+                            value={registration_date} onChange={(e) => setRegistrationDate(e.target.value)} />
+                    </div>
+                </div>
 
 
                 {/* first middle last name */}

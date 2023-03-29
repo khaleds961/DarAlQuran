@@ -3,6 +3,7 @@ import Swal from 'sweetalert2';
 import Api from '../Api'
 import Form from 'react-bootstrap/Form';
 import { BsPlusCircle, BsTrash } from 'react-icons/bs';
+import { FiMoreHorizontal } from 'react-icons/fi';
 import { TbPencil } from 'react-icons/tb'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Pagination } from '@mui/material'
@@ -13,6 +14,7 @@ import TeacherSelect from './TeacherSelect';
 import { AES } from 'crypto-js';
 import CryptoJS from 'crypto-js';
 import Table from 'react-bootstrap/Table';
+
 
 
 function StudentsTable() {
@@ -36,6 +38,7 @@ function StudentsTable() {
   const [filterteacher, setfilterteacher] = useState(0)
   const [studentfilter, setstudentfilter] = useState('')
   const [hidepagination, setHidePagination] = useState(false)
+  const [hideTeacher, setHideTeacher] = useState(true)
 
   const location = useLocation()
   const default_teacher_id = location?.state?.teacher_id ?? null
@@ -158,6 +161,10 @@ function StudentsTable() {
     navigate(`/editstudent/${encrypted}`)
   }
 
+  const handlehideTeacher = () =>{
+    setHideTeacher(!hideTeacher)
+  }
+
   useEffect(() => {
     if (role_id === 4) {
       getstudentbyteacher(id, 1)
@@ -216,51 +223,55 @@ function StudentsTable() {
           </div>
         </div>
         <>
-        <div className='table-responsive'>
-          <table className="table table-dark table-hover text-center">
-            <thead>
-              <tr>
-                <th scope="col">الاسم</th>
-                <th scope="col" className="d-none d-md-table-cell">الجنسية</th>
-                <th scope="col">رقم الهاتف</th>
-                <th scope="col">الاستاذ</th>
-                <th scope="col">المركز</th>
-                <th scope="col"></th>
-              </tr>
-            </thead>
-            {loading ?
-              <tbody>
+          <div className='table-responsive'>
+            <table className="table table-dark table-hover text-center">
+              <thead>
                 <tr>
-                  <td colSpan={2}></td>
-                  <td>
-                    <Spinner animation="border" variant="primary" />
-                  </td>
-                  <td colSpan={3}></td>
+                  <th scope="col">الاسم</th>
+                  <th scope="col" className="d-none d-md-table-cell">الجنسية</th>
+                  <th scope="col">رقم الهاتف</th>
+                  <th scope="col" className={`d-${hideTeacher ? 'none' : 'table-cell'} d-md-table-cell`}>الاستاذ</th>
+                  <th scope="col">المركز</th>
+                  <th scope="col"></th>
                 </tr>
-              </tbody> :
-              <tbody>
-                {students?.map(student =>
-                  <tr key={student.id}>
-                    <th scope="row">{student.first_name} {student.middle_name} {student.last_name}</th>
-                    <td className="d-none d-md-table-cell">{student.nationality}</td>
-                    <td>{student.phone_number}</td>
-                    <td>{student.teacher_fn} {student.teacher_mn} {student.teacher_ln}</td>
-                    <td>{student.center_name}</td>
+              </thead>
+              {loading ?
+                <tbody>
+                  <tr>
+                    <td colSpan={2}></td>
                     <td>
-                      <span className='mx-2 cursor_pointer' onClick={() => deleteStudent(student.id, student.center_id)}>
-                        <BsTrash />
-                      </span>
-                      <span className='text-white cursor_pointer' onClick={() => handleNavigate(student.id)}>
-                        <TbPencil />
-                      </span>
+                      <Spinner animation="border" variant="primary" />
                     </td>
-                    
+                    <td colSpan={3}></td>
                   </tr>
-                )}
-              </tbody>
-            }
-          </table>
-          </div> 
+                </tbody> :
+                <tbody>
+                  {students?.map(student =>
+                    <tr key={student.id}>
+                      <th scope="row">{student.first_name} {student.middle_name} {student.last_name}</th>
+                      <td className="d-none d-md-table-cell">{student.nationality}</td>
+                      <td>{student.phone_number}</td>
+                      <td className={`d-${hideTeacher ? 'none' : 'table-cell'} d-md-table-cell`}>{student.teacher_fn} {student.teacher_mn} {student.teacher_ln}</td>
+                      <td>{student.center_name}</td>
+                      <td>
+                        <span className='mx-2 cursor_pointer' onClick={() => deleteStudent(student.id, student.center_id)}>
+                          <BsTrash />
+                        </span>
+                        <span className='text-white cursor_pointer' onClick={() => handleNavigate(student.id)}>
+                          <TbPencil />
+                        </span>
+
+                        <div className='text-white cursor_pointer d-sm-block d-md-none' onClick={() => handlehideTeacher()}>
+                          <FiMoreHorizontal />
+                        </div>
+                      </td>
+
+                    </tr>
+                  )}
+                </tbody>
+              }
+            </table>
+          </div>
           {hidepagination ? '' :
             <Pagination
               shape="rounded"

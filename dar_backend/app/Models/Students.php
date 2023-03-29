@@ -47,7 +47,8 @@ class Students extends Model
         'notes',
         'type_kiraat',
         'file_name',
-        'path'
+        'path',
+        'registration_date'
     ];
 
     public function teachers()

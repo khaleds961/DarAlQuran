@@ -16,6 +16,7 @@ import { NavLink } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import { AES } from 'crypto-js';
 import CryptoJS from 'crypto-js';
+import moment from 'moment';
 
 export default function EditRingStudent() {
   const { student_id: id } = useParams()
@@ -35,7 +36,7 @@ export default function EditRingStudent() {
     { 'id': 6, 'value': 'AB+' },
     { 'id': 7, 'value': 'O+' },
     { 'id': 8, 'value': 'O-' },
-    { 'id': 9, 'value': 'NA'}
+    { 'id': 9, 'value': 'NA' }
   ]
 
 
@@ -78,6 +79,7 @@ export default function EditRingStudent() {
   const [notes, setnotes] = useState('')
   const theme = useTheme();
   const [loading, setloading] = useState(true)
+  const [registration_date, setRegistrationDate] = useState('')
 
   const days = [
     { 'id': 1, 'value': 'الاثنين' },
@@ -178,6 +180,7 @@ export default function EditRingStudent() {
     const sheikh_arr = []
     sheikhs.map(sh => sheikh_arr.push(sh.value))
     Api.post(`editstudent/${student_id}`, {
+      registration_date:registration_date,
       first_name: first_name,
       middle_name: middle_name,
       last_name: last_name,
@@ -254,7 +257,7 @@ export default function EditRingStudent() {
   const getRingStudent = (student_id) => {
     Api.get(`getringstudentbyid/${student_id}`).then((res) => {
       console.log({ res }, 'jjjkkjjk');
-      setFirst_name(res.data.data['first_name'] )
+      setFirst_name(res.data.data['first_name'])
       setMiddle_name(res.data.data['middle_name'])
       setLast_name(res.data.data['last_name'])
       setmothername(res.data.data['mother_name'])
@@ -330,6 +333,16 @@ export default function EditRingStudent() {
     <>
       {loading ? <div className='mt-5 text-center'><Spinner /></div> :
         <div className='container' style={{ width: '80%' }}>
+
+          <div className='row'>
+            <div className='col'>
+              <label htmlFor='registration_date' className='my-2'>تاريخ تعبئة الاستبانة</label>
+              <input type="date" max={moment().format('YYYY-MM-DD')}
+                className='form-control my-2'
+                id='registration_date'
+                value={registration_date} onChange={(e) => setRegistrationDate(e.target.value)} />
+            </div>
+          </div>
 
           {/* first middle last name */}
           <div className='row'>

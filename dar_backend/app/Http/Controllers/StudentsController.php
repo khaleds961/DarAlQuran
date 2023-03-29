@@ -86,6 +86,7 @@ class StudentsController extends Controller
         try {
             if ($request->is_ring == 1) {
                 $student = Students::create([
+                    'registration_date' => $request->registration_date,
                     'first_name'        => $request->first_name,
                     'middle_name'       => $request->middle_name,
                     'last_name'         => $request->last_name,
@@ -118,6 +119,7 @@ class StudentsController extends Controller
                 }
 
                 $student = Students::create([
+                    'registration_date' => $request->registration_date,
                     'first_name'        => $request->first_name,
                     'middle_name'       => $request->middle_name,
                     'last_name'         => $request->last_name,
@@ -267,7 +269,8 @@ class StudentsController extends Controller
                 'sheikh_names' => $request->sheikh_names,
                 'memorizing' => $request->memorizing,
                 'skills' => $request->skills,
-                'ring_id' => $request->ring_id
+                'ring_id' => $request->ring_id,
+                'registration_date' => $request->registration_date
             ]);
             $student_center_teacher = Students_Centers_Teachers::where('student_id', $id)->first();
             if ($student_center_teacher) {
@@ -325,7 +328,8 @@ class StudentsController extends Controller
                 'suitable_times' => $request->suitable_times,
                 'sheikh_names' => $request->sheikh_names,
                 'memorizing' => $request->memorizing,
-                'female_question' => $request->female_question
+                'female_question' => $request->female_question,
+                'registration_date' => $request->registration_date
             ]);
             $student_center_teacher = Students_Centers_Teachers::where('student_id', $id)->first();
 
