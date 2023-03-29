@@ -98,7 +98,7 @@ export default function AddStudentForm() {
     }, [center_id])
 
     useEffect(() => {
-        console.log(id)
+        console.log(id,'userId')
         if (id === '1') {
             setstudent_isring('yes')
         } else {
@@ -131,7 +131,6 @@ export default function AddStudentForm() {
 
     const getTeachersByCenter = () => {
         setTeachers([])
-        setTeacher_id(0)
         Api.get(`getAllTeachersByCenter/${center_id}`).then((res) => {
             setTeachers(res.data.data);
         })
@@ -198,6 +197,7 @@ export default function AddStudentForm() {
         })
     }
     const getcenterid = (id) => {
+        setTeacher_id(0)
         setCenter_id(id)
     }
 
