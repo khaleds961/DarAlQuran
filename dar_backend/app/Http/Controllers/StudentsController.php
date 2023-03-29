@@ -151,11 +151,19 @@ class StudentsController extends Controller
                     'type_kiraat'       => $request->type_kiraat
                 ]);
                 if ($student->id) {
-                   $student_center_teacher =  Students_Centers_Teachers::create([
-                        'student_id' => $student['id'],
-                        'center_id' => $request['center_id'],
-                        'user_id' => $request['teacher_id']
-                    ]);
+                    if ($request->center_id != 0 && $request->teacher_id != 0) {
+                        $student_center_teacher =  Students_Centers_Teachers::create([
+                            'student_id' => $student['id'],
+                            'center_id' => $request['center_id'],
+                            'user_id' => $request['teacher_id']
+                        ]);
+                    }else{
+                        return response([
+                            'message' => 'center or user id is null',
+                            'success' => false
+                        ]);
+                        $student->delete();
+                    }
                 }
             }
             if ($student->id && $student_center_teacher->id) {
@@ -163,7 +171,7 @@ class StudentsController extends Controller
                     'message' => __('message.student_added'),
                     'success' => true
                 ]);
-            }else{
+            } else {
                 $student->delete();
                 return response([
                     'message' => 'failed',
