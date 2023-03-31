@@ -30,10 +30,8 @@ function StudentsTable() {
   const defualt_center_id = role_id === 1 || role_id === 2 ? 0 : centers[0]?.center_id;
 
   const location = useLocation()
-  // const default_teacher_id = location?.state?.teacher_id ?? null
   const default_teacher_id = location?.state?.teacher_id ?? 0
 
-  // const [teacherid, setteacherid] = useState(null)
   const [students, setStudents] = useState(null);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(1);
@@ -88,14 +86,12 @@ function StudentsTable() {
     if (role_id === 4) {
       getstudentbyteacher(id, value)
     } else {
+
       if (filterteacher !== 0) {
         getstudentbyteacher(filterteacher, value)
       } else {
-        if (teacherid !== 0) {
-          getstudentbyteacher(teacherid, value)
-        } else {
-          getStudentsByCenter(center_id, value)
-        }
+        console.log(center_id, 'alo2');
+        getStudentsByCenter(center_id, value)
       }
     }
   };
