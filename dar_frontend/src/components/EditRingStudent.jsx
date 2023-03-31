@@ -17,12 +17,16 @@ import { Spinner } from 'react-bootstrap';
 import { AES } from 'crypto-js';
 import CryptoJS from 'crypto-js';
 import moment from 'moment';
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
+import countries from '../JsonFiles/countries.json'
 
 export default function EditRingStudent() {
   const { student_id: id } = useParams()
   const navigate = useNavigate()
   const { session: { user: { role_id } } } = useContext(SessionContext);
   const { session: { user: { centers } } } = useContext(SessionContext);
+  const { session: { token } } = useContext(SessionContext)
   const defaultvalue = role_id === 3 || role_id === 4 ? centers[0]['center_id'] : 0;
 
   const student_id = AES.decrypt(id.replace(/_/g, '/'), 'secretKey').toString(CryptoJS.enc.Utf8);
@@ -54,6 +58,8 @@ export default function EditRingStudent() {
   const [bloodtype, setbloodtype] = useState('')
   const [gender, setgender] = useState('male')
   const [nationality, setnationality] = useState('')
+  const [oldNationalityName, setOldNationalityName] = useState(null)
+  const [newnationality, setnewnationality] = useState('')
   const [current_job, setcurrent_job] = useState('')
   const [motherjob, setmotherjob] = useState('')
   const [fatherjob, setfatherjob] = useState('')
@@ -80,6 +86,7 @@ export default function EditRingStudent() {
   const theme = useTheme();
   const [loading, setloading] = useState(true)
   const [registration_date, setRegistrationDate] = useState('')
+  const [index,setindex] = useState(null)
 
   const days = [
     { 'id': 1, 'value': 'الاثنين' },
@@ -162,7 +169,9 @@ export default function EditRingStudent() {
 
   const getTeachersByCenter = (center_id) => {
     setTeachers([])
-    Api.get(`getAllTeachersByCenter/${center_id}`).then((res) => {
+    Api.get(`getAllTeachersByCenter/${center_id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then((res) => {
       console.log(res.data.data, 'teacgersss');
       setTeachers(res.data.data);
     })
@@ -180,7 +189,7 @@ export default function EditRingStudent() {
     const sheikh_arr = []
     sheikhs.map(sh => sheikh_arr.push(sh.value))
     Api.post(`editstudent/${student_id}`, {
-      registration_date:registration_date,
+      registration_date: registration_date,
       first_name: first_name,
       middle_name: middle_name,
       last_name: last_name,
@@ -193,7 +202,7 @@ export default function EditRingStudent() {
       major: major,
       blood_type: bloodtype,
       gender: gender,
-      nationality: nationality,
+      nationality: newnationality,
       current_job: current_job,
       phone_number: phone_number,
       work_number: work_number,
@@ -213,6 +222,8 @@ export default function EditRingStudent() {
       ring_id: ringid,
       is_ring: true,
       sheikh_names: sheikh_arr.toString()
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
     }).then(
       (res) => {
         if (res.data.success) {
@@ -255,13 +266,22 @@ export default function EditRingStudent() {
   }
 
   const getRingStudent = (student_id) => {
-    Api.get(`getringstudentbyid/${student_id}`).then((res) => {
+    Api.get(`getringstudentbyid/${student_id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then((res) => {
       console.log({ res }, 'jjjkkjjk');
       setFirst_name(res.data.data['first_name'])
       setMiddle_name(res.data.data['middle_name'])
       setLast_name(res.data.data['last_name'])
       setmothername(res.data.data['mother_name'])
-      setnationality(res.data.data['nationality'])
+      const oldNationality = countries.find(country => country.code === res.data.data['nationality']);
+      if (oldNationality !== undefined) {
+        const index = countries.findIndex(item => item.name === oldNationality.name);
+        setOldNationalityName(oldNationality.name);
+        setindex(index)
+      } else {
+        setnationality('')
+      }
       setgender(res.data.data['gender'])
       setaddress(res.data.data['address'])
       setcurrent_job(res.data.data['current_job'] ?? '')
@@ -298,11 +318,22 @@ export default function EditRingStudent() {
       setsuitablestimes(suitable_times)
       setstudent_centerid(res.data.data.center_id)
       setTeacher_id(res.data.data.teacher_id)
+      setRegistrationDate(res?.data?.data?.registration_date)
       setTimeout(() => {
         setloading(false)
       }, 1000);
     })
   }
+
+  const handleChangeNationality = (event, value) => {
+    if (value !== null) {
+      const newindex = countries.findIndex(item => item.name === value.name)
+      setnewnationality(value.code)
+      setindex(newindex)
+      return
+    }
+    setnewnationality('')
+  };
 
   const getteacherid = (t_id) => {
     setTeacher_id(t_id)
@@ -310,7 +341,9 @@ export default function EditRingStudent() {
 
   const getringsbycenter = (center_id) => {
     setrings([])
-    Api.get(`getringsbycenter/${center_id}`).
+    Api.get(`getringsbycenter/${center_id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).
       then((res) => {
         setrings(res.data.data)
       }).catch(function (err) {
@@ -382,11 +415,18 @@ export default function EditRingStudent() {
             </div>
 
             <div className="col-md">
-              <label >الجنسية</label>
-              <input type="text" className="form-control my-2"
-                value={nationality}
-                onChange={(e) => setnationality(e.target.value)}
-              />
+              <label>الجنسية</label>
+              <div className=''>
+                <Autocomplete
+                  disablePortal
+                  id="combo-box-demo"
+                  options={countries}
+                  getOptionLabel={(option) => option.name}
+                  value={countries[index] ?? null}
+                  renderInput={(params) => <TextField {...params} label="الجنسية" />}
+                  onChange={handleChangeNationality}
+                />
+              </div>
             </div>
 
             <div className="col-md">

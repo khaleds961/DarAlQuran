@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Spinner } from 'react-bootstrap'
 import { AiFillPlusCircle } from 'react-icons/ai'
 import { BsTrash } from 'react-icons/bs'
@@ -6,14 +6,19 @@ import { TbPencil } from 'react-icons/tb'
 import { NavLink } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import Api from '../Api'
+import SessionContext from '../session/SessionContext'
+
 
 export default function ExamTable() {
+    const { session: { token } } = useContext(SessionContext)
 
     const [students, setstudents] = useState([])
     const [loading, setloading] = useState(true)
 
     const getStudents = () => {
-        Api.get(`moujazstudents`).then((res) => {
+        Api.get(`moujazstudents`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then((res) => {
             setstudents(res.data.data.data)
             setloading(false)
         })
@@ -28,7 +33,9 @@ export default function ExamTable() {
         }).then((result) => {
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
-                Api.delete(`deleteexam/${exam_id}`).then((res) => {
+                Api.delete(`deleteexam/${exam_id}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                }).then((res) => {
                     if (res.data.success) {
                         console.log('shu');
                         const newList = students.filter((student) => student.exam_id !== exam_id);

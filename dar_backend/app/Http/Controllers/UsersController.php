@@ -152,7 +152,7 @@ class UsersController extends Controller
                 ->select('student_id')->get();
             if (count($check_teacher) > 0) {
                 return response([
-                    'message' => __('message.cant_delete'),
+                    'message' => __('message.cant_delete_teacher'),
                     'success' => false
                 ]);
             } else {
@@ -288,11 +288,18 @@ class UsersController extends Controller
 
     public function logout(Request $request)
     {
-        auth()->user()->tokens()->delete();
-        return response([
-            'message' => 'logout',
-            'success' => true
-        ]);
+        try {
+            $token = PersonalAccessToken::findToken($request->bearerToken());
+            if ($token) {
+                $token->delete();
+                return response([
+                    'message' => 'logout',
+                    'success' => true
+                ]);
+            }
+        } catch (Exception $e) {
+            return response($e->getMessage());
+        }
     }
 
     public function getAllUsers($user_id)
@@ -388,7 +395,7 @@ class UsersController extends Controller
                 ->where('center_id', $center_id)
                 ->where('role_id', 4)
                 ->groupBy('id')
-                ->orderBy('id','desc')
+                ->orderBy('id', 'desc')
                 ->paginate(10);
         } else {
             $data = Users::join('students_centers_teachers', 'students_centers_teachers.user_id', '=', 'users.id')
@@ -405,7 +412,7 @@ class UsersController extends Controller
                 )
                 ->where('role_id', 4)
                 ->groupBy('id')
-                ->orderBy('id','desc')
+                ->orderBy('id', 'desc')
                 ->paginate(10);
         }
         return response([

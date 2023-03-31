@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Checkbox from '@mui/material/Checkbox';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -8,12 +8,16 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import Api from '../Api';
 import Swal from 'sweetalert2';
 import moment from 'moment';
+import SessionContext from '../session/SessionContext'
+
 
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 export default function Exam() {
+
+    const { session: { token } } = useContext(SessionContext)
 
 
     const [teachers, setteachers] = useState([])
@@ -245,7 +249,9 @@ export default function Exam() {
 
 
     const getAllTeachers = () => {
-        Api.get(`allteachers`).then((res) => {
+        Api.get(`allteachers`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then((res) => {
             if (res.data.success) {
                 setteachers(res.data.data)
             }
@@ -253,7 +259,9 @@ export default function Exam() {
     }
 
     const getAllStudents = () => {
-        Api.get(`allstudents`).then((res) => {
+        Api.get(`allstudents`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then((res) => {
             if (res.data.success) {
                 setstudents(res.data.data)
             }
@@ -261,7 +269,9 @@ export default function Exam() {
     }
 
     const getallcenters = () => {
-        Api.get(`getcenters`).then((res) => {
+        Api.get(`getcenters`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then((res) => {
             setcenters(res.data.data)
         })
     }
@@ -354,6 +364,8 @@ export default function Exam() {
                 date: date,
                 recieve_ijaza_date: recieve_ijaza_date,
                 has_receive_ijaza: has_receive_ijaza
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
             }).then((res) => {
                 if (res.data.success) {
                     Swal.fire(res.data.message, '', 'success')

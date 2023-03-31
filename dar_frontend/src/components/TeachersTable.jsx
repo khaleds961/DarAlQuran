@@ -17,6 +17,7 @@ function TeachersTable() {
   const { session: { user: { role_id } } } = useContext(SessionContext);
   const { session: { user: { centers } } } = useContext(SessionContext);
   const { session: { user: { id } } } = useContext(SessionContext);
+  const { session: { token } } = useContext(SessionContext)
 
   const default_center_id = role_id === 3 ? centers[0]['center_id'] : 0;
 
@@ -47,7 +48,7 @@ function TeachersTable() {
   const [loading, setLoading] = useState(false);
   const [outloading, setoutloading] = useState(true)
   const [noteacher, setnoteacher] = useState(false)
-  const [filterCenterId,setFilterCenterId] = useState(0)
+  const [filterCenterId, setFilterCenterId] = useState(0)
 
   const changePage = (e, value) => {
     setPage(value);
@@ -81,6 +82,8 @@ function TeachersTable() {
       role_id: role_id === 3 ? 4 : user_role,
       phone_number: phone_number,
       center_id: role_id === 3 ? centers[0]['center_id'] : filterCenterId
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
     })
       .then((response) => {
         if (response.data.success) {
@@ -114,7 +117,9 @@ function TeachersTable() {
   const getTeachers = (p) => {
     setLoading(true)
     setnoteacher(false)
-    Api.get(`getTeachersByCenter/${center_id}?page=${p}`).then(
+    Api.get(`getTeachersByCenter/${center_id}?page=${p}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then(
       res => {
         setTeachers(res.data.data.data)
         setTotal(Math.ceil(res.data.data.total / 10))
@@ -136,7 +141,9 @@ function TeachersTable() {
   }
   const getTeachersByCenter = (id_center, p) => {
     setnoteacher(false)
-    Api.get(`getTeachersByCenter/${id_center}?page=${p}`).then(
+    Api.get(`getTeachersByCenter/${id_center}?page=${p}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then(
       (res) => {
         setTeachers(res.data.data.data)
         setTotal(Math.ceil(res.data.data.total / 10))
@@ -149,7 +156,9 @@ function TeachersTable() {
   }
 
   const getCenters = () => {
-    Api.get('getcenters').then((response) => {
+    Api.get('getcenters', {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then((response) => {
       setAllCenters(response.data.data);
     })
   }
@@ -164,7 +173,9 @@ function TeachersTable() {
     }).then((result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
-        Api.delete(`deleteteacher/${teacher_id}`).then(
+        Api.delete(`deleteteacher/${teacher_id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }).then(
           (res) => {
             if (res.data.success) {
               Swal.fire(res.data.message, '', 'success')

@@ -3,7 +3,7 @@
 return [
     //TEACHER
     'teacher_deleted' => 'تم حذف المستخدم بنجاح ',
-    
+
     //STUDENT
     'student_added'   => 'تم اضافة الطالب',
     'student_deleted' => 'تم حذف الطالب',
@@ -26,7 +26,7 @@ return [
     'teacher_unauthorized'  => 'خطأ في الادخال',
     'teacher_updated'       => 'تم تحديث الاستاذ',
     'teacher_deleted'       => 'تم حذف الاستاذ بنجاح',
-    'cant_delete'           => 'لا يمكن حذف استاذ ملحق بتلاميذ',
+    'cant_delete_teacher'    => 'لا يمكن حذف استاذ ملحق بتلاميذ',
 
     //CENTERS
     'center_added'          => 'تم اضافة المركز بنجاح',
@@ -45,9 +45,10 @@ return [
     'ring_updated' => 'تم تحديث الحلقة',
     'ring_deleted' => 'تم حذف الحلقة ',
     'cant_delete' => 'لا يمكن حذف الحلقة لان فيها طلاب',
-    
+
     //Revision 
     'revision_added' => 'تمت الاضافة',
+    'revision_deleted' => 'تم حذف الحصة بنجاح',
 
     //RingRevision
     'ring_revision_added' => 'تمت الاضافة',

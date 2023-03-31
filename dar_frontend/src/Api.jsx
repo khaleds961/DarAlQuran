@@ -5,7 +5,7 @@ const Api = axios.create({
     // baseURL: 'http://192.168.1.80:8000/api',
     // baseURL: 'http://192.168.0.103:8000/api',
     // baseURL: 'http://172.20.10.2/api',
-    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    // headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
 });
 
 export default Api;

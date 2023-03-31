@@ -13,13 +13,15 @@ import Select from '@mui/material/Select';
 import CreatableSelect from 'react-select/creatable';
 import { NavLink, useParams } from 'react-router-dom';
 import moment from 'moment';
-
+import countries from '../JsonFiles/countries.json'
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
 
 
 export default function AddStudentForm() {
 
     const { id } = useParams()
-
+    const { session: { token } } = useContext(SessionContext)
     const { session: { user: { role_id } } } = useContext(SessionContext);
     const { session: { user: { centers } } } = useContext(SessionContext);
     const defaultvalue = role_id === 3 || role_id === 4 ? centers[0]['center_id'] : 0;
@@ -52,6 +54,7 @@ export default function AddStudentForm() {
     const [bloodtype, setbloodtype] = useState('A+')
     const [gender, setgender] = useState('male')
     const [nationality, setnationality] = useState('')
+    const [selectednationality, setSelectednationality] = useState(null)
     const [current_job, setcurrent_job] = useState('')
     const [motherjob, setmotherjob] = useState('')
     const [fatherjob, setfatherjob] = useState('')
@@ -80,11 +83,12 @@ export default function AddStudentForm() {
     const [registration_date, setRegistrationDate] = useState(moment().format('YYYY-MM-DD'))
     const theme = useTheme();
 
-
     const getringsbycenter = () => {
         setrings([])
         setringid(0)
-        Api.get(`getringsbycenter/${center_id}`).
+        Api.get(`getringsbycenter/${center_id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).
             then((res) => setrings(res.data.data)).catch(function (err) {
                 console.log(err)
             })
@@ -105,7 +109,7 @@ export default function AddStudentForm() {
         } else {
             setstudent_isring('no')
         }
-    })
+    }, [])
 
     const components = {
         DropdownIndicator: null,
@@ -130,13 +134,25 @@ export default function AddStudentForm() {
         }
     };
 
+    const handleChangeNationality = (event, value) => {
+        if (value) {
+            setnationality(value.code)
+            setSelectednationality(value);
+            return
+        }
+        setnationality('')
+        setSelectednationality(null);
+    };
+
     const getTeachersByCenter = () => {
         setTeachers([])
-        Api.get(`getAllTeachersByCenter/${center_id}`).then((res) => {
+        Api.get(`getAllTeachersByCenter/${center_id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then((res) => {
             setTeachers(res.data.data);
         })
     }
-    console.log('centerId', center_id);
+
     const addringstudent = (e) => {
         e.preventDefault();
         const skills_arr = []
@@ -165,6 +181,8 @@ export default function AddStudentForm() {
             skills: skills_arr.toString(),
             memorizing: memorizing,
             is_ring: 1
+        }, {
+            headers: { Authorization: `Bearer ${token}` }
         }).then(
             (res) => {
                 if (res.data.success) {
@@ -174,6 +192,7 @@ export default function AddStudentForm() {
                     setLast_name('')
                     setmothername('')
                     setnationality('')
+                    setSelectednationality(null)
                     setgender('male')
                     setaddress('')
                     setPhone_number('')
@@ -247,6 +266,7 @@ export default function AddStudentForm() {
             Api.post('addstudent', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`
                 },
             }).then((res) => {
                 if (res.data.success) {
@@ -258,6 +278,7 @@ export default function AddStudentForm() {
                     setLast_name('')
                     setmothername('')
                     setnationality('')
+                    setSelectednationality(null)
                     setgender('male')
                     setaddress('')
                     setPhone_number('')
@@ -283,13 +304,13 @@ export default function AddStudentForm() {
                     setTeacher_id(0)
                     settype_kiraat(0)
                     setFile(null)
-                }else{
-                    console.log({res});
+                } else {
+                    console.log({ res });
                 }
 
 
             }).catch(function (err) { console.log(err); })
-        }else{
+        } else {
             console.log('student id or center id are null');
         }
     }
@@ -368,6 +389,8 @@ export default function AddStudentForm() {
         { 'id': 34, 'value': '21:30' },
         { 'id': 35, 'value': '22:00' },
     ]
+
+
     return (
         <>
             <div className='container' style={{ width: '80%' }}>
@@ -442,13 +465,19 @@ export default function AddStudentForm() {
                     </div>
 
                     <div className="col-md">
-                        <label >الجنسية</label>
-                        <input type="text" className="form-control my-2"
-                            value={nationality}
-                            onChange={(e) => setnationality(e.target.value)}
-                        />
+                        <label>الجنسية</label>
+                        <div className=''>
+                            <Autocomplete
+                                disablePortal
+                                id="combo-box-demo"
+                                options={countries}
+                                getOptionLabel={(option) => option.name}
+                                renderInput={(params) => <TextField {...params} label="الجنسية" />}
+                                value={selectednationality}
+                                onChange={handleChangeNationality}
+                            />
+                        </div>
                     </div>
-
 
                     <div className="col-md">
                         <label >الجنس</label>

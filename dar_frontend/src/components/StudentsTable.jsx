@@ -14,6 +14,7 @@ import TeacherSelect from './TeacherSelect';
 import { AES } from 'crypto-js';
 import CryptoJS from 'crypto-js';
 import Table from 'react-bootstrap/Table';
+import { AiOutlineSearch } from 'react-icons/ai';
 
 
 
@@ -21,12 +22,16 @@ function StudentsTable() {
 
   const navigate = useNavigate()
 
-
+  const { session: { token } } = useContext(SessionContext)
   const { session: { user: { role_id } } } = useContext(SessionContext);
   const { session: { user: { centers } } } = useContext(SessionContext);
   const { session: { user: { id } } } = useContext(SessionContext);
 
   const defualt_center_id = role_id === 1 || role_id === 2 ? 0 : centers[0]?.center_id;
+
+  const location = useLocation()
+  // const default_teacher_id = location?.state?.teacher_id ?? null
+  const default_teacher_id = location?.state?.teacher_id ?? 0
 
   // const [teacherid, setteacherid] = useState(null)
   const [students, setStudents] = useState(null);
@@ -35,14 +40,10 @@ function StudentsTable() {
   const [center_id, setCenter_id] = useState(defualt_center_id);
   const [loading, setLoading] = useState(false)
   const [teachers, setteachers] = useState([])
-  const [filterteacher, setfilterteacher] = useState(0)
+  const [filterteacher, setfilterteacher] = useState(default_teacher_id)
   const [studentfilter, setstudentfilter] = useState('')
   const [hidepagination, setHidePagination] = useState(false)
   const [hideTeacher, setHideTeacher] = useState(true)
-
-  const location = useLocation()
-  const default_teacher_id = location?.state?.teacher_id ?? null
-
   const [teacherid, setteacherid] = useState(default_teacher_id)
 
   const deleteStudent = (student_id, center_id) => {
@@ -54,7 +55,9 @@ function StudentsTable() {
     }).then((result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
-        Api.delete(`deletestudent/${student_id}/${center_id}`).then(
+        Api.delete(`deletestudent/${student_id}/${center_id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }).then(
           res => {
             Swal.fire(res.data.message, '', 'success')
             const newList = students.filter((student) => student.id !== student_id);
@@ -67,7 +70,9 @@ function StudentsTable() {
 
   const getStudentsByCenter = (c, p) => {
     setLoading(true)
-    Api.get(`getStudentsByCenter/${c}?page=${p}`).then((res) => {
+    Api.get(`getStudentsByCenter/${c}?page=${p}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then((res) => {
       setStudents(res.data.data.data);
       setTotal(Math.ceil(res.data.data.total / 10))
       setLoading(false)
@@ -86,7 +91,7 @@ function StudentsTable() {
       if (filterteacher !== 0) {
         getstudentbyteacher(filterteacher, value)
       } else {
-        if (teacherid !== null) {
+        if (teacherid !== 0) {
           getstudentbyteacher(teacherid, value)
         } else {
           getStudentsByCenter(center_id, value)
@@ -120,7 +125,9 @@ function StudentsTable() {
   const getstudentbyteacher = (teacher_id, p) => {
 
     setLoading(true)
-    Api.get(`getStudentsByTeacherPagination/${center_id}/${teacher_id}?page=${p}`).then(
+    Api.get(`getStudentsByTeacherPagination/${center_id}/${teacher_id}?page=${p}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then(
       (res) => {
         console.log(res.data);
         setStudents(res.data.data.data);
@@ -132,7 +139,9 @@ function StudentsTable() {
 
   const getTeachersByCenter = (center_id) => {
     setteachers([])
-    Api.get(`getAllTeachersByCenter/${center_id}`).then((res) => {
+    Api.get(`getAllTeachersByCenter/${center_id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then((res) => {
       setteachers(res.data.data);
     })
   }
@@ -145,6 +154,8 @@ function StudentsTable() {
         center_id: center_id,
         role_id: role_id,
         teacher_id: id
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       }).then((res) => {
         setStudents(res.data.data)
         setHidePagination(true)
@@ -161,7 +172,7 @@ function StudentsTable() {
     navigate(`/editstudent/${encrypted}`)
   }
 
-  const handlehideTeacher = () =>{
+  const handlehideTeacher = () => {
     setHideTeacher(!hideTeacher)
   }
 
@@ -169,8 +180,9 @@ function StudentsTable() {
     if (role_id === 4) {
       getstudentbyteacher(id, 1)
     } else {
-      if (teacherid !== null) {
+      if (filterteacher !== 0) {
         getstudentbyteacher(teacherid, 1)
+        getTeachersByCenter(center_id)
       } else {
         getStudentsByCenter(center_id, page)
         getTeachersByCenter(center_id)
@@ -216,10 +228,20 @@ function StudentsTable() {
 
         <div>
           <div className='d-flex my-3 flex-md-row-reverse'>
-            <button className='btn btn-dark text-white mx-md-2' onClick={searchforstudent}>بحث عن طالب</button>
-            <input type="text" className='rounded border border-dark mx-2 mx-sm-2 mx-md-0'
+
+            {/* medium screen and more */}
+            <button className='d-none d-md-block btn btn-dark text-white mx-md-2' onClick={searchforstudent}
+            >بحث عن طالب
+            </button>
+
+            <input type="text" className='rounded border border-dark'
               value={studentfilter}
               onChange={(e) => setstudentfilter(e.target.value)} />
+
+            {/* small screen*/}
+            <span className='d-md-none bg-dark text-center text-white px-2 mx-2 rounded' onClick={searchforstudent}>
+              <AiOutlineSearch />
+            </span>
           </div>
         </div>
         <>

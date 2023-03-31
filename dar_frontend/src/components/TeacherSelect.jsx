@@ -4,7 +4,9 @@ import SessionContext from '../session/SessionContext';
 
 export default function ({ teacher_id, tid, teachers ,fromquransession = false}) {
 
+    const { session:{token} }  = useContext(SessionContext)
     const { session: { user: { role_id } } } = useContext(SessionContext);
+    
     console.log(tid, 'tidd');
     return (
         <div>

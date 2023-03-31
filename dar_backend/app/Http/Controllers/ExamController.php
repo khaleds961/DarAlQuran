@@ -147,12 +147,10 @@ class ExamController extends Controller
         try {
             $exam = Exams::find($id);
             $exam->delete();
-            if (!$exam->exists()) {
-                return response([
-                    'message' => __('message.exam_deleted'),
-                    'success' => true
-                ]);
-            }
+            return response([
+                'message' => __('message.exam_deleted'),
+                'success' => true
+            ]);
         } catch (Exception $e) {
             return response($e->getMessage());
         }

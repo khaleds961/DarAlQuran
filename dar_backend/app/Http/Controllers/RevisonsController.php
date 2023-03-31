@@ -42,17 +42,19 @@ class RevisonsController extends Controller
                     $request->session_id && $request->type &&
                     $request->date && $request->absence_type
                 ) {
-                    Revisions::create([
+                    $revision = Revisions::create([
                         'session_id' => $request->session_id,
                         'notes'      => $request->notes,
                         'type'       => $request->type,
                         'absence_type' => $request->absence_type,
                         'date'         => $request->date
                     ]);
-                    return response([
-                        'message' => __('message.revision_added'),
-                        'success' => true
-                    ]);
+                    if ($revision->id) {
+                        return response([
+                            'message' => __('message.revision_added'),
+                            'success' => true
+                        ]);
+                    }
                 }
             } else {
                 if (
@@ -64,7 +66,7 @@ class RevisonsController extends Controller
                     $request->page_from &&
                     $request->page_to
                 ) {
-                    Revisions::create([
+                    $revision = Revisions::create([
                         'session_id' => $request->session_id,
                         'surah_from' => $request->surah_from,
                         'surah_to'   => $request->surah_to,
@@ -77,10 +79,12 @@ class RevisonsController extends Controller
                         'riwayahname'  => $request->riwayahname,
                         'date'         => $request->date
                     ]);
-                    return response([
-                        'message' => __('message.revision_added'),
-                        'success' => true
-                    ]);
+                    if ($revision->id) {
+                        return response([
+                            'message' => __('message.revision_added'),
+                            'success' => true
+                        ]);
+                    }
                 }
             }
         } catch (Exception $e) {
@@ -130,6 +134,17 @@ class RevisonsController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $revision = Revisions::find($id);
+            if ($revision) {
+                $revision->delete();
+                return response([
+                    'message' => __('message.revision_deleted'),
+                    'success' => true
+                ]);
+            }
+        } catch (Exception $e) {
+            return response($e->getMessage());
+        }
     }
 }

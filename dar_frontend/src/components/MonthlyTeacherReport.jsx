@@ -10,6 +10,8 @@ import Swal from 'sweetalert2'
 
 
 export default function MonthlyTeacherReport() {
+
+    const { session:{token} }  = useContext(SessionContext)
     const { session: { user: { role_id } } } = useContext(SessionContext);
     const { session: { user: { centers } } } = useContext(SessionContext);
     const defaultvalue = role_id === 3 || role_id === 4 ? centers[0]['center_id'] : 0;
@@ -29,7 +31,9 @@ export default function MonthlyTeacherReport() {
         Api.post(`monthyteachereport/${center_id}/${teacher_id}?page=${p}`, {
             start: startdate,
             end: enddate,
-        }).then(
+        },{
+            headers: { Authorization: `Bearer ${token}` }
+          }).then(
             (res) => {
                 const sessions = res.data.data.data
                 // const filtered_sessions = sessions.filter((session) =>
@@ -59,7 +63,9 @@ export default function MonthlyTeacherReport() {
 
     const getTeachersByCenter = (center_id = 0) => {
         setteachers([])
-        Api.get(`getAllTeachersByCenter/${center_id}`).then(
+        Api.get(`getAllTeachersByCenter/${center_id}`,{
+            headers: { Authorization: `Bearer ${token}` }
+          }).then(
             (res) => {
                 setteachers(res.data.data)
             }

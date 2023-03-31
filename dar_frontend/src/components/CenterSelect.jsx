@@ -5,6 +5,7 @@ import SessionContext from '../session/SessionContext';
 function CenterSelect({ center_id, fromstudent = false, data, c_id, monthlyreport = false }) {
 
     const { session: { user: { role_id } } } = useContext(SessionContext);
+    const { session:{token} }  = useContext(SessionContext)
     const [allcenters, setAllCenters] = useState([]);
 
     useEffect(() => {
@@ -12,7 +13,9 @@ function CenterSelect({ center_id, fromstudent = false, data, c_id, monthlyrepor
     }, [])
 
     const getCenters = () => {
-        Api.get('getcenters').then(
+        Api.get('getcenters',{
+            headers: { Authorization: `Bearer ${token}` }
+          }).then(
             (res) => {
                 setAllCenters(res.data.data)
             }

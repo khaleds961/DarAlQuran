@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import Api from '../Api'
 import Moment from 'react-moment';
 import { Spinner } from 'react-bootstrap';
 import { Pagination } from '@mui/material'
-
+import SessionContext from '../session/SessionContext';
+import { BsPlusCircle, BsTrash, BsPencil } from 'react-icons/bs';
+import Swal from 'sweetalert2';
 
 function ShowSessions() {
 
     const { session_id } = useParams()
-
+    const { session: { token } } = useContext(SessionContext)
     const [sessions, setsesions] = useState([])
     const [student_teacher, setstudent_teacher] = useState([])
     const [students, setstudents] = useState([])
@@ -22,7 +24,9 @@ function ShowSessions() {
 
 
     const getsessions = (p) => {
-        Api.get(`getsessionsbystcente/${session_id}?page=${p}`).then(
+        Api.get(`getsessionsbystcente/${session_id}?page=${p}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then(
             (res) => {
                 setsesions(res.data.data.data)
                 setstudent_teacher(res.data.student_teacher)
@@ -33,18 +37,22 @@ function ShowSessions() {
     }
 
     const getstudents = () => {
-        Api.get(`getstudentsbystcete/${session_id}`).then(
+        Api.get(`getstudentsbystcete/${session_id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then(
             (res) => {
                 setstudents(res.data.data)
             }
         ).catch(function (err) { console.log(err) })
     }
 
-    const getsessionbyids = (teacher_id, student_id,start_date,end_date, p) => {
+    const getsessionbyids = (teacher_id, student_id, start_date, end_date, p) => {
         setloading(true)
-        Api.post(`getsessionsbyids/${teacher_id}/${student_id}?page=${p}`,{
-            start_date:start_date,
-            end_date:end_date
+        Api.post(`getsessionsbyids/${teacher_id}/${student_id}?page=${p}`, {
+            start_date: start_date,
+            end_date: end_date
+        }, {
+            headers: { Authorization: `Bearer ${token}` }
         }).then(
             (res) => {
                 setsesions(res.data.data.data)
@@ -68,8 +76,36 @@ function ShowSessions() {
     const search = () => {
         if (student_id !== 0 && start_date && end_date) {
             setpage(1)
-            getsessionbyids(student_teacher['teacher_id'], student_id,start_date,end_date, 1)
+            getsessionbyids(student_teacher['teacher_id'], student_id, start_date, end_date, 1)
         }
+    }
+
+    const deleterevision = (revision_id) => {
+        Swal.fire({
+            title: 'هل انت متأكد من حذف الحصة؟',
+            showCancelButton: true,
+            cancelButtonText: 'الغاء',
+            confirmButtonText: 'حذف',
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                Api.delete(`deleterevision/${revision_id}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                }).then(
+                    res => {
+                        if (res.data.success) {
+                            const newList = sessions.filter((session) => session.revision_id !== revision_id);
+                            setsesions(newList);
+                            Swal.fire(res.data.message, '', 'success')
+                        } else {
+                            Swal.fire(res.data.message, '', 'warning')
+                        }
+                    }
+                )
+
+            }
+        })
+
     }
 
     useEffect(() => {
@@ -139,50 +175,58 @@ function ShowSessions() {
 
                     </div>
 
-                    <table className='table text-md-center'>
-                        <thead>
+                    <div className='table-responsive'>
+                        <table className='table text-md-center'>
+                            <thead>
 
-                            <tr>
-                                <th>اليوم</th>
-                                <th>التاريخ</th>
-                                <th>النوع</th>
-                                <th>نوع الغياب</th>
-                                <th>من سورة</th>
-                                <th>من ايه</th>
-                                <th>من صفحة</th>
-                                <th>الى سورة</th>
-                                <th>الى ايه</th>
-                                <th>الى صفحة</th>
-                                <th>القراءة</th>
-                                <th>ملاحظات</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {sessions.length > 0 ?
-                                sessions.map((session) =>
-                                    <tr key={session.revision_id}>
-                                        <td>{session.weekday}</td>
-                                        <td>
-                                            <Moment format="YYYY/MM/DD">
-                                                {session.rivison_date}
-                                            </Moment>
-                                        </td>
-                                        <td>{session.type === 'recite' ? 'تسميع' : session.type === 'revision' ? 'مراجعة' : 'غياب'}</td>
-                                        <td>{session.absence_type === 'excused' ? 'أ' :
-                                            session.absence_type === 'unexcused' ? 'غ' :
-                                                session.absence_type === 'teacher_excused' ? 'ش' : ''}</td>
-                                        <td>{session.surah_from}</td>
-                                        <td>{session.ayyah_from}</td>
-                                        <td>{session.page_from}</td>
-                                        <td>{session.surah_to}</td>
-                                        <td>{session.ayyah_to}</td>
-                                        <td>{session.page_to}</td>
-                                        <td>{session.riwayahname === '0' ? '' : session.riwayahname}</td>
-                                        <td>{session.notes}</td>
-                                    </tr>
-                                ) : 'لا يوجد اي حصة بعد'}
-                        </tbody>
-                    </table>
+                                <tr>
+                                    <th>اليوم</th>
+                                    <th>التاريخ</th>
+                                    <th>النوع</th>
+                                    <th>نوع الغياب</th>
+                                    <th>من سورة</th>
+                                    <th>من ايه</th>
+                                    <th>من صفحة</th>
+                                    <th>الى سورة</th>
+                                    <th>الى ايه</th>
+                                    <th>الى صفحة</th>
+                                    <th>القراءة</th>
+                                    <th>ملاحظات</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {sessions.length > 0 ?
+                                    sessions.map((session) =>
+                                        <tr key={session.revision_id}>
+                                            <td>{session.weekday}</td>
+                                            <td>
+                                                <Moment format="YYYY/MM/DD">
+                                                    {session.rivison_date}
+                                                </Moment>
+                                            </td>
+                                            <td>{session.type === 'recite' ? 'تسميع' : session.type === 'revision' ? 'مراجعة' : 'غياب'}</td>
+                                            <td>{session.absence_type === 'excused' ? 'أ' :
+                                                session.absence_type === 'unexcused' ? 'غ' :
+                                                    session.absence_type === 'teacher_excused' ? 'ش' : ''}</td>
+                                            <td>{session.surah_from}</td>
+                                            <td>{session.ayyah_from}</td>
+                                            <td>{session.page_from}</td>
+                                            <td>{session.surah_to}</td>
+                                            <td>{session.ayyah_to}</td>
+                                            <td>{session.page_to}</td>
+                                            <td>{session.riwayahname === '0' ? '' : session.riwayahname}</td>
+                                            <td>{session.notes}</td>
+                                            <td>
+                                                <span className='cursor_pointer' onClick={() => deleterevision(session.revision_id)}>
+                                                    <BsTrash />
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ) : 'لا يوجد اي حصة بعد'}
+                            </tbody>
+                        </table>
+                    </div>
 
                     <Pagination
                         shape="rounded"

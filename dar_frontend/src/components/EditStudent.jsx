@@ -16,7 +16,9 @@ import { Spinner } from 'react-bootstrap';
 import { AES } from 'crypto-js';
 import CryptoJS from 'crypto-js';
 import moment from 'moment';
-
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
+import countries from '../JsonFiles/countries.json'
 
 export default function EditStudent() {
 
@@ -25,6 +27,7 @@ export default function EditStudent() {
 
   const id = AES.decrypt(encrypt.replace(/_/g, '/'), 'secretKey').toString(CryptoJS.enc.Utf8);
 
+  const { session: { token } } = useContext(SessionContext)
   const { session: { user: { role_id } } } = useContext(SessionContext);
   const { session: { user: { centers } } } = useContext(SessionContext);
   const defaultvalue = role_id === 3 || role_id === 4 ? centers[0]['center_id'] : 0;
@@ -57,6 +60,8 @@ export default function EditStudent() {
   const [bloodtype, setbloodtype] = useState('A+')
   const [gender, setgender] = useState('male')
   const [nationality, setnationality] = useState('')
+  const [oldNationalityName, setOldNationalityName] = useState(null)
+  const [newnationality, setnewnationality] = useState('')
   const [current_job, setcurrent_job] = useState('')
   const [motherjob, setmotherjob] = useState('')
   const [fatherjob, setfatherjob] = useState('')
@@ -84,17 +89,27 @@ export default function EditStudent() {
   const [student, setstudent] = useState([])
   const [registration_date, setRegistrationDate] = useState('')
   const [loading, setloading] = useState(true)
+  const [index, setindex] = useState(null)
 
   const getStudentById = (student_id) => {
-    Api.get(`getstudentbyid/${student_id}`).then((res) => {
-      console.log({res});
+    Api.get(`getstudentbyid/${student_id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then((res) => {
+      console.log({ res });
       setstudent(res.data.data)
       setRegistrationDate(res.data.data.registration_date)
       setFirst_name(res.data.data['first_name'])
       setMiddle_name(res.data.data['middle_name'])
       setLast_name(res.data.data['last_name'])
       setmothername(res.data.data['mother_name'])
-      setnationality(res.data.data['nationality'])
+      const oldNationality = countries.find(country => country.code === res.data.data['nationality']);
+      if (oldNationality !== undefined) {
+        const index = countries.findIndex(item => item.name === oldNationality.name);
+        setOldNationalityName(oldNationality.name);
+        setindex(index)
+      } else {
+        setnationality('')
+      }
       setgender(res.data.data['gender'])
       setaddress(res.data.data['address'])
       setcurrent_job(res.data.data['current_job'])
@@ -160,7 +175,9 @@ export default function EditStudent() {
   const getTeachersByCenter = () => {
     setTeachers([])
     // setTeacher_id(0)
-    Api.get(`getAllTeachersByCenter/${center_id}`).then((res) => {
+    Api.get(`getAllTeachersByCenter/${center_id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then((res) => {
       setTeachers(res.data.data);
     })
   }
@@ -194,21 +211,23 @@ export default function EditStudent() {
       major: major,
       blood_type: bloodtype,
       gender: gender,
-      nationality: nationality,
+      nationality: newnationality,
       current_job: current_job,
       phone_number: phone_number,
       work_number: work_number,
       home_number: home_number,
       student_level_status: student_level_status,
       center_id: center_id,
-      teacher_id: teacher_id !== 0 ? teacher_id : null,
+      teacher_id: teacher_id,
       address: address,
       suitable_times: suitabletimes.toString(),
       suitable_days: suitabledays.toString(),
       sheikh_names: sheikh_names_arr.toString(),
       memorizing: memorizing,
       female_question: female_question,
-      registration_date:registration_date
+      registration_date: registration_date
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
     }).then(
       (res) => {
         if (res.data.success) {
@@ -248,6 +267,16 @@ export default function EditStudent() {
           : theme.typography.fontWeightMedium,
     };
   }
+
+  const handleChangeNationality = (event, value) => {
+    if (value !== null) {
+      const newindex = countries.findIndex(item => item.name === value.name)
+      setnewnationality(value.code)
+      setindex(newindex)
+      return
+    }
+    setnewnationality('')
+  };
 
   const days = [
     { 'id': 1, 'value': 'الاثنين' },
@@ -294,7 +323,7 @@ export default function EditStudent() {
     { 'id': 34, 'value': '21:30' },
     { 'id': 35, 'value': '22:00' },
   ]
-  console.log(teacher_id, 'hon from editstudent');
+
   return (
     <>
       {loading ? <div className='mt-5 text-center'><Spinner /></div> :
@@ -349,11 +378,18 @@ export default function EditStudent() {
             </div>
 
             <div className="col-md">
-              <label >الجنسية</label>
-              <input type="text" className="form-control my-2"
-                value={nationality}
-                onChange={(e) => setnationality(e.target.value)}
-              />
+              <label>الجنسية</label>
+              <div className=''>
+                <Autocomplete
+                  disablePortal
+                  id="combo-box-demo"
+                  options={countries}
+                  getOptionLabel={(option) => option.name}
+                  value={countries[index] ?? null}
+                  renderInput={(params) => <TextField {...params} label="الجنسية" />}
+                  onChange={handleChangeNationality}
+                />
+              </div>
             </div>
 
 

@@ -9,6 +9,7 @@ import Swal from 'sweetalert2'
 
 export default function MonthlyRingReport() {
 
+  const { session: { token } } = useContext(SessionContext)
   const { session: { user: { role_id } } } = useContext(SessionContext);
   const { session: { user: { centers } } } = useContext(SessionContext);
   const defaultvalue = role_id === 3 || role_id === 4 ? centers[0]['center_id'] : 0;
@@ -33,6 +34,8 @@ export default function MonthlyRingReport() {
       ring_id: ring_id,
       start: startdate,
       end: enddate,
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
     }).then(
       (res) => {
         console.log({ res });
@@ -64,7 +67,9 @@ export default function MonthlyRingReport() {
 
   const getTeachersByCenter = (center_id = 0) => {
     setteachers([])
-    Api.get(`getAllTeachersByCenter/${center_id}`).then(
+    Api.get(`getAllTeachersByCenter/${center_id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then(
       (res) => {
         setteachers(res.data.data)
       }
@@ -82,7 +87,9 @@ export default function MonthlyRingReport() {
   }
 
   const getringsbyteacher = (teacher_id) => {
-    Api.get(`getallringsbyteacher/${teacher_id}`).then((res) => {
+    Api.get(`getallringsbyteacher/${teacher_id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then((res) => {
       setrings(res.data.data)
     }).catch(function (err) { console.log(err) })
   }

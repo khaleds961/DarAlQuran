@@ -109,6 +109,19 @@ class StudentsController extends Controller
                     'rate'              => $request->rate,
                     'notes'             => $request->notes
                 ]);
+
+                if ($student->id) {
+                    return response([
+                        'message' => __('message.student_added'),
+                        'success' => true
+                    ]);
+                } else {
+                    $student->delete();
+                    return response([
+                        'message' => 'failed',
+                        'success' => false
+                    ]);
+                }
             } else {
 
                 $path = null;
@@ -157,26 +170,26 @@ class StudentsController extends Controller
                             'center_id' => $request['center_id'],
                             'user_id' => $request['teacher_id']
                         ]);
-                    }else{
+                        if ($student->id && $student_center_teacher->id) {
+                            return response([
+                                'message' => __('message.student_added'),
+                                'success' => true
+                            ]);
+                        } else {
+                            $student->delete();
+                            return response([
+                                'message' => 'failed',
+                                'success' => false
+                            ]);
+                        }
+                    } else {
                         return response([
                             'message' => 'center or user id is null',
                             'success' => false
                         ]);
-                        $student->delete();
+                        $student->delete;
                     }
                 }
-            }
-            if ($student->id && $student_center_teacher->id) {
-                return response([
-                    'message' => __('message.student_added'),
-                    'success' => true
-                ]);
-            } else {
-                $student->delete();
-                return response([
-                    'message' => 'failed',
-                    'success' => false
-                ]);
             }
         } catch (Exception $e) {
             return response($e->getMessage());

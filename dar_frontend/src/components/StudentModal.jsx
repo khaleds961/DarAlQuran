@@ -1,13 +1,16 @@
 import moment from 'moment';
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { Button, Modal } from 'react-bootstrap'
 import { BsPlusCircle } from 'react-icons/bs';
 import Moment from 'react-moment';
 import Swal from 'sweetalert2';
 import Api from '../Api';
+import SessionContext from '../session/SessionContext';
 
 
 export default function StudentModal({ student }) {
+    const { session: { token } } = useContext(SessionContext)
+
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
@@ -28,7 +31,6 @@ export default function StudentModal({ student }) {
                 settoayyah(null)
                 settype(null)
             }
-            console.log('hehe', attendance);
             Api.post(`addsessionring`, {
                 attendance: attendance === 'attendance' ? 1 : 0,
                 ring_id: student.ring_id,
@@ -39,6 +41,8 @@ export default function StudentModal({ student }) {
                 to_surrah: tosurrah,
                 to_ayyah: toayyah,
                 type: type
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
             }).then((res) => {
                 if (res.data.success) {
                     Swal.fire(res.data.message, '', 'success')

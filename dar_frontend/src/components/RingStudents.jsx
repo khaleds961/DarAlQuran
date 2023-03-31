@@ -17,6 +17,7 @@ export default function RingStudents() {
 
     const { session: { user: { role_id } } } = useContext(SessionContext);
     const { session: { user: { centers } } } = useContext(SessionContext);
+    const { session: { token } } = useContext(SessionContext)
 
     const navigate = useNavigate()
 
@@ -37,7 +38,7 @@ export default function RingStudents() {
     const [notedate, setnotedate] = useState('')
     const [note, setnote] = useState('')
 
-
+    console.log(ring_id,'ijijij');
     const handleNavigate = (id) => {
         const encrypted = AES.encrypt(id.toString(), 'secretKey').toString().replace(/\//g, '_');
         navigate(`/editringstudent/${encrypted}`)
@@ -51,12 +52,14 @@ export default function RingStudents() {
 
     const getfiltercenter = (c_id) => {
         setcenterid(c_id)
+        setring_id(0)
         getringsbycenter(c_id)
     }
 
     const getringsbycenter = (center_id) => {
-        setring_id(0)
-        Api.get(`getringsbycenter/${center_id}`).then(
+        Api.get(`getringsbycenter/${center_id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then(
             (res) => {
                 setring(res.data.data)
             }
@@ -65,10 +68,13 @@ export default function RingStudents() {
 
     const getstudentbyring = (ring_id, p) => {
         setloading(true)
-        Api.get(`getstudentsbyring/${ring_id}?page=${p}`).then((res) => {
-            setring_name(res.data.teacher_ring.name)
-            setteacher(res.data.teacher_ring.teacher)
-            setstudents(res.data.data.data)
+        Api.get(`getstudentsbyring/${ring_id}?page=${p}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then((res) => {
+            console.log({res});
+            setring_name(res?.data?.teacher_ring?.name)
+            setteacher(res?.data?.teacher_ring?.teacher)
+            setstudents(res?.data?.data?.data)
             settotal(Math.ceil(res.data.data.total / 10))
             setloading(false)
         }).catch(function (err) { console.log(err) })
@@ -84,6 +90,8 @@ export default function RingStudents() {
                     ring_id: ring_id,
                     comment: note,
                     date: notedate
+                }, {
+                    headers: { Authorization: `Bearer ${token}` }
                 }).then((res) => {
                     if (res.data.success) {
                         Swal.fire(res.data.message, '', 'success')
@@ -112,7 +120,9 @@ export default function RingStudents() {
         }).then((result) => {
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
-                Api.delete(`deletestudent/${student_id}/${centerid}`).then(
+                Api.delete(`deletestudent/${student_id}/${centerid}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                }).then(
                     res => {
                         Swal.fire(res.data.message, '', 'success')
                         const newList = students.filter((student) => student.id !== student_id);

@@ -14,6 +14,7 @@ export default function EditTeacher() {
     const { teacher_id } = useParams()
     const { session: { user: { centers } } } = useContext(SessionContext)
     const { session: { user: { role_id } } } = useContext(SessionContext);
+    const { session: { token } } = useContext(SessionContext)
 
     const [teacher, setTeacher] = useState([])
     const [newfirst_name, setnewfirst_name] = useState('')
@@ -29,7 +30,9 @@ export default function EditTeacher() {
     const checkteacher = () => {
         if (role_id === 3) {
             const id_center = centers[0]['center_id']
-            Api.get(`checkteacher/${id_center}/${teacher_id}`).then(
+            Api.get(`checkteacher/${id_center}/${teacher_id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            }).then(
                 (res) => {
                     if (res.data.success) {
                         setTeacher(res.data.data)
@@ -48,7 +51,9 @@ export default function EditTeacher() {
                 }
             ).catch(function (err) { console.log(err) })
         } else {
-            Api.get(`getteacherbyid/${teacher_id}`).then(
+            Api.get(`getteacherbyid/${teacher_id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            }).then(
                 (res) => {
                     setTeacher(res.data.data)
                     setnewfirst_name(res.data.data.first_name)
@@ -77,6 +82,8 @@ export default function EditTeacher() {
             username: newusername,
             password: newpassword,
             phone_number: newphone_number
+        }, {
+            headers: { Authorization: `Bearer ${token}` }
         }).then((res) => {
             if (res.data.success) {
                 Swal.fire(res.data.message, '', 'success')

@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { NavLink, useNavigate, useParams } from 'react-router-dom'
 import Api from '../Api'
 import { useTheme } from '@mui/material/styles';
 import Swal from 'sweetalert2';
 import moment from 'moment';
+import SessionContext from '../session/SessionContext';
 
 function AddReciteRevision() {
 
   const navigate = useNavigate()
+  const { session: { token } } = useContext(SessionContext)
 
   //Material UI
   const ITEM_HEIGHT = 48;
@@ -143,8 +145,8 @@ function AddReciteRevision() {
   const [tosurah, settosurah] = useState(0)
   const [fromayya, setfromayya] = useState('')
   const [toayya, settoayya] = useState('')
-  const [frompage,setfrompage] = useState('')
-  const [topage,settopage] = useState('')
+  const [frompage, setfrompage] = useState('')
+  const [topage, settopage] = useState('')
   const [notes, setnotes] = useState('')
   const [type, settype] = useState('revision')
   const [absence_type, setabsence_type] = useState(0)
@@ -160,20 +162,34 @@ function AddReciteRevision() {
   }
 
   const addrevision = () => {
+    console.log(id,'id')
+    console.log(rev_rec,'type')
+    console.log(fromsurah,'fromsurah')
+    console.log(tosurah,'tosurah')
+    console.log(fromayya)
+    console.log(toayya)
+    console.log(frompage)
+    console.log(topage)
+    console.log(notes)
+    console.log(riwayahname)
+    console.log(date)
+    console.log(absence_type)
 
     Api.post(`addrevision`, {
       session_id: id,
-      type: rev_rec === 'recite' ? 'recite' : rev_rec === 'revsion' ? 'revsion' : 'absence',
+      type: rev_rec === 'recite' ? 'recite' : rev_rec === 'revision' ? 'revision' : 'absence',
       surah_from: fromsurah,
       surah_to: tosurah,
       ayyah_from: fromayya,
       ayyah_to: toayya,
-      page_from:frompage,
-      page_to:topage,
+      page_from: frompage,
+      page_to: topage,
       notes: notes,
       riwayahname: riwayahname,
       date: date,
       absence_type: absence_type
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
     }).then((res) => {
       if (res.data.success) {
         Swal.fire(res.data.message, '', 'success')
@@ -188,7 +204,7 @@ function AddReciteRevision() {
       }
     })
   }
-  console.log('type', type);
+
   useEffect(() => {
     getSurahList()
   }, [])

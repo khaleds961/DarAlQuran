@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Spinner } from 'react-bootstrap';
 import Modal from "react-bootstrap/Modal";
 import { BsPlusCircle, BsTrash, BsPencil } from 'react-icons/bs';
 import Swal from 'sweetalert2';
 import Api from '../Api'
-
+import SessionContext from '../session/SessionContext';
 
 function CenterTable() {
+
+    const { session: { token } } = useContext(SessionContext)
+
 
     const [isOpen, setIsOpen] = useState(false);
     const [editModal, setEditModal] = useState(false);
@@ -37,7 +40,9 @@ function CenterTable() {
         }).then((result) => {
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
-                Api.put(`deleteCenter/${id}`).then(
+                Api.put(`deleteCenter/${id}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                }).then(
                     res => {
                         if (res.data.success) {
                             Swal.fire(res.data.message, '', 'success')
@@ -60,6 +65,8 @@ function CenterTable() {
             Api.post(`addcenter`, {
                 name: name,
                 location: location
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
             }).then(res => {
                 hideModal()
                 Swal.fire(res.data.message, '', 'success')
@@ -71,7 +78,9 @@ function CenterTable() {
     }
 
     const getCenters = () => {
-        Api.get(`getcenters`)
+        Api.get(`getcenters`, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
             .then(res => {
                 const response = res.data.data;
                 setCenters(response);
@@ -83,7 +92,9 @@ function CenterTable() {
         setinnerloading(true)
         setCenterbyid([])
         setEditModal(true)
-        Api.get(`getcenterbyid/${center_id}`).
+        Api.get(`getcenterbyid/${center_id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).
             then((res) => {
                 setCenterbyid(res.data.data)
                 setinnerloading(false)
@@ -97,16 +108,18 @@ function CenterTable() {
                 {
                     name: newname,
                     location: newlocation
-                }).then((res) => {
-                    if (res.data.success) {
-                        Swal.fire(res.data.message, '', 'success')
-                        getCenters()
-                        setEditModal(false)
-                    } else {
-                        console.log(res)
-                    }
+                }, {
+                headers: { Authorization: `Bearer ${token}` }
+            }).then((res) => {
+                if (res.data.success) {
+                    Swal.fire(res.data.message, '', 'success')
+                    getCenters()
+                    setEditModal(false)
+                } else {
+                    console.log(res)
                 }
-                ).
+            }
+            ).
                 catch(function (err) { console.log(err) })
         } else {
             Swal.fire('يجب ادخال الاسم والعنوان', '', 'warning')
@@ -180,7 +193,7 @@ function CenterTable() {
                             )}
                             {/* here */}
                             <Modal show={editModal} onHide={hideModal}>
-                                {innerloading ? <div className='text-center'><Spinner/></div> :
+                                {innerloading ? <div className='text-center'><Spinner /></div> :
                                     <>
                                         <Modal.Body className='rtl'>
 

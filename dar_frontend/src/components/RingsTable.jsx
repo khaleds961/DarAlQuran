@@ -3,7 +3,7 @@ import React, { useState, useEffect, useContext } from 'react'
 import { Spinner } from 'react-bootstrap';
 import Modal from "react-bootstrap/Modal";
 import { AiOutlineEye } from 'react-icons/ai';
-import { BsPlusCircle, BsPencil } from 'react-icons/bs';
+import { BsPlusCircle, BsPencil, BsTrash } from 'react-icons/bs';
 import Moment from 'react-moment';
 import { NavLink, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -16,7 +16,7 @@ import TeacherSelect from './TeacherSelect';
 
 export default function RingsTable() {
 
-
+  const { session:{token} }  = useContext(SessionContext)
   const { session: { user: { role_id } } } = useContext(SessionContext);
   const { session: { user: { centers } } } = useContext(SessionContext);
   const defaultvalue = role_id === 3 || role_id === 4 ? centers[0]['center_id'] : 0;
@@ -86,7 +86,9 @@ export default function RingsTable() {
 
   const getTeachersByCenter = (center_id) => {
     setteachers([])
-    Api.get(`getAllTeachersByCenter/${center_id}`).then((res) => {
+    Api.get(`getAllTeachersByCenter/${center_id}`,{
+      headers: { Authorization: `Bearer ${token}` }
+    }).then((res) => {
       setteachers(res.data.data);
       console.log({ res });
     })
@@ -94,7 +96,9 @@ export default function RingsTable() {
 
   const getTeachersFilterByCenter = (center_id) => {
     setteachers([])
-    Api.get(`getAllTeachersByCenter/${center_id}`).then((res) => {
+    Api.get(`getAllTeachersByCenter/${center_id}`,{
+      headers: { Authorization: `Bearer ${token}` }
+    }).then((res) => {
       setteachers_filter(res.data.data);
     })
   }
@@ -104,6 +108,8 @@ export default function RingsTable() {
       name: ringname,
       teacher_id: teacherid,
       center_id: selectcenterid
+    },{
+      headers: { Authorization: `Bearer ${token}` }
     }).then((res) => {
       if (res.data.success) {
         Swal.fire(res.data.message, '', 'success')
@@ -117,7 +123,9 @@ export default function RingsTable() {
 
   const getRings = (p) => {
     setLoading(true)
-    Api.get(`getrings/${centerid}?page=${p}`).then((res) => {
+    Api.get(`getrings/${centerid}?page=${p}`,{
+      headers: { Authorization: `Bearer ${token}` }
+    }).then((res) => {
       setrings(res.data.data.data)
       settotal(Math.ceil(res.data.data.total / 10))
       setLoading(false)
@@ -128,7 +136,9 @@ export default function RingsTable() {
     setringbyid([])
     setEditModal(true)
     setinsideLoading(true)
-    Api.get(`getringbyid/${ring_id}`).then((res) => {
+    Api.get(`getringbyid/${ring_id}`,{
+      headers: { Authorization: `Bearer ${token}` }
+    }).then((res) => {
       setringbyid(res.data.data)
       setisactive(res.data.data.isactive)
       seteditringname(res.data.data.name)
@@ -143,6 +153,8 @@ export default function RingsTable() {
       name: editringname,
       is_active: isactive,
       teacher_id: editteacherid
+    },{
+      headers: { Authorization: `Bearer ${token}` }
     }).then((res) => {
       if (res.data.success) {
         Swal.fire(res.data.message, '', 'success')
@@ -162,7 +174,9 @@ export default function RingsTable() {
     }).then((result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
-        Api.delete(`deletering/${ring_id}`).then(
+        Api.delete(`deletering/${ring_id}`,{
+          headers: { Authorization: `Bearer ${token}` }
+        }).then(
           (res) => {
             if (res.data.success) {
               Swal.fire(res.data.message, '', 'success')
@@ -188,7 +202,9 @@ export default function RingsTable() {
 
   const getringsbyteacher = (teacher_id, p) => {
     setLoading(true)
-    Api.get(`getringsbyteacher/${teacher_id}?page=${p}`).then((res) => {
+    Api.get(`getringsbyteacher/${teacher_id}?page=${p}`,{
+      headers: { Authorization: `Bearer ${token}` }
+    }).then((res) => {
       setrings(res.data.data.data)
       settotal(Math.ceil(res.data.data.total / 10))
       setLoading(false)
@@ -225,7 +241,7 @@ export default function RingsTable() {
         <button type="button" className="btn btn-success mb-3 d-flex align-items-center" onClick={showModal}>
           <BsPlusCircle className='text-white' />
           <span className='px-2'>
-            اضافة حلقة جديد
+           اضافة حلقة جديدة
           </span>
         </button>
 
@@ -303,9 +319,13 @@ export default function RingsTable() {
                   </Moment>
                 </td>
                 <td>
-                  <span className='mx-2 text-white'
+                  <span className='mx-2 text-white cursor_pointer'
                     onClick={() => getringbyid(ring.id)}>
                     <BsPencil />
+                  </span>
+                  <span className='mx-2 text-white cursor_pointer'
+                    onClick={() => deletering(ring.id)}>
+                    <BsTrash />
                   </span>
                 </td>
               </tr>

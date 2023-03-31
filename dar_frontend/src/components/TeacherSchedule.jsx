@@ -13,6 +13,8 @@ function TeacherSchedule() {
 
   const { session: { user: { role_id } } } = useContext(SessionContext);
   const { session: { user: { centers } } } = useContext(SessionContext);
+  const { session: { token } } = useContext(SessionContext)
+
   const defaultValue = role_id === 3 ? centers[0]['center_id'] : 0;
 
 
@@ -23,7 +25,9 @@ function TeacherSchedule() {
   const [loading, setloading] = useState(false)
 
   const getSchedule = (teacher_id) => {
-    Api.get(`teacherschedule/${id_center}/${teacher_id}}`).then(
+    Api.get(`teacherschedule/${id_center}/${teacher_id}}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then(
       (res) => {
         setschedule(res.data.data)
         setloading(false)
@@ -33,7 +37,9 @@ function TeacherSchedule() {
 
   const getTeachersByCenter = (center_id = 0) => {
     setTeachers([])
-    Api.get(`getAllTeachersByCenter/${center_id}`).then(
+    Api.get(`getAllTeachersByCenter/${center_id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then(
       (res) => {
         setTeachers(res.data.data)
       }
@@ -49,9 +55,9 @@ function TeacherSchedule() {
   const getfiltercenterid = (center_id) => {
     setid_center(center_id)
   }
-  const is_session_added = (bo) =>{
-    if(bo){
-      if(id_center !== 0 && filterteacher_id !== 0){
+  const is_session_added = (bo) => {
+    if (bo) {
+      if (id_center !== 0 && filterteacher_id !== 0) {
         getSchedule(filterteacher_id)
       }
     }

@@ -20,6 +20,7 @@ function QuranSessionTable() {
     const navigate = useNavigate()
     const { session_id } = useParams()
 
+    const { session: { token } } = useContext(SessionContext)
     const { session: { user: { centers } } } = useContext(SessionContext);
     const { session: { user: { role_id } } } = useContext(SessionContext);
     const { session: { user: { id } } } = useContext(SessionContext);
@@ -102,7 +103,9 @@ function QuranSessionTable() {
 
     const getTeachersByCenter = (center_id = 0) => {
         setTeachers([])
-        Api.get(`getAllTeachersByCenter/${center_id}`).then(
+        Api.get(`getAllTeachersByCenter/${center_id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then(
             (res) => {
                 setTeachers(res.data.data)
             }
@@ -113,7 +116,9 @@ function QuranSessionTable() {
         setStudents([])
         setSelected(0)
         const teacher_id = e.target.value;
-        Api.get(`getStudentsByTeacher/${id_center}/${teacher_id}`).then(
+        Api.get(`getStudentsByTeacher/${id_center}/${teacher_id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then(
             (res) => {
                 setStudents(res.data.data)
                 setTeacher_id(teacher_id)
@@ -122,12 +127,6 @@ function QuranSessionTable() {
     }
 
     const addSession = () => {
-        console.log('id_center', id_center);
-        console.log('teacher_id', teacher_id);
-        console.log('student_id', student_id);
-        console.log('time', time);
-        console.log('day', day);
-        console.log('day_id', day_id);
         Api.post('addsession', {
             center_id: id_center,
             user_id: teacher_id,
@@ -135,6 +134,8 @@ function QuranSessionTable() {
             time: time,
             day: day,
             day_id: day_id
+        }, {
+            headers: { Authorization: `Bearer ${token}` }
         }).then((res) => {
             if (res.data.success) {
                 Swal.fire(res.data.message, '', 'success')
@@ -185,7 +186,9 @@ function QuranSessionTable() {
         if (role_id === 4) {
             getsessionsbyteacher(id, 1)
         } else {
-            Api.get(`getsessions/${id_center}?page=${p}`).then(
+            Api.get(`getsessions/${id_center}?page=${p}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            }).then(
                 (res) => {
                     setSessions(res.data.data.data)
                     setTotal(Math.ceil(res.data.data.total / 10))
@@ -213,7 +216,9 @@ function QuranSessionTable() {
         }).then((result) => {
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
-                Api.get(`deletesession/${sess_id}/${st_ce_te}`).then(
+                Api.get(`deletesession/${sess_id}/${st_ce_te}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                }).then(
                     res => {
 
                         if (res.data.success) {
@@ -239,7 +244,9 @@ function QuranSessionTable() {
 
     const getTimes = (st_ct_te_id) => {
         setDay_time([])
-        Api.get(`getsessionsbyid/${st_ct_te_id}`).then(
+        Api.get(`getsessionsbyid/${st_ct_te_id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then(
             (res) => {
                 setDay_time(res.data.data)
                 setdaysloading(false)
@@ -278,7 +285,9 @@ function QuranSessionTable() {
 
     const getsessionsbyteacher = (teacher_id, p) => {
         setloading(true)
-        Api.get(`getsessionsbyteacher/${id_center}/${teacher_id}?page=${p}`).then(
+        Api.get(`getsessionsbyteacher/${id_center}/${teacher_id}?page=${p}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then(
             (res) => {
                 setSessions(res.data.data.data)
                 setTotal(Math.ceil(res.data.data.total / 10))
@@ -290,7 +299,9 @@ function QuranSessionTable() {
     const callStudentsTeacher = (id) => {
         console.log(id, 'teacher_id');
         console.log(id_center, 'center_id');
-        Api.get(`getStudentsByTeacher/${id_center}/${id}`).then(
+        Api.get(`getStudentsByTeacher/${id_center}/${id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then(
             (res) => {
                 setStudents(res.data.data)
                 setTeacher_id(id)

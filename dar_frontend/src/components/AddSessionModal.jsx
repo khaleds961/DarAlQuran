@@ -14,11 +14,12 @@ import TeacherSelect from './TeacherSelect';
 import CenterSelect from './CenterSelect';
 
 
-export default function AddSessionModal({addsession}) {
+export default function AddSessionModal({ addsession }) {
 
     const { session: { user: { centers } } } = useContext(SessionContext);
     const { session: { user: { role_id } } } = useContext(SessionContext);
     const { session: { user: { id } } } = useContext(SessionContext);
+    const { session: { token } } = useContext(SessionContext)
 
     const days = [
         { 'id': 1, 'value': 'الاثنين' },
@@ -90,7 +91,11 @@ export default function AddSessionModal({addsession}) {
 
     const getTeachersByCenter = (center_id = 0) => {
         setTeachers([])
-        Api.get(`getAllTeachersByCenter/${center_id}`).then(
+        Api.get(`getAllTeachersByCenter/${center_id}`,
+            {
+                headers: { Authorization: `Bearer ${token}` }
+            }
+        ).then(
             (res) => {
                 setTeachers(res.data.data)
                 setloading(false)
@@ -102,7 +107,11 @@ export default function AddSessionModal({addsession}) {
         setStudents([])
         setSelected(0)
         const teacher_id = e.target.value;
-        Api.get(`getStudentsByTeacher/${id_center}/${teacher_id}`).then(
+        Api.get(`getStudentsByTeacher/${id_center}/${teacher_id}`,
+            {
+                headers: { Authorization: `Bearer ${token}` }
+            }
+        ).then(
             (res) => {
                 setStudents(res.data.data)
                 setTeacher_id(teacher_id)
@@ -112,12 +121,6 @@ export default function AddSessionModal({addsession}) {
     }
 
     const addSession = () => {
-        console.log('id_center', id_center);
-        console.log('teacher_id', teacher_id);
-        console.log('student_id', student_id);
-        console.log('time', time);
-        console.log('day', day);
-        console.log('day_id', day_id);
         Api.post('addsession', {
             center_id: id_center,
             user_id: teacher_id,
@@ -125,7 +128,11 @@ export default function AddSessionModal({addsession}) {
             time: time,
             day: day,
             day_id: day_id
-        }).then((res) => {
+        },
+            {
+                headers: { Authorization: `Bearer ${token}` }
+            }
+        ).then((res) => {
             if (res.data.success) {
                 Swal.fire(res.data.message, '', 'success')
                 if (role_id === 1 || role_id === 2) {
@@ -154,7 +161,7 @@ export default function AddSessionModal({addsession}) {
 
     const hideModal = () => {
         setIsOpen(false);
-        if(role_id === 1 || role_id === 2){
+        if (role_id === 1 || role_id === 2) {
             setid_center(0)
         }
         if (role_id !== 4) {
@@ -168,15 +175,17 @@ export default function AddSessionModal({addsession}) {
     };
 
     const getcenters = () => {
-        Api.get(`getcenters`).then((res) => {
+        Api.get(`getcenters`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then((res) => {
             setcenters(res.data.data)
         })
     }
 
     const callStudentsTeacher = (id) => {
-        console.log(id, 'teacher_id');
-        console.log(id_center, 'center_id');
-        Api.get(`getStudentsByTeacher/${id_center}/${id}`).then(
+        Api.get(`getStudentsByTeacher/${id_center}/${id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then(
             (res) => {
                 setStudents(res.data.data)
                 setTeacher_id(id)
