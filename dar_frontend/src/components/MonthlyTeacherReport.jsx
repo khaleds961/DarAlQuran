@@ -11,14 +11,16 @@ import Swal from 'sweetalert2'
 
 export default function MonthlyTeacherReport() {
 
-    const { session:{token} }  = useContext(SessionContext)
+    const { session: { token } } = useContext(SessionContext)
     const { session: { user: { role_id } } } = useContext(SessionContext);
     const { session: { user: { centers } } } = useContext(SessionContext);
-    const defaultvalue = role_id === 3 || role_id === 4 ? centers[0]['center_id'] : 0;
+    const { session: { user: { id: user_id } } } = useContext(SessionContext);
 
+    const defaultvalue = role_id === 3 || role_id === 4 ? centers[0]['center_id'] : 0;
+    const defaultTeacherId = role_id === 4 ? user_id : 0;
     const [sessions, setsesions] = useState([])
     const [teachers, setteachers] = useState([])
-    const [teacher_id, setteacher_id] = useState(0)
+    const [teacher_id, setteacher_id] = useState(defaultTeacherId)
     const [centerid, setcenterid] = useState(defaultvalue)
     const [startdate, setstartdate] = useState('')
     const [enddate, setenddate] = useState('')
@@ -31,9 +33,9 @@ export default function MonthlyTeacherReport() {
         Api.post(`monthyteachereport/${center_id}/${teacher_id}?page=${p}`, {
             start: startdate,
             end: enddate,
-        },{
+        }, {
             headers: { Authorization: `Bearer ${token}` }
-          }).then(
+        }).then(
             (res) => {
                 const sessions = res.data.data.data
                 // const filtered_sessions = sessions.filter((session) =>
@@ -63,9 +65,9 @@ export default function MonthlyTeacherReport() {
 
     const getTeachersByCenter = (center_id = 0) => {
         setteachers([])
-        Api.get(`getAllTeachersByCenter/${center_id}`,{
+        Api.get(`getAllTeachersByCenter/${center_id}`, {
             headers: { Authorization: `Bearer ${token}` }
-          }).then(
+        }).then(
             (res) => {
                 setteachers(res.data.data)
             }
@@ -75,9 +77,9 @@ export default function MonthlyTeacherReport() {
         setpage(1)
         if (centerid !== 0 && teacher_id !== 0 && startdate && enddate) {
             getsessions(centerid, teacher_id, startdate, enddate, 1)
-        }else{
+        } else {
             Swal.fire('!ادخل كل المعلومات قبل البحث')
-          }
+        }
     }
 
     useEffect(() => {
@@ -93,29 +95,33 @@ export default function MonthlyTeacherReport() {
                 <div className='row'>
                     {role_id === 1 || role_id === 2 ?
                         <div className='col-md'>
+                            <label htmlFor=""></label>
                             <CenterSelect center_id={getcenterid} c_id={centerid} monthlyreport={true} />
                         </div>
                         : ''}
-
-                    <div className='col-md'>
-                        <TeacherSelect teachers={teachers} teacher_id={getfilterteacher} tid={teacher_id} fromquransession={true} />
-                    </div>
+                    {role_id !== 4 ?
+                        <div className='col-md'>
+                            <label htmlFor=""></label>
+                            <TeacherSelect teachers={teachers} teacher_id={getfilterteacher} tid={teacher_id} fromquransession={true} />
+                        </div>
+                        : ''}
 
                     <div className='col-md my-2'>
-                        {/* <label htmlFor="">من</label> */}
+                        <label style={{marginBottom:'3px'}}>من تاريخ</label>
                         <input type="date" className='form-control'
                             value={startdate}
                             onChange={(e) => setstartdate(e.target.value)} />
                     </div>
                     <div className='col-md my-2'>
-                        {/* <label htmlFor="">الى</label> */}
+                        <label style={{marginBottom:'3px'}}>الى تاريخ</label>
                         <input type="date" className='form-control'
                             value={enddate}
                             onChange={(e) => setenddate(e.target.value)} />
                     </div>
 
                     <div className='col-md my-2'>
-                        <button className='btn btn-dark px-4' onClick={search}>بحث</button>
+                        <label htmlFor=""></label>
+                        <button className='btn btn-dark px-4 form-control my-2 my-md-4' onClick={search}>بحث</button>
                     </div>
                 </div>
             </div>
@@ -124,11 +130,11 @@ export default function MonthlyTeacherReport() {
                     <>
                         {sessions.map((session) =>
                             <>
-                                <div key={session.st_ct_te_id}>
+                                <div key={session.st_ct_te_id} className='table-responsive'>
                                     <table className='table table-secondary text-center'>
                                         <thead>
                                             <tr>
-                                                <td colSpan={10} className='bg-info text-white'>
+                                                <td colSpan={10} className='bg-info text-white' style={{ textAlign: 'right' }}>
                                                     {session.full_name}
                                                 </td>
                                             </tr>

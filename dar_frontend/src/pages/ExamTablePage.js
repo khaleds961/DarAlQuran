@@ -23,7 +23,9 @@ export default function ExamTablePage() {
                     <SideBar />
                 }
                 <div className="col py-3" style={{ background: '#EEEEEE' }}>
-                    <h3 className='mb-5 text-center'>الطلاب المجازين</h3>
+                    <h3 className='mb-5 text-center'>
+                        محاضر جلسة الاختبار
+                    </h3>
                     <ExamTable />
                 </div>
             </div>

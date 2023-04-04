@@ -200,10 +200,14 @@ function QuranSessionTable() {
 
     const changePage = (e, value) => {
         setPage(value)
-        if (filterteacher_id != 0) {
-            getsessionsbyteacher(filterteacher_id, value)
+        if (role_id === 4) {
+            getsessionsbyteacher(teacher_id, value)
         } else {
-            getSessions(value)
+            if (filterteacher_id != 0) {
+                getsessionsbyteacher(filterteacher_id, value)
+            } else {
+                getSessions(value)
+            }
         }
     }
 
@@ -345,12 +349,6 @@ function QuranSessionTable() {
 
             {role_id === 3 || role_id === 4 ?
                 <div>
-                    {/* <button type="button" className="btn btn-dark my-2 d-flex align-items-center" onClick={showModal}>
-                        <BsPlusCircle className='text-white' />
-                        <span className='px-2'>
-                            اضافة حصة جديدة
-                        </span>
-                    </button> */}
                     {
                         loading ? '' :
                             <div className='d-flex flex-row-reverse'>
@@ -360,9 +358,9 @@ function QuranSessionTable() {
                 </div>
                 :
                 <div>
-                    <div className='d-flex flex-row-reverse'>
+                    <div className='d-md-flex flex-row-reverse'>
                         {id_center !== 0 ?
-                            <select className="btn bg-white text-dark my-2 px-2 mx-3"
+                            <select className="btn bg-white text-dark my-2 px-md-2 mx-md-3 responsive_width"
                                 value={filterteacher_id}
                                 onChange={(e) => setfilterteacher_id(e.target.value)}>
                                 <option value={0} disabled> اختر احد الاساتذة</option>

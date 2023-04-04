@@ -25,7 +25,7 @@ function RingPage() {
           <SideBar />
         }
         <div className="col py-3" style={{ background: '#EEEEEE' }}>
-          <h3 className='mb-5 text-center'>الحلقات</h3>
+          <h3 className='mb-5 text-center'>حلقات جيل القران</h3>
           <RingsTable />
         </div>
       </div>

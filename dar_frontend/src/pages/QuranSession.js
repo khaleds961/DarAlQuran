@@ -26,7 +26,7 @@ function QuranSession() {
           <SideBar />
         }
         <div className="col py-3" style={{ background: '#EEEEEE' }}>
-          <h3 className='mb-5 text-center'>الحصص والجلسات</h3>
+          <h3 className='mb-5 text-center'>جداول تسميع الطالب</h3>
           <QuranSessionTable />
         </div>
       </div>

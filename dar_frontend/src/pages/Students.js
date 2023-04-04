@@ -23,7 +23,7 @@ function Students() {
           <SideBar />
         }
         <div className="col py-3" style={{ background: '#EEEEEE' }}>
-          <h3 className='mb-5 text-center'>الطلاب</h3>
+          <h3 className='mb-5 text-center'>الاستبانات الشخصية</h3>
           <StudentsTable />
         </div>
       </div>

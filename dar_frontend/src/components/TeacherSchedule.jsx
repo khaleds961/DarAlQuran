@@ -14,17 +14,19 @@ function TeacherSchedule() {
   const { session: { user: { role_id } } } = useContext(SessionContext);
   const { session: { user: { centers } } } = useContext(SessionContext);
   const { session: { token } } = useContext(SessionContext)
+  const {session:{user:{id:user_id}}} = useContext(SessionContext)
 
-  const defaultValue = role_id === 3 ? centers[0]['center_id'] : 0;
-
+  const defaultValue = role_id === 3 || role_id === 4 ? centers[0]['center_id'] : 0;
 
   const [id_center, setid_center] = useState(defaultValue)
   const [filterteacher_id, setfilterteacher_id] = useState(0)
+  const [teacher_id,setTeacher_id] = useState()
   const [teachers, setTeachers] = useState([])
   const [schedule, setschedule] = useState([])
   const [loading, setloading] = useState(false)
 
   const getSchedule = (teacher_id) => {
+    setloading(true)
     Api.get(`teacherschedule/${id_center}/${teacher_id}}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then(
@@ -67,6 +69,9 @@ function TeacherSchedule() {
     if (id_center !== 0) {
       getTeachersByCenter(id_center)
     }
+    if(role_id === 4){
+      getSchedule(user_id)
+    }
   }, [])
 
   useEffect(() => {
@@ -91,6 +96,7 @@ function TeacherSchedule() {
       </div>
 
       {loading ? <div className='mt-5 text-center'><Spinner /></div> :
+        <div className='table-responsive'>
         <table className='table table-bordered '>
           <thead>
             <tr>
@@ -158,6 +164,7 @@ function TeacherSchedule() {
             </tr>
           </tbody>
         </table>
+        </div>
       }
     </div>
   )

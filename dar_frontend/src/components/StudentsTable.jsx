@@ -201,20 +201,20 @@ function StudentsTable() {
       <div>
         <div className='d-md-flex justify-content-between'>
 
-          <button type="button" onClick={popup} className="btn btn-success mb-3 d-flex align-items-center">
+          <button type="button" onClick={popup} className="btn btn-success mb-3 d-flex align-items-center responsive_width ">
             <BsPlusCircle className='text-white' />
-            <span className='px-2 text-center'>
+            <span className='px-2 col-md-auto mx-auto mb-md-0'>
               اضافة طالب جديد
             </span>
           </button>
 
-          <div className='d-flex'>
+          <div className='d-md-flex'>
             <div className='mx-md-2'>
               <CenterSelect fromstudent={true} data={data} c_id={center_id} />
             </div>
 
             {center_id !== 0 ?
-              <div className='mx-2 mx-sm-2 mx-md-0'>
+              <div>
                 <TeacherSelect teachers={teachers} teacher_id={getfilterteacherid} tid={filterteacher} fromquransession={true} />
               </div>
               : ''}
@@ -230,12 +230,12 @@ function StudentsTable() {
             >بحث عن طالب
             </button>
 
-            <input type="text" className='rounded border border-dark'
+            <input type="text" className='rounded border border-dark responsive_width'
               value={studentfilter}
               onChange={(e) => setstudentfilter(e.target.value)} />
 
             {/* small screen*/}
-            <span className='d-md-none bg-dark text-center text-white px-2 mx-2 rounded' onClick={searchforstudent}>
+            <span className='d-md-none bg-dark text-center text-white p-2 rounded' style={{marginRight:'1rem'}} onClick={searchforstudent}>
               <AiOutlineSearch />
             </span>
           </div>

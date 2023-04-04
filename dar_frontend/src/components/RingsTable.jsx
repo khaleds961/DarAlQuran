@@ -16,11 +16,13 @@ import TeacherSelect from './TeacherSelect';
 
 export default function RingsTable() {
 
-  const { session:{token} }  = useContext(SessionContext)
+  const { session: { token } } = useContext(SessionContext)
   const { session: { user: { role_id } } } = useContext(SessionContext);
   const { session: { user: { centers } } } = useContext(SessionContext);
-  const defaultvalue = role_id === 3 || role_id === 4 ? centers[0]['center_id'] : 0;
+  const { session: { user: { id: user_id } } } = useContext(SessionContext);
 
+  const defaultvalue = role_id === 3 || role_id === 4 ? centers[0]['center_id'] : 0;
+  const defaultTeacherId = role_id === 4 ? user_id : null;
   const navigate = useNavigate()
 
   const [isOpen, setIsOpen] = useState(false);
@@ -33,7 +35,7 @@ export default function RingsTable() {
   const [editcenterid, seteditcenterid] = useState(null)
   const [selectcenterid, setselectcenterid] = useState(defaultvalue)
   const [filtercenterid, setfiltercenterid] = useState(0)
-  const [teacherid, setteacherid] = useState(null)
+  const [teacherid, setteacherid] = useState(defaultTeacherId)
   const [filterteacherid, setfilterteacherid] = useState(0)
   const [editteacherid, seteditteacherid] = useState(null)
   const [teachers, setteachers] = useState([])
@@ -86,7 +88,7 @@ export default function RingsTable() {
 
   const getTeachersByCenter = (center_id) => {
     setteachers([])
-    Api.get(`getAllTeachersByCenter/${center_id}`,{
+    Api.get(`getAllTeachersByCenter/${center_id}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => {
       setteachers(res.data.data);
@@ -96,7 +98,7 @@ export default function RingsTable() {
 
   const getTeachersFilterByCenter = (center_id) => {
     setteachers([])
-    Api.get(`getAllTeachersByCenter/${center_id}`,{
+    Api.get(`getAllTeachersByCenter/${center_id}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => {
       setteachers_filter(res.data.data);
@@ -108,22 +110,33 @@ export default function RingsTable() {
       name: ringname,
       teacher_id: teacherid,
       center_id: selectcenterid
-    },{
+    }, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => {
       if (res.data.success) {
         Swal.fire(res.data.message, '', 'success')
         setringname('')
-        setteacherid(0)
-        setselectcenterid(0)
-        getRings(1)
+
+        if (role_id !== 4) {
+          setteacherid(0)
+        }
+
+        if (role_id === 1 || role_id === 2) {
+          setselectcenterid(0)
+        }
+
+        if (role_id === 4) {
+          getringsbyteacher(user_id, page)
+        } else {
+          getRings(page)
+        }
       }
     }).catch(function (err) { console.log(err) })
   }
 
   const getRings = (p) => {
     setLoading(true)
-    Api.get(`getrings/${centerid}?page=${p}`,{
+    Api.get(`getrings/${centerid}?page=${p}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => {
       setrings(res.data.data.data)
@@ -136,7 +149,7 @@ export default function RingsTable() {
     setringbyid([])
     setEditModal(true)
     setinsideLoading(true)
-    Api.get(`getringbyid/${ring_id}`,{
+    Api.get(`getringbyid/${ring_id}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => {
       setringbyid(res.data.data)
@@ -153,7 +166,7 @@ export default function RingsTable() {
       name: editringname,
       is_active: isactive,
       teacher_id: editteacherid
-    },{
+    }, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => {
       if (res.data.success) {
@@ -174,7 +187,7 @@ export default function RingsTable() {
     }).then((result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
-        Api.delete(`deletering/${ring_id}`,{
+        Api.delete(`deletering/${ring_id}`, {
           headers: { Authorization: `Bearer ${token}` }
         }).then(
           (res) => {
@@ -196,13 +209,17 @@ export default function RingsTable() {
     if (filterteacherid !== 0) {
       getringsbyteacher(filterteacherid, value)
     } else {
-      getRings(value)
+      if (role_id === 4) {
+        getringsbyteacher(user_id, value)
+      } else {
+        getRings(value)
+      }
     }
   }
 
   const getringsbyteacher = (teacher_id, p) => {
     setLoading(true)
-    Api.get(`getringsbyteacher/${teacher_id}?page=${p}`,{
+    Api.get(`getringsbyteacher/${teacher_id}?page=${p}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => {
       setrings(res.data.data.data)
@@ -216,9 +233,15 @@ export default function RingsTable() {
   }
 
   useEffect(() => {
-    getRings(1)
     if (role_id === 3) {
       getTeachersByCenter(centerid)
+      getRings(1)
+    }
+    if (role_id === 1 || role_id === 2) {
+      getRings(1)
+    }
+    if (role_id === 4) {
+      getringsbyteacher(user_id, 1)
     }
   }, [])
 
@@ -241,7 +264,7 @@ export default function RingsTable() {
         <button type="button" className="btn btn-success mb-3 d-flex align-items-center" onClick={showModal}>
           <BsPlusCircle className='text-white' />
           <span className='px-2'>
-           اضافة حلقة جديدة
+            اضافة حلقة جديدة
           </span>
         </button>
 
@@ -258,7 +281,7 @@ export default function RingsTable() {
       <div className='d-flex flex-row-reverse'>
         <div className='mx-2'>
           {role_id === 3 ?
-            <TeacherSelect teachers={teachers } teacher_id={getfilterteacherid} tid={filterteacherid} fromquransession={true} />
+            <TeacherSelect teachers={teachers} teacher_id={getfilterteacherid} tid={filterteacherid} fromquransession={true} />
             :
             <TeacherSelect teachers={teachers_filter} teacher_id={getfilterteacherid} tid={filterteacherid} fromquransession={true} />
           }
@@ -282,57 +305,59 @@ export default function RingsTable() {
         </Modal.Footer>
       </Modal>
 
-      <table className="table table-dark table-responsive table-hover text-center">
-        <thead>
-          <tr>
-            <th scope="col">اسم الحلقة</th>
-            <th scope="col">المركز</th>
-            <th scope="col">الاستاذ</th>
-            <th scope="col">الحالة</th>
-            <th scope="col">التاريخ</th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {loading ?
+      <div className='table-responsive'>
+        <table className="table table-dark table-responsive table-hover text-center">
+          <thead>
             <tr>
-              <td colSpan={3}></td>
-              <td>
-                <Spinner animation="border" variant="primary" />
-              </td>
-              <td colSpan={3}></td>
+              <th scope="col">اسم الحلقة</th>
+              <th scope="col">المركز</th>
+              <th scope="col">الاستاذ</th>
+              <th scope="col">الحالة</th>
+              <th scope="col">التاريخ</th>
+              <th scope="col"></th>
             </tr>
-            :
-            rings.length > 0 ? rings.map(ring =>
-              <tr key={ring.id}>
-                <th>
-                  <span className='cursor_pointer' onClick={() => handleNavigate(ring.id)}>
-                    {ring.name}
-                  </span>
-                </th>
-                <td>{ring.center_name}</td>
-                <td>{ring.teacher_fn} {ring.teacher_mn} {ring.teacher_ln}</td>
-                <td>{ring.is_active ? 'نشط' : 'غير نشط'}</td>
+          </thead>
+          <tbody>
+            {loading ?
+              <tr>
+                <td colSpan={3}></td>
                 <td>
-                  <Moment format="YYYY/MM/DD">
-                    {ring.created_at}
-                  </Moment>
+                  <Spinner animation="border" variant="primary" />
                 </td>
-                <td>
-                  <span className='mx-2 text-white cursor_pointer'
-                    onClick={() => getringbyid(ring.id)}>
-                    <BsPencil />
-                  </span>
-                  <span className='mx-2 text-white cursor_pointer'
-                    onClick={() => deletering(ring.id)}>
-                    <BsTrash />
-                  </span>
-                </td>
+                <td colSpan={3}></td>
               </tr>
-            ) : <></>
-          }
-        </tbody>
-      </table>
+              :
+              rings.length > 0 ? rings.map(ring =>
+                <tr key={ring.id}>
+                  <th>
+                    <span className='cursor_pointer' onClick={() => handleNavigate(ring.id)}>
+                      {ring.name}
+                    </span>
+                  </th>
+                  <td>{ring.center_name}</td>
+                  <td>{ring.teacher_fn} {ring.teacher_mn} {ring.teacher_ln}</td>
+                  <td>{ring.is_active ? 'نشط' : 'غير نشط'}</td>
+                  <td>
+                    <Moment format="YYYY/MM/DD">
+                      {ring.created_at}
+                    </Moment>
+                  </td>
+                  <td>
+                    <span className='mx-2 text-white cursor_pointer'
+                      onClick={() => getringbyid(ring.id)}>
+                      <BsPencil />
+                    </span>
+                    <span className='mx-2 text-white cursor_pointer'
+                      onClick={() => deletering(ring.id)}>
+                      <BsTrash />
+                    </span>
+                  </td>
+                </tr>
+              ) : <></>
+            }
+          </tbody>
+        </table>
+      </div>
 
       {rings && rings.length > 0 ?
         <>

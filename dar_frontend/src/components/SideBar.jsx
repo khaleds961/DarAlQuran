@@ -160,7 +160,7 @@ function Navbar() {
                                     { backgroundColor: 'white' }
                             }>
                             <FaUserGraduate className='text-dark' />
-                            <span className='px-2 d-none d-md-block'>الطلاب</span>
+                            <span className='px-2 d-none d-md-block'>الاستبانات الشخصية</span>
                         </NavLink>
                     </div>
 
@@ -187,7 +187,7 @@ function Navbar() {
                                     { backgroundColor: 'white' }
                             }>
                             <MdClass className='text-dark' />
-                            <span className='px-2 d-none d-md-block'>الحصص والجلسات</span>
+                            <span className='px-2 d-none d-md-block'>جداول تسميع الطالب</span>
                         </NavLink>
                     </div>
 
@@ -214,7 +214,7 @@ function Navbar() {
                                     { backgroundColor: 'white' }
                             }>
                             <AiFillSchedule className='text-dark' />
-                            <span className='px-2 d-none d-md-block'>جدول الاستاذ</span>
+                            <span className='px-2 d-none d-md-block'>برامج المدرسين</span>
                         </NavLink>
                     </div>
 
@@ -242,7 +242,7 @@ function Navbar() {
                             }>
                             <MdCalendarToday className='text-dark' />
                             <span className='px-2 d-none d-md-block'>
-                                جدول الاستاذ الشهري
+                                البيانات الشهرية
                             </span>
                         </NavLink>
                     </div>
@@ -270,7 +270,7 @@ function Navbar() {
                                     { backgroundColor: 'white' }
                             }>
                             <FaRing className='text-dark' />
-                            <span className='px-2 d-none d-md-block'>الحلقات والدورات</span>
+                            <span className='px-2 d-none d-md-block'>حلقات جيل القراّن</span>
                         </NavLink>
                     </div>
 
@@ -338,7 +338,7 @@ function Navbar() {
                                     }>
                                     <FaBuromobelexperte className='text-dark' />
                                     <span className='px-2 d-none d-md-block'>
-                                        جلسة الاختبار
+                                        محاضر جلسة الاختبار
                                     </span>
                                 </NavLink>
                             </div>

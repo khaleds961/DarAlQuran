@@ -12,13 +12,16 @@ export default function MonthlyRingReport() {
   const { session: { token } } = useContext(SessionContext)
   const { session: { user: { role_id } } } = useContext(SessionContext);
   const { session: { user: { centers } } } = useContext(SessionContext);
+  const { session: { user: { id: user_id } } } = useContext(SessionContext);
+
   const defaultvalue = role_id === 3 || role_id === 4 ? centers[0]['center_id'] : 0;
+  const defaultTeacherId = role_id === 4 ? user_id : 0;
 
   const [sessions, setsesions] = useState([])
   const [rings, setrings] = useState([])
   const [ring_id, setring_id] = useState(0)
   const [teachers, setteachers] = useState([])
-  const [teacher_id, setteacher_id] = useState(0)
+  const [teacher_id, setteacher_id] = useState(defaultTeacherId)
   const [centerid, setcenterid] = useState(defaultvalue)
   const [startdate, setstartdate] = useState('')
   const [enddate, setenddate] = useState('')
@@ -95,8 +98,12 @@ export default function MonthlyRingReport() {
   }
 
   useEffect(() => {
-    if (centerid) {
-      getTeachersByCenter(centerid)
+    if (role_id === 4) {
+      getringsbyteacher(user_id)
+    } else {
+      if (centerid) {
+        getTeachersByCenter(centerid)
+      }
     }
   }, [])
 
@@ -114,15 +121,19 @@ export default function MonthlyRingReport() {
         <div className='row'>
           {role_id === 1 || role_id === 2 ?
             <div className='col-lg'>
+              <label htmlFor=""></label>
               <CenterSelect center_id={getcenterid} c_id={centerid} monthlyreport={true} />
             </div>
             : ''}
-
-          <div className='col-lg'>
-            <TeacherSelect teachers={teachers} teacher_id={getfilterteacher} tid={teacher_id} fromquransession={true} />
-          </div>
+          {role_id !== 4 ?
+            <div className='col-lg'>
+              <label htmlFor=""></label>
+              <TeacherSelect teachers={teachers} teacher_id={getfilterteacher} tid={teacher_id} fromquransession={true} />
+            </div>
+            : ''}
 
           <div className='col-lg my-2'>
+            <label htmlFor=""></label>
             <select className='form-control' value={ring_id}
               onChange={(e) => setring_id(e.target.value)}>
               <option value={0} disabled>اختر احد الحلقات</option>
@@ -135,20 +146,20 @@ export default function MonthlyRingReport() {
           </div>
 
           <div className='col-lg my-2'>
-            {/* <label htmlFor="">من</label> */}
+            <label style={{ marginBottom: '3px' }}>من تاريخ</label>
             <input type="date" className='form-control'
               value={startdate}
               onChange={(e) => setstartdate(e.target.value)} />
           </div>
           <div className='col-lg my-2'>
-            {/* <label htmlFor="">الى</label> */}
+            <label style={{ marginBottom: '3px' }}>الى تاريخ</label>
             <input type="date" className='form-control'
               value={enddate}
               onChange={(e) => setenddate(e.target.value)} />
           </div>
 
           <div className='col-md my-2'>
-            <button className='btn btn-dark px-4' onClick={search}>بحث</button>
+            <button className='btn btn-dark px-4 my-sm-2 my-md-4 form-control' onClick={search}>بحث</button>
           </div>
         </div>
       </div>
@@ -162,7 +173,7 @@ export default function MonthlyRingReport() {
             </div>
             {sessions.map((session) =>
               <>
-                <div key={session.student_id}>
+                <div key={session.student_id} className="table-responsive">
                   <table className='table table-secondary text-center'>
                     <thead>
                       <tr>

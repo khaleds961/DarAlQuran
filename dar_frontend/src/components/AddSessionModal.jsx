@@ -214,8 +214,8 @@ export default function AddSessionModal({ addsession }) {
             <div className='d-flex justify-content-between'>
                 <button type="button" className="btn btn-dark my-2 d-flex align-items-center" onClick={showModal}>
                     <BsPlusCircle className='text-white' />
-                    <span className='px-2'>
-                        اضافة حصة جديدة
+                    <span className='px-2' style={{ fontSize: '14px' }}>
+                        اضافة حصة
                     </span>
                 </button>
             </div>
@@ -245,13 +245,17 @@ export default function AddSessionModal({ addsession }) {
                                     </>
                                     : ''
                                 }
-                                <label >الاستاذ</label>
-                                <select className='form-control mb-3' value={teacher_id} onChange={callStudents}>
-                                    <option disabled value='0'>اختر احد الاساتذة</option>
-                                    {teachers ? teachers.map((teacher) =>
-                                        <option key={teacher.id} value={teacher.id}>{teacher.first_name} {teacher.middle_name} {teacher.last_name}</option>
-                                    ) : <option>تحميل...</option>}
-                                </select>
+                                {role_id !== 4 ?
+                                    <>
+                                        <label >الاستاذ</label>
+                                        <select className='form-control mb-3' value={teacher_id} onChange={callStudents}>
+                                            <option disabled value='0'>اختر احد الاساتذة</option>
+                                            {teachers ? teachers.map((teacher) =>
+                                                <option key={teacher.id} value={teacher.id}>{teacher.first_name} {teacher.middle_name} {teacher.last_name}</option>
+                                            ) : <option>تحميل...</option>}
+                                        </select>
+                                    </>
+                                    : ''}
 
                                 {students.length !== 0 ?
                                     <>

@@ -23,7 +23,7 @@ function TeacherSchedulePage() {
           <SideBar />
         }
         <div className="col py-3" style={{ background: '#EEEEEE' }}>
-          <h3 className='mb-5 text-center'>جدول الاستاذ</h3>
+          <h3 className='mb-5 text-center'>برامج المدرسين</h3>
           <TeacherSchedule />
         </div>
       </div>
