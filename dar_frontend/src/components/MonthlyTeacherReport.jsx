@@ -6,6 +6,8 @@ import CenterSelect from './CenterSelect'
 import TeacherSelect from './TeacherSelect'
 import { Pagination } from '@mui/material'
 import Swal from 'sweetalert2'
+import { AiOutlineArrowLeft } from 'react-icons/ai'
+
 
 
 
@@ -107,13 +109,13 @@ export default function MonthlyTeacherReport() {
                         : ''}
 
                     <div className='col-md my-2'>
-                        <label style={{marginBottom:'3px'}}>من تاريخ</label>
+                        <label style={{ marginBottom: '3px' }}>من تاريخ</label>
                         <input type="date" className='form-control'
                             value={startdate}
                             onChange={(e) => setstartdate(e.target.value)} />
                     </div>
                     <div className='col-md my-2'>
-                        <label style={{marginBottom:'3px'}}>الى تاريخ</label>
+                        <label style={{ marginBottom: '3px' }}>الى تاريخ</label>
                         <input type="date" className='form-control'
                             value={enddate}
                             onChange={(e) => setenddate(e.target.value)} />
@@ -144,7 +146,16 @@ export default function MonthlyTeacherReport() {
                                                 <th>حضور / غياب</th>
                                                 <th>من السورة</th>
                                                 <th>من الاية</th>
-                                                <th>من صفحة</th>
+                                                <th>
+                                                    <span>
+                                                        من صفحة
+                                                    </span>
+                                                    <span className='text-danger d-md-none'>
+                                                        <strong>
+                                                            <AiOutlineArrowLeft />
+                                                        </strong>
+                                                    </span>
+                                                </th>
                                                 <th>الى السورة</th>
                                                 <th>الى الاية</th>
                                                 <th>الى صفحة</th>

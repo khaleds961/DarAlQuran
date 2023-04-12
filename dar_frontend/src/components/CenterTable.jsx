@@ -40,7 +40,7 @@ function CenterTable() {
         }).then((result) => {
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
-                Api.put(`deleteCenter/${id}`, {
+                Api.delete(`deleteCenter/${id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 }).then(
                     res => {

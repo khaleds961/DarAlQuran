@@ -45,7 +45,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/editteacherbyid/{user_id}', [UsersController::class, 'update']);
     Route::delete('/deleteteacher/{teacher_id}', [UsersController::class, 'destroy']);
     Route::get('/counting', [UsersController::class, 'counting']);
-
+    Route::get('/getCenterIdByTeacher/{teacher_id}', [UsersController::class, 'getCenterIdByTeacher']);
 
     //STUDENTS
     Route::get('/getAllStudents', [StudentsController::class, 'index']);
@@ -60,16 +60,16 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/addstudent', [StudentsController::class, 'store']);
     Route::post('/searchforstudent', [StudentsController::class, 'searchforstudent']);
     Route::post('/editstudent/{id}', [StudentsController::class, 'update']);
+    Route::post('/editPdf/{id}',[StudentsController::class, 'editPdf']);
     Route::delete('/deletestudent/{id}/{center_id}', [StudentsController::class, 'destroy']);
 
 
     //CENTER
     Route::get('/getcenters', [CentersController::class, 'index']);
     Route::post('/addcenter', [CentersController::class, 'store']);
-    Route::put('/deleteCenter/{id}', [CentersController::class, 'destroy']);
+    Route::delete('/deleteCenter/{id}', [CentersController::class, 'destroy']);
     Route::get('/getcenterbyid/{id}', [CentersController::class, 'show']);
     Route::post('/updatecenter/{id}', [CentersController::class, 'update']);
-    // Route::get('/getget',[CentersController::class,'studentsbycenter']);
 
     //Sessions
     Route::get('/getsessions/{center_id}', [SessionsController::class, 'index']);
@@ -86,8 +86,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/getrings/{center_id}', [RingsController::class, 'index']);
     Route::get('/getringbyid/{ring_id}', [RingsController::class, 'show']);
     Route::get('/getringsbycenter/{center_id}', [RingsController::class, 'getringsbycenter']);
+    Route::get('/getringsbycenterpagination/{center_id}', [RingsController::class, 'getringsbycenterpagination']);
     Route::get('/getringsbyteacher/{teacher_id}', [RingsController::class, 'getringsbyteacher']);
     Route::get('/getallringsbyteacher/{teacher_id}', [RingsController::class, 'getallringsbyteacher']);
+    Route::get('/filterRings/{center_id}/{teacher_id}/{filter_id}', [RingsController::class, 'filterRings']);
     Route::post('/addring', [RingsController::class, 'store']);
     Route::post('/editring/{id}', [RingsController::class, 'update']);
     Route::delete('/deletering/{id}', [RingsController::class, 'destroy']);

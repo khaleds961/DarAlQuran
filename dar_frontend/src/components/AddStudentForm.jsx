@@ -211,6 +211,7 @@ export default function AddStudentForm() {
                     if (role_id === 1 || role_id === 2) {
                         setCenter_id(0)
                     }
+                    setRegistrationDate(moment().format('YYYY-MM-DD'))
                 } else {
                     console.log({ res });
                 }
@@ -394,26 +395,6 @@ export default function AddStudentForm() {
     return (
         <>
             <div className='container' style={{ width: '80%' }}>
-
-                {/* <div className='bg-info text-white px-4 py-2 rounded my-3'>
-
-                    <div className="col-md d-flex justify-content-between align-items-center">
-                        <span>هل يتبع هذا الطالب لاحد الحلقات؟</span>
-                        <span>
-                            <label className='mx-1'>نعم</label>
-                            <input type="radio" value='yes' name='student_isring'
-                                onClick={(e) => setstudent_isring(e.target.value)} />
-                        </span>
-                        <span className='mx-2'>
-                            <label className='mx-1'>كلا</label>
-                            <input type="radio"
-                                defaultChecked
-                                value='no'
-                                name='student_isring'
-                                onClick={(e) => setstudent_isring(e.target.value)} />
-                        </span>
-                    </div>
-                </div> */}
 
                 <div className='row'>
                     <div className='col'>

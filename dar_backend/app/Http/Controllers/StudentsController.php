@@ -7,10 +7,14 @@ use App\Models\Rings;
 use App\Models\Students;
 use App\Models\Students_Centers_Teachers;
 use App\Models\Users;
+use Illuminate\Support\Facades\Validator;
 use Exception;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator as IlluminateValidator;
 
 class StudentsController extends Controller
 {
@@ -123,12 +127,13 @@ class StudentsController extends Controller
                     ]);
                 }
             } else {
-
-                $path = null;
+                $pathWithoutPublic = null;
 
                 if ($request->hasFile('file')) {
                     $file = $request->file('file');
-                    $path = $file->store('uploads');
+                    $path = Storage::putFile('public/uploads', $file);
+                    // Remove the public/ prefix from the path
+                    $pathWithoutPublic = str_replace('public/', '', $path);
                 }
 
                 $student = Students::create([
@@ -160,7 +165,7 @@ class StudentsController extends Controller
                     'skills'            => $request->skills,
                     'rate'              => $request->rate,
                     'notes'             => $request->notes,
-                    'path'              => $path,
+                    'path'              => $pathWithoutPublic,
                     'type_kiraat'       => $request->type_kiraat
                 ]);
                 if ($student->id) {
@@ -187,7 +192,7 @@ class StudentsController extends Controller
                             'message' => 'center or user id is null',
                             'success' => false
                         ]);
-                        $student->delete;
+                        $student->delete();
                     }
                 }
             }
@@ -213,6 +218,7 @@ class StudentsController extends Controller
                 ->where('user_id', $teacher_id)->first()->center_id;
             $student->teacher_id = $teacher_id;
             $student->center_id = $center_id;
+            $student->pathpdf = asset('storage/' . $student->path);
             return response([
                 'data' => $student,
                 'success' => true
@@ -375,6 +381,45 @@ class StudentsController extends Controller
                     'success' => false
                 ]);
             }
+        }
+    }
+
+    public function editPdf(Request $request, $student_id)
+    {
+        try {
+            $request->validate([
+                'file' => 'required|mimes:pdf|max:5120'
+            ], [
+                'file.mimes' => __('message.pdf'),
+                'file.max' => __('message.max_size'),
+            ]);
+            $file = $request->file('file');
+
+            // Delete the previous file, if any
+            $previousPath = $request->previous_path;
+            if ($previousPath) {
+                $filename = basename($previousPath);
+                $path_name = 'public/uploads/' . $filename;
+                if (Storage::exists($path_name)) {
+                    Storage::delete($path_name);
+                }
+            }
+            $path = Storage::putFile('public/uploads', $file);
+            // Remove the public/ prefix from the path
+            $pathWithoutPublic = str_replace('public/', '', $path);
+            $student = Students::find($student_id);
+            $student->update([
+                'path' => $pathWithoutPublic
+            ]);
+            if ($student->wasChanged()) {
+                return response([
+                    'message' => __('message.fileUpdated'),
+                    'success' => true
+                ]);
+            }
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return response($e->getMessage());
         }
     }
 

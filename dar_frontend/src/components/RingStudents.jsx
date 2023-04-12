@@ -17,14 +17,15 @@ export default function RingStudents() {
 
     const { session: { user: { role_id } } } = useContext(SessionContext);
     const { session: { user: { centers } } } = useContext(SessionContext);
+    const { session: { user: { id: user_id } } } = useContext(SessionContext);
     const { session: { token } } = useContext(SessionContext)
 
     const navigate = useNavigate()
 
     const location = useLocation()
     const default_ring_id = location?.state?.ringid ?? 0;
+    const default_center_id = role_id === 3 || role_id === 4 ? centers[0]['center_id'] : location?.state?.center_id ?? 0;
 
-    const default_center_id = role_id === 3 ? centers[0]['center_id'] : 0
     const [students, setstudents] = useState([])
     const [teacher, setteacher] = useState([])
     const [ring, setring] = useState([])
@@ -38,7 +39,7 @@ export default function RingStudents() {
     const [notedate, setnotedate] = useState('')
     const [note, setnote] = useState('')
 
-    console.log(ring_id,'ijijij');
+    console.log(ring_id, 'ijijij');
     const handleNavigate = (id) => {
         const encrypted = AES.encrypt(id.toString(), 'secretKey').toString().replace(/\//g, '_');
         navigate(`/editringstudent/${encrypted}`)
@@ -71,7 +72,7 @@ export default function RingStudents() {
         Api.get(`getstudentsbyring/${ring_id}?page=${p}`, {
             headers: { Authorization: `Bearer ${token}` }
         }).then((res) => {
-            console.log({res});
+            console.log({ res });
             setring_name(res?.data?.teacher_ring?.name)
             setteacher(res?.data?.teacher_ring?.teacher)
             setstudents(res?.data?.data?.data)
@@ -139,6 +140,18 @@ export default function RingStudents() {
         getstudentbyring(ring_id, value)
     }
 
+    const getringsbyteacher = (user_id) => {
+        console.log('hey');
+        Api.get(`getallringsbyteacher/${user_id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then((res) => {
+            console.log({res});
+            if (res.data.success) {
+                setring(res.data.data)
+            }
+        })
+    }
+
     useEffect(() => {
         if (ring_id !== 0) {
             getstudentbyring(ring_id, 1)
@@ -147,8 +160,12 @@ export default function RingStudents() {
     }, [ring_id])
 
     useEffect(() => {
-        if (centerid) {
-            getringsbycenter(centerid)
+        if (role_id === 4) {
+            getringsbyteacher(user_id)
+        } else {
+            if (centerid) {
+                getringsbycenter(centerid)
+            }
         }
     }, [])
 

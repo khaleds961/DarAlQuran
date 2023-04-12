@@ -7,6 +7,9 @@ import SessionContext from '../session/SessionContext';
 import CenterSelect from './CenterSelect';
 import TeacherSelect from './TeacherSelect';
 import AddSessionModal from './AddSessionModal'
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { BsFillTelephoneFill } from 'react-icons/bs';
+import { AiOutlineArrowLeft } from 'react-icons/ai'
 
 
 function TeacherSchedule() {
@@ -14,13 +17,13 @@ function TeacherSchedule() {
   const { session: { user: { role_id } } } = useContext(SessionContext);
   const { session: { user: { centers } } } = useContext(SessionContext);
   const { session: { token } } = useContext(SessionContext)
-  const {session:{user:{id:user_id}}} = useContext(SessionContext)
+  const { session: { user: { id: user_id } } } = useContext(SessionContext)
 
   const defaultValue = role_id === 3 || role_id === 4 ? centers[0]['center_id'] : 0;
 
   const [id_center, setid_center] = useState(defaultValue)
   const [filterteacher_id, setfilterteacher_id] = useState(0)
-  const [teacher_id,setTeacher_id] = useState()
+  const [teacher_id, setTeacher_id] = useState()
   const [teachers, setTeachers] = useState([])
   const [schedule, setschedule] = useState([])
   const [loading, setloading] = useState(false)
@@ -69,7 +72,7 @@ function TeacherSchedule() {
     if (id_center !== 0) {
       getTeachersByCenter(id_center)
     }
-    if(role_id === 4){
+    if (role_id === 4) {
       getSchedule(user_id)
     }
   }, [])
@@ -83,87 +86,146 @@ function TeacherSchedule() {
 
   return (
     <div>
-      <div className='d-flex justify-content-between'>
+      <div className='d-md-flex justify-content-between'>
 
         <div>
           <AddSessionModal addsession={is_session_added} />
         </div>
 
-        <div className='d-flex flex-row-reverse' style={{ gap: 10 }}>
-          <TeacherSelect teachers={teachers} teacher_id={getteacherid} tid={filterteacher_id} fromquransession={true} />
+        <div className='d-md-flex flex-row' style={{ gap: 10 }}>
           <CenterSelect c_id={id_center} data={getfiltercenterid} fromstudent={true} />
+          <TeacherSelect teachers={teachers} teacher_id={getteacherid} tid={filterteacher_id} fromquransession={true} />
         </div>
       </div>
 
       {loading ? <div className='mt-5 text-center'><Spinner /></div> :
         <div className='table-responsive'>
-        <table className='table table-bordered '>
-          <thead>
-            <tr>
-              <th>الاثنين</th>
-              <th>الثلاثاء</th>
-              <th>الاربعاء</th>
-              <th>الخميس</th>
-              <th>الجمعة </th>
-              <th>السبت</th>
-              <th>الاحد</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                {Object.keys(schedule).length > 0 ? schedule[1]?.sort((a, b) => a.session_time > b.session_time ? 1 : -1)
-                  .map((sc) => <div style={{ gap: 5 }} className='border-bottom' key={sc.id}>
-                    <b>{sc.session_time}</b>
-                    <p>{sc.student_fn} {sc.student_mn} {sc.student_ln}</p>
-                  </div>) : ''}
-              </td>
-              <td>
-                {Object.keys(schedule).length > 0 ? schedule[2]?.sort((a, b) => a.session_time > b.session_time ? 1 : -1)
-                  .map((sc) => <div style={{ gap: 5 }} className='border-bottom' key={sc.id}>
-                    <b>{sc.session_time}</b>
-                    <p>{sc.student_fn} {sc.student_mn} {sc.student_ln}</p>
-                  </div>) : ''}
-              </td>
-              <td>
-                {Object.keys(schedule).length > 0 ? schedule[3]?.sort((a, b) => a.session_time > b.session_time ? 1 : -1)
-                  .map((sc) => <div style={{ gap: 5 }} className='border-bottom' key={sc.id}>
-                    <b>{sc.session_time}</b>
-                    <p>{sc.student_fn} {sc.student_mn} {sc.student_ln}</p>
-                  </div>) : ''}
-              </td>
-              <td>
-                {Object.keys(schedule).length > 0 ? schedule[4]?.sort((a, b) => a.session_time > b.session_time ? 1 : -1)
-                  .map((sc) => <div style={{ gap: 5 }} className='border-bottom' key={sc.id}>
-                    <b>{sc.session_time}</b>
-                    <p>{sc.student_fn} {sc.student_mn} {sc.student_ln}</p>
-                  </div>) : ''}
-              </td>
-              <td>
-                {Object.keys(schedule).length > 0 ? schedule[5]?.sort((a, b) => a.session_time > b.session_time ? 1 : -1)
-                  .map((sc) => <div style={{ gap: 5 }} className='border-bottom' key={sc.id}>
-                    <b>{sc.session_time}</b>
-                    <p>{sc.student_fn} {sc.student_mn} {sc.student_ln}</p>
-                  </div>) : ''}
-              </td>
-              <td>
-                {Object.keys(schedule).length > 0 ? schedule[6]?.sort((a, b) => a.session_time > b.session_time ? 1 : -1)
-                  .map((sc) => <div style={{ gap: 5 }} className='border-bottom' key={sc.id}>
-                    <b>{sc.session_time}</b>
-                    <p>{sc.student_fn} {sc.student_mn} {sc.student_ln}</p>
-                  </div>) : ''}
-              </td>
-              <td>
-                {Object.keys(schedule).length > 0 ? schedule[7]?.sort((a, b) => a.session_time > b.session_time ? 1 : -1)
-                  .map((sc) => <div style={{ gap: 5 }} className='border-bottom' key={sc.id}>
-                    <b>{sc.session_time}</b>
-                    <p>{sc.student_fn} {sc.student_mn} {sc.student_ln}</p>
-                  </div>) : ''}
-              </td>
+          <table className='table table-bordered '>
+            <thead>
+              <tr>
+                <th>الاثنين</th>
+                <th>الثلاثاء</th>
+                <th>الاربعاء</th>
+                <th>
+                  الخميس
+                  <AiOutlineArrowLeft className='mx-1 d-md-none'/>
+                </th>
+                <th>الجمعة </th>
+                <th>السبت</th>
+                <th>الاحد</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  {Object.keys(schedule).length > 0 ? schedule[1]?.sort((a, b) => a.session_time > b.session_time ? 1 : -1)
+                    .map((sc) => <div style={{ gap: 5 }} className='border-bottom' key={sc.id}>
+                      <b>{sc.session_time}</b>
+                      <OverlayTrigger
+                        placement="top"
+                        overlay={<Tooltip>{sc.student_number}</Tooltip>}
+                      >
+                        <p>
+                          {sc.student_fn} {sc.student_mn} {sc.student_ln}
+                          <BsFillTelephoneFill className='mx-1 text-primary' />
+                        </p>
+                      </OverlayTrigger>
+                    </div>) : ''}
+                </td>
+                <td>
+                  {Object.keys(schedule).length > 0 ? schedule[2]?.sort((a, b) => a.session_time > b.session_time ? 1 : -1)
+                    .map((sc) => <div style={{ gap: 5 }} className='border-bottom' key={sc.id}>
+                      <b>{sc.session_time}</b>
+                      <OverlayTrigger
+                        placement="top"
+                        overlay={<Tooltip>{sc.student_number}</Tooltip>}
+                      >
+                        <p>
+                          {sc.student_fn} {sc.student_mn} {sc.student_ln}
+                          <BsFillTelephoneFill className='mx-1 text-primary' />
+                        </p>
+                      </OverlayTrigger>
+                    </div>) : ''}
+                </td>
+                <td>
+                  {Object.keys(schedule).length > 0 ? schedule[3]?.sort((a, b) => a.session_time > b.session_time ? 1 : -1)
+                    .map((sc) => <div style={{ gap: 5 }} className='border-bottom' key={sc.id}>
+                      <b>{sc.session_time}</b>
+                      <OverlayTrigger
+                        placement="top"
+                        overlay={<Tooltip>{sc.student_number}</Tooltip>}
+                      >
+                        <p>
+                          {sc.student_fn} {sc.student_mn} {sc.student_ln}
+                          <BsFillTelephoneFill className='mx-1 text-primary' />
+                        </p>
+                      </OverlayTrigger>
+                    </div>) : ''}
+                </td>
+                <td>
+                  {Object.keys(schedule).length > 0 ? schedule[4]?.sort((a, b) => a.session_time > b.session_time ? 1 : -1)
+                    .map((sc) => <div style={{ gap: 5 }} className='border-bottom' key={sc.id}>
+                      <b>{sc.session_time}</b>
+                      <OverlayTrigger
+                        placement="top"
+                        overlay={<Tooltip>{sc.student_number}</Tooltip>}
+                      >
+                        <p>
+                          {sc.student_fn} {sc.student_mn} {sc.student_ln}
+                          <BsFillTelephoneFill className='mx-1 text-primary' />
+                        </p>
+                      </OverlayTrigger>
+                    </div>) : ''}
+                </td>
+                <td>
+                  {Object.keys(schedule).length > 0 ? schedule[5]?.sort((a, b) => a.session_time > b.session_time ? 1 : -1)
+                    .map((sc) => <div style={{ gap: 5 }} className='border-bottom' key={sc.id}>
+                      <b>{sc.session_time}</b>
+                      <OverlayTrigger
+                        placement="top"
+                        overlay={<Tooltip>{sc.student_number}</Tooltip>}
+                      >
+                        <p>
+                          {sc.student_fn} {sc.student_mn} {sc.student_ln}
+                          <BsFillTelephoneFill className='mx-1 text-primary' />
+                        </p>
+                      </OverlayTrigger>
+                    </div>) : ''}
+                </td>
+                <td>
+                  {Object.keys(schedule).length > 0 ? schedule[6]?.sort((a, b) => a.session_time > b.session_time ? 1 : -1)
+                    .map((sc) => <div style={{ gap: 5 }} className='border-bottom' key={sc.id}>
+                      <b>{sc.session_time}</b>
+                      <OverlayTrigger
+                        placement="top"
+                        overlay={<Tooltip>{sc.student_number}</Tooltip>}
+                      >
+                        <p>
+                          {sc.student_fn} {sc.student_mn} {sc.student_ln}
+                          <BsFillTelephoneFill className='mx-1 text-primary' />
+                        </p>
+                      </OverlayTrigger>
+                    </div>) : ''}
+                </td>
+                <td>
+                  {Object.keys(schedule).length > 0 ? schedule[7]?.sort((a, b) => a.session_time > b.session_time ? 1 : -1)
+                    .map((sc) => <div style={{ gap: 5 }} className='border-bottom' key={sc.id}>
+                      <b>{sc.session_time}</b>
+                      <OverlayTrigger
+                        placement="top"
+                        overlay={<Tooltip>{sc.student_number}</Tooltip>}
+                      >
+                        <p>
+                          {sc.student_fn} {sc.student_mn} {sc.student_ln}
+                          <BsFillTelephoneFill className='mx-1 text-primary' />
+                        </p>
+                      </OverlayTrigger>
+                    </div>) : ''}
+                </td>
 
-            </tr>
-          </tbody>
-        </table>
+              </tr>
+            </tbody>
+          </table>
         </div>
       }
     </div>

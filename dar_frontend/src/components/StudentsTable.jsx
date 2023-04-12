@@ -27,10 +27,11 @@ function StudentsTable() {
   const { session: { user: { centers } } } = useContext(SessionContext);
   const { session: { user: { id } } } = useContext(SessionContext);
 
-  const defualt_center_id = role_id === 1 || role_id === 2 ? 0 : centers[0]?.center_id;
 
   const location = useLocation()
+  console.log(location);
   const default_teacher_id = location?.state?.teacher_id ?? 0
+  const defualt_center_id = role_id === 1 || role_id === 2 ? location?.state?.center_id ?? 0 : centers[0]?.center_id;
 
   const [students, setStudents] = useState(null);
   const [page, setPage] = useState(1);
@@ -172,6 +173,17 @@ function StudentsTable() {
     setHideTeacher(!hideTeacher)
   }
 
+  const getCenterIdByTeacher = (default_teacher_id) => {
+    Api.get(`getCenterIdByTeacher/${default_teacher_id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then((res) => {
+      if (res.data.success) {
+        setCenter_id(res.data.center_id)
+        // getTeachersByCenter(res.data.center_id)
+      }
+    })
+  }
+  console.log(center_id, 'centerrrr');
   useEffect(() => {
     if (role_id === 4) {
       getstudentbyteacher(id, 1)
@@ -179,6 +191,7 @@ function StudentsTable() {
       if (filterteacher !== 0) {
         getstudentbyteacher(teacherid, 1)
         getTeachersByCenter(center_id)
+        // getCenterIdByTeacher(default_teacher_id)
       } else {
         getStudentsByCenter(center_id, page)
         getTeachersByCenter(center_id)
@@ -235,7 +248,7 @@ function StudentsTable() {
               onChange={(e) => setstudentfilter(e.target.value)} />
 
             {/* small screen*/}
-            <span className='d-md-none bg-dark text-center text-white p-2 rounded' style={{marginRight:'1rem'}} onClick={searchforstudent}>
+            <span className='d-md-none bg-dark text-center text-white p-2 rounded' style={{ marginRight: '1rem' }} onClick={searchforstudent}>
               <AiOutlineSearch />
             </span>
           </div>

@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Rings;
 use App\Models\Students;
+use App\Models\Students_Centers_Teachers;
 use Exception;
 use Illuminate\Http\Request;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class RingsController extends Controller
 {
@@ -41,7 +43,7 @@ class RingsController extends Controller
                         'rings.id',
                         'rings.name',
                         'rings.is_active',
-                        'rings.created_at', 
+                        'rings.created_at',
                         'users.id as teacher_id',
                         'users.first_name as teacher_fn',
                         'users.middle_name as teacher_mn',
@@ -67,65 +69,239 @@ class RingsController extends Controller
             $rings = Rings::where('center_id', $center_id)
                 ->where('is_active', 1)
                 ->get();
-                return response([
-                    'data' => $rings,
-                    'success' => true
-                ]);
+            return response([
+                'data' => $rings,
+                'success' => true
+            ]);
         } catch (Exception $e) {
             return response($e->getMessage());
         }
     }
 
-    public function getringsbyteacher($teacher_id){
+    // pagination
+    public function getringsbycenterpagination($center_id)
+    {
         try {
             $rings = Rings::join('users', 'users.id', '=', 'rings.teacher_id')
-            ->join('centers', 'centers.id', '=', 'rings.center_id')
-            ->where('teacher_id',$teacher_id)
-            ->select(
-                'rings.id',
-                'rings.name',
-                'rings.is_active',
-                'rings.created_at',
-                'users.id as teacher_id',
-                'users.first_name as teacher_fn',
-                'users.middle_name as teacher_mn',
-                'users.last_name as teacher_ln',
-                'centers.id as center_id',
-                'centers.name as center_name'
-            )
-            ->paginate(10);
-                return response([
-                    'data' => $rings,
-                    'success' => true
-                ]);
+                ->join('centers', 'centers.id', '=', 'rings.center_id')
+                ->where('center_id', $center_id)
+                ->select(
+                    'rings.*',
+                    'users.first_name as teacher_fn',
+                    'users.middle_name as teacher_mn',
+                    'users.last_name as teacher_ln',
+                    'centers.name as center_name',
+                    'centers.id as center_id'
+                )
+                ->paginate(10);
+            return response([
+                'data' => $rings,
+                'success' => true
+            ]);
         } catch (Exception $e) {
             return response($e->getMessage());
         }
     }
 
-    public function getallringsbyteacher($teacher_id){
+    // pagination
+    public function filterRings(Request $request, $center_id, $teacher_id, $filter_ring)
+    {
+        try {
+            //get user_id from token 
+            $token = PersonalAccessToken::findToken($request->bearerToken());
+            $user = $token->tokenable;
+            if ($user) {
+                $role_id = $user->role_id;
+                if ($role_id == 1 || $role_id == 2) {
+                    if ($filter_ring == 'all') {
+                        $query = Rings::join('users', 'users.id', '=', 'rings.teacher_id')
+                            ->join('centers', 'centers.id', '=', 'rings.center_id')
+                            ->select(
+                                'rings.*',
+                                'users.first_name as teacher_fn',
+                                'users.middle_name as teacher_mn',
+                                'users.last_name as teacher_ln',
+                                'centers.name as center_name'
+                            );
+                        if ($center_id != 0) {
+                            $query->where('center_id', $center_id);
+                        }
+                        if ($teacher_id != 0) {
+                            $query->where('teacher_id', $teacher_id);
+                        }
+                        $rings = $query->paginate(10);
+                    } else {
+                        if ($center_id == 0 && $teacher_id == 0) {
+                            $rings = Rings::join('users', 'users.id', '=', 'rings.teacher_id')
+                                ->join('centers', 'centers.id', '=', 'rings.center_id')
+                                ->where('is_active', $filter_ring)
+                                ->select(
+                                    'rings.*',
+                                    'users.first_name as teacher_fn',
+                                    'users.middle_name as teacher_mn',
+                                    'users.last_name as teacher_ln',
+                                    'centers.name as center_name'
+                                )
+                                ->paginate(10);
+                        } elseif ($center_id != 0 && $teacher_id == 0) {
+                            $rings = Rings::join('users', 'users.id', '=', 'rings.teacher_id')
+                                ->join('centers', 'centers.id', '=', 'rings.center_id')
+                                ->where('center_id', $center_id)
+                                ->where('is_active', $filter_ring)
+                                ->select(
+                                    'rings.*',
+                                    'users.first_name as teacher_fn',
+                                    'users.middle_name as teacher_mn',
+                                    'users.last_name as teacher_ln',
+                                    'centers.name as center_name'
+                                )
+                                ->paginate(10);
+                        } else {
+                            $rings = Rings::join('users', 'users.id', '=', 'rings.teacher_id')
+                                ->join('centers', 'centers.id', '=', 'rings.center_id')
+                                ->where('center_id', $center_id)
+                                ->where('teacher_id', $teacher_id)
+                                ->where('is_active', $filter_ring)
+                                ->select(
+                                    'rings.*',
+                                    'users.first_name as teacher_fn',
+                                    'users.middle_name as teacher_mn',
+                                    'users.last_name as teacher_ln',
+                                    'centers.name as center_name'
+                                )
+                                ->paginate(10);
+                        }
+                    }
+                } elseif ($role_id === 3) {
+                    $id_center = Students_Centers_Teachers::where('user_id', $user->id)
+                        ->first()->center_id;
+                    if ($filter_ring == 'all') {
+                        $query = Rings::join('users', 'users.id', '=', 'rings.teacher_id')
+                            ->join('centers', 'centers.id', '=', 'rings.center_id')
+                            ->select(
+                                'rings.*',
+                                'users.first_name as teacher_fn',
+                                'users.middle_name as teacher_mn',
+                                'users.last_name as teacher_ln',
+                                'centers.name as center_name'
+                            )
+                            ->where('center_id', $id_center);
+                        if ($teacher_id != 0) {
+                            $query->where('teacher_id', $teacher_id);
+                        }
+                        $rings = $query->paginate(10);
+                    } else {
+                        $query = Rings::join('users', 'users.id', '=', 'rings.teacher_id')
+                            ->join('centers', 'centers.id', '=', 'rings.center_id')
+                            ->select(
+                                'rings.*',
+                                'users.first_name as teacher_fn',
+                                'users.middle_name as teacher_mn',
+                                'users.last_name as teacher_ln',
+                                'centers.name as center_name'
+                            )
+                            ->where('center_id', $id_center)
+                            ->where('is_active', $filter_ring);
+                        if ($teacher_id != 0) {
+                            $query->where('teacher_id', $teacher_id);
+                        }
+                        $rings = $query->paginate(10);
+                    }
+                } else {
+                    $id_center = Students_Centers_Teachers::where('user_id', $user->id)
+                        ->first()->center_id;
+                    if ($filter_ring == 'all') {
+                        $query = Rings::join('users', 'users.id', '=', 'rings.teacher_id')
+                            ->join('centers', 'centers.id', '=', 'rings.center_id')
+                            ->select(
+                                'rings.*',
+                                'users.first_name as teacher_fn',
+                                'users.middle_name as teacher_mn',
+                                'users.last_name as teacher_ln',
+                                'centers.name as center_name'
+                            )
+                            ->where('center_id', $id_center)
+                            ->where('teacher_id', $user->id);
+
+                        $rings = $query->paginate(10);
+                    } else {
+                        $query = Rings::join('users', 'users.id', '=', 'rings.teacher_id')
+                            ->join('centers', 'centers.id', '=', 'rings.center_id')
+                            ->select(
+                                'rings.*',
+                                'users.first_name as teacher_fn',
+                                'users.middle_name as teacher_mn',
+                                'users.last_name as teacher_ln',
+                                'centers.name as center_name'
+                            )
+                            ->where('center_id', $id_center)
+                            ->where('is_active', $filter_ring)
+                            ->where('teacher_id', $user->id);
+                        $rings = $query->paginate(10);
+                    }
+                }
+            }
+            return response([
+                'data' => $rings,
+                'success' => true
+            ]);
+        } catch (Exception $e) {
+            return response($e->getMessage());
+        }
+    }
+
+    public function getringsbyteacher($teacher_id)
+    {
         try {
             $rings = Rings::join('users', 'users.id', '=', 'rings.teacher_id')
-            ->join('centers', 'centers.id', '=', 'rings.center_id')
-            ->where('teacher_id',$teacher_id)
-            ->where('is_active',1)
-            ->select(
-                'rings.id',
-                'rings.name',
-                'rings.is_active',
-                'rings.created_at',
-                'users.id as teacher_id',
-                'users.first_name as teacher_fn',
-                'users.middle_name as teacher_mn',
-                'users.last_name as teacher_ln',
-                'centers.id as center_id',
-                'centers.name as center_name'
-            )
-            ->get();
-                return response([
-                    'data' => $rings,
-                    'success' => true
-                ]);
+                ->join('centers', 'centers.id', '=', 'rings.center_id')
+                ->where('teacher_id', $teacher_id)
+                ->select(
+                    'rings.id',
+                    'rings.name',
+                    'rings.is_active',
+                    'rings.created_at',
+                    'users.id as teacher_id',
+                    'users.first_name as teacher_fn',
+                    'users.middle_name as teacher_mn',
+                    'users.last_name as teacher_ln',
+                    'centers.id as center_id',
+                    'centers.name as center_name'
+                )
+                ->paginate(10);
+            return response([
+                'data' => $rings,
+                'success' => true
+            ]);
+        } catch (Exception $e) {
+            return response($e->getMessage());
+        }
+    }
+
+    public function getallringsbyteacher($teacher_id)
+    {
+        try {
+            $rings = Rings::join('users', 'users.id', '=', 'rings.teacher_id')
+                ->join('centers', 'centers.id', '=', 'rings.center_id')
+                ->where('teacher_id', $teacher_id)
+                ->where('is_active', 1)
+                ->select(
+                    'rings.id',
+                    'rings.name',
+                    'rings.is_active',
+                    'rings.created_at',
+                    'users.id as teacher_id',
+                    'users.first_name as teacher_fn',
+                    'users.middle_name as teacher_mn',
+                    'users.last_name as teacher_ln',
+                    'centers.id as center_id',
+                    'centers.name as center_name'
+                )
+                ->get();
+            return response([
+                'data' => $rings,
+                'success' => true
+            ]);
         } catch (Exception $e) {
             return response($e->getMessage());
         }
@@ -225,6 +401,8 @@ class RingsController extends Controller
             return response($e->getMessage());
         }
     }
+
+
 
     /**
      * Remove the specified resource from storage.

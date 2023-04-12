@@ -8,6 +8,9 @@ return [
     'student_added'   => 'تم اضافة الطالب',
     'student_deleted' => 'تم حذف الطالب',
     'student_updated' => 'تم تعديل الطالب',
+    'fileUpdated'     => 'تم تعديل الملف',
+    'pdf'             => 'لا يمكن ادخال بغير صيغة pdf',
+    'max_size'        => 'لا يمكن اضافة ملف اكبر من 2 ميغا',
 
     //USERS
     'first_name_required'   => 'يرجي ادخال الاسم الاول',

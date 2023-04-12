@@ -23,8 +23,8 @@ function TeachersTable() {
 
   const navigate = useNavigate();
 
-  const handleNavigate = (teacher_id) => {
-    navigate(`/students`, { state: { teacher_id: teacher_id } })
+  const handleNavigate = (teacher_id,center_id) => {
+    navigate(`/students`, { state: { teacher_id: teacher_id, center_id: center_id } })
   }
 
   const [teachers, setTeachers] = useState([]);
@@ -333,7 +333,7 @@ function TeachersTable() {
                 : teachers.length > 0 ? teachers.map(teacher =>
                   <tr key={teacher.id}>
                     <th>
-                      <span className='cursor_pointer' onClick={() => handleNavigate(teacher.id)}>
+                      <span className='cursor_pointer' onClick={() => handleNavigate(teacher.id,teacher.center_id)}>
                         {teacher.first_name} {teacher.middle_name} {teacher.last_name}
                       </span>
                     </th>

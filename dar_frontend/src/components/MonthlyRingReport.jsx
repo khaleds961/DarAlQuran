@@ -6,6 +6,8 @@ import CenterSelect from './CenterSelect'
 import TeacherSelect from './TeacherSelect'
 import { Pagination } from '@mui/material'
 import Swal from 'sweetalert2'
+import { AiOutlineArrowLeft } from 'react-icons/ai'
+
 
 export default function MonthlyRingReport() {
 
@@ -140,7 +142,7 @@ export default function MonthlyRingReport() {
               {rings && rings.length > 0 ?
                 rings.map((ring) =>
                   <option key={ring.id} value={ring.id}>{ring.name}</option>) :
-                <option disabled>...تحميل</option>
+                <option disabled>لا يوجد</option>
               }
             </select>
           </div>
@@ -186,7 +188,10 @@ export default function MonthlyRingReport() {
                         <th>حضور/غياب</th>
                         <th>تسميع/حفظ</th>
                         <th>من السورة</th>
-                        <th>من الاية</th>
+                        <th>
+                        <span>من الاية</span>
+                        <span className='text-danger d-md-none'><AiOutlineArrowLeft/></span>
+                        </th>
                         <th>الى السورة</th>
                         <th>الى الاية</th>
                       </tr>

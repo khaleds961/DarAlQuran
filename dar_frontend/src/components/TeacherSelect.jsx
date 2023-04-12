@@ -20,7 +20,7 @@ export default function ({ teacher_id, tid, teachers ,fromquransession = false})
                         <div className='form-group col my-2'>
                             {teachers.length !== 0 ?
                                 <>
-                                    <select className="form-control col-md-6 my-2"
+                                    <select className="form-control col-md-6 my-2 "
                                         value={tid}
                                         onChange={(e) => teacher_id(e.target.value)}>
                                         <option value={0} disabled> اختر احد الاساتذة</option>

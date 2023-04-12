@@ -440,4 +440,16 @@ class UsersController extends Controller
             return response($e);
         }
     }
+
+    public function getCenterIdByTeacher($teacher_id){
+        try{
+            $center_id = Students_Centers_Teachers::where('user_id',$teacher_id)->first()->id;
+            return response([
+                'center_id' => $center_id,
+                'success' => true
+            ]);
+        }catch(Exception $e){
+            return response($e->getMessage());
+        }
+    }
 }

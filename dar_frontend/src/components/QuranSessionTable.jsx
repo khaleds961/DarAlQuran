@@ -345,20 +345,22 @@ function QuranSessionTable() {
 
     return (
         <div>
+            <div className='d-md-flex justify-content-between'>
             <AddSessionModal addSession={is_session_added} />
 
             {role_id === 3 || role_id === 4 ?
                 <div>
                     {
                         loading ? '' :
-                            <div className='d-flex flex-row-reverse'>
+                            <div className='d-flex flex-row'>
                                 <TeacherSelect teachers={teachers} teacher_id={getteacherid} tid={filterteacher_id} fromquransession={true} />
                             </div>
                     }
                 </div>
                 :
                 <div>
-                    <div className='d-md-flex flex-row-reverse'>
+                    <div className='d-md-flex flex-row'>
+                        <CenterSelect c_id={id_center} data={getfiltercenterid} fromstudent={true} />
                         {id_center !== 0 ?
                             <select className="btn bg-white text-dark my-2 px-md-2 mx-md-3 responsive_width"
                                 value={filterteacher_id}
@@ -369,11 +371,11 @@ function QuranSessionTable() {
                                     <option disabled> ...تحميل</option>}
                             </select>
                             : ''}
-                        <CenterSelect c_id={id_center} data={getfiltercenterid} fromstudent={true} />
                     </div>
 
                 </div>
             }
+            </div>
 
             {/* modal */}
             <Modal show={isOpen} onHide={hideModal}>

@@ -8,7 +8,8 @@ import { AiFillSchedule, AiOutlineAreaChart } from 'react-icons/ai'
 import SessionContext from '../session/SessionContext';
 
 
-function Navbar() {
+
+function Navbar({clicked,clicked_md}) {
 
     // const [center_location, setCenterLocation] = useState(null);
 
@@ -31,7 +32,7 @@ function Navbar() {
     return (
 
         <>
-            <div className='text-dark col-auto col-md-3 col-xl-2 bg-white min-vh-100'>
+            <div className={`d-${clicked ? 'none' : 'block'} d-md-${clicked_md ? 'none' : 'block'} text-dark col-auto col-md-3 col-xl-2 bg-white min-vh-100`}>
                 {/* <button className='btn' onClick={() => sethidemenu(true)}>hide</button> */}
                 <h4 className='d-none d-md-block text-center mt-3'>دار القرآن الكريم</h4>
                 {/* <h6 className='d-none d-md-block text-center mt-3'>{ center_location}</h6> */}
@@ -39,18 +40,16 @@ function Navbar() {
                 <div className='mt-3'>
 
                     {/* case 1: small screen Dashboard */}
-                    <div className='text-center'>
-                        <div>
-                            <NavLink to='/' className='text-decoration-none p-1 p-md-0'
-                                style={({ isActive }) =>
-                                    isActive ?
-                                        { backgroundColor: '#EEEEEE' }
-                                        :
-                                        { backgroundColor: 'white' }
-                                }>
-                                <FaHome className='d-xs-block d-md-none text-dark' />
-                            </NavLink>
-                        </div>
+                    <div className='text-center d-flex justify-content-center'>
+                        <NavLink to='/' className='text-decoration-none'
+                            style={({ isActive }) =>
+                                isActive ?
+                                    { backgroundColor: '#EEEEEE' }
+                                    :
+                                    { backgroundColor: 'white' }
+                            }>
+                            <FaHome className='d-xs-block d-md-none text-dark' />
+                        </NavLink>
                     </div>
 
                     {/* case 2:md page and more Dashboard */}
@@ -75,7 +74,7 @@ function Navbar() {
                     {role_id === 1 || role_id === 2 ?
                         <>
                             {/* case 1: small screen Centers */}
-                            <div className='text-center'>
+                            <div className='text-center d-flex justify-content-center'>
                                 <NavLink to='/centers' className='text-decoration-none p-1 p-md-0'
                                     style={({ isActive }) =>
                                         isActive ?
@@ -107,7 +106,7 @@ function Navbar() {
 
                         <>
                             {/* case 1: small screen TEACHERS */}
-                            < div className='text-center'>
+                            < div className='text-center d-flex justify-content-center'>
                                 <NavLink to='/teachers' className='text-decoration-none p-1 p-md-0'
                                     style={({ isActive }) =>
                                         isActive ?
@@ -137,7 +136,7 @@ function Navbar() {
                     }
 
                     {/* case 1: small screen Students */}
-                    <div className='text-center'>
+                    <div className='text-center d-flex justify-content-center'>
                         <NavLink to='/students' className='text-decoration-none p-1 p-md-0'
                             style={({ isActive }) =>
                                 isActive ?
@@ -165,7 +164,7 @@ function Navbar() {
                     </div>
 
                     {/* case 1: small screen Class */}
-                    <div className='text-center'>
+                    <div className='text-center d-flex justify-content-center'>
                         <NavLink to='/sessions' className='text-decoration-none p-1 p-md-0'
                             style={({ isActive }) =>
                                 isActive ?
@@ -192,7 +191,7 @@ function Navbar() {
                     </div>
 
                     {/* case 1: small screen Class */}
-                    <div className='text-center'>
+                    <div className='text-center d-flex justify-content-center'>
                         <NavLink to='/teacherschedule' className='text-decoration-none p-1 p-md-0'
                             style={({ isActive }) =>
                                 isActive ?
@@ -219,7 +218,7 @@ function Navbar() {
                     </div>
 
                     {/* case 1: small screen Class */}
-                    <div className='text-center'>
+                    <div className='text-center d-flex justify-content-center'>
                         <NavLink to='/monthlyteachereport' className='text-decoration-none p-1 p-md-0'
                             style={({ isActive }) =>
                                 isActive ?
@@ -248,7 +247,7 @@ function Navbar() {
                     </div>
 
                     {/* case 1: small screen Class */}
-                    <div className='text-center'>
+                    <div className='text-center d-flex justify-content-center'>
                         <NavLink to='/rings' className='text-decoration-none p-1 p-md-0'
                             style={({ isActive }) =>
                                 isActive ?
@@ -275,7 +274,7 @@ function Navbar() {
                     </div>
 
                     {/* case 1: small screen Class */}
-                    <div className='text-center'>
+                    <div className='text-center d-flex justify-content-center'>
                         <div
                         >
                             <NavLink to='/monthlyringreport' className='text-decoration-none p-1 p-md-0'
@@ -315,7 +314,7 @@ function Navbar() {
                         :
                         <>
                             {/* case 1: small screen Class */}
-                            <div className='text-center'>
+                            <div className='text-center d-flex justify-content-center'>
                                 <NavLink to='/examtable' className='text-decoration-none p-1 p-md-0'
                                     style={({ isActive }) =>
                                         isActive ?
@@ -346,14 +345,14 @@ function Navbar() {
                     }
 
                     {/*case1: md and more logout button */}
-                    <div className='d-xs-block d-md-none mt-5 py-2 px-2 text-center' onClick={logout}>
+                    <div className='d-xs-block d-md-none mt-5 py-2 text-center d-flex justify-content-center' onClick={logout}>
                         <NavLink className='text-decoration-none'>
                             <BiLogOutCircle size={20} className='text-dark' />
                         </NavLink>
                     </div>
 
                     {/*case2: md and more logout button */}
-                    <div className='d-none d-md-block mt-5 py-2 px-4 bg-dark text-white' onClick={logout}>
+                    <div className='d-none d-md-block my-5 py-2 px-4 bg-dark text-white' onClick={logout}>
                         <NavLink className='d-flex align-items-center text-decoration-none '>
                             <BiLogOutCircle size={18} className='text-white' />
                             <span className='px-2 text-white' style={{ fontSize: '14px' }}>تسجيل الخروج</span>

@@ -14,7 +14,6 @@ export default function SessionProvider({ children }) {
     const [loading, setLoading] = useState(false)
 
     const getUserData = async () => {
-        // console.log(localStorage.getItem('token'));return;
         setLoading(true)
         try {
             Api.get('/getUserbyToken', {
@@ -56,10 +55,7 @@ export default function SessionProvider({ children }) {
                 password: password,
             })
                 .then((response) => {
-                    console.log({ response });
-                    console.log({ response });
                     let token = response?.data?.data?.token;
-                    console.log(token, 'token login');
                     let user = { ...response.data?.data?.user }
                     updateSession({ user, roles: [user.role_id], token });
                     navigate(from, { replace: true });
@@ -82,7 +78,6 @@ export default function SessionProvider({ children }) {
             headers: { Authorization: `Bearer ${session.token}` }
         })
             .then((res) => {
-                console.log({ res });
                 if (res.data.success) {
                     localStorage.removeItem("token")
                     updateSession({ user: null, roles: null })

@@ -27,7 +27,6 @@ return new class extends Migration
             $table->index(['student_id']);
             $table->integer('center_id');
             $table->index(['center_id']);
-            $table->index(['center_student_teacher_id'])->nullable();
             $table->string('b')->nullable();
             $table->string('tarik')->nullable();
             $table->string('grade')->nullable();

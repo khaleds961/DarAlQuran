@@ -411,6 +411,7 @@ class SessionsController extends Controller
                     'students.first_name as student_fn',
                     'students.middle_name as student_mn',
                     'students.last_name as student_ln',
+                    'students.phone_number as student_number',
                     'students_centers_teachers.user_id'
                 )
                 ->orderBy('weekday_id')->get()->groupBy('weekday_id');

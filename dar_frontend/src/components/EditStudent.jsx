@@ -90,52 +90,80 @@ export default function EditStudent() {
   const [registration_date, setRegistrationDate] = useState('')
   const [loading, setloading] = useState(true)
   const [index, setindex] = useState(null)
+  const [pdf_file, setPdf_file] = useState('download')
+  const [file, setFile] = useState(null);
 
   const getStudentById = (student_id) => {
-    Api.get(`getstudentbyid/${student_id}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    }).then((res) => {
-      console.log({ res });
-      setstudent(res.data.data)
-      setRegistrationDate(res.data.data.registration_date)
-      setFirst_name(res.data.data['first_name'])
-      setMiddle_name(res.data.data['middle_name'])
-      setLast_name(res.data.data['last_name'])
-      setmothername(res.data.data['mother_name'])
-      const oldNationality = countries.find(country => country.code === res.data.data['nationality']);
-      if (oldNationality !== undefined) {
-        const index = countries.findIndex(item => item.name === oldNationality.name);
-        setOldNationalityName(oldNationality.name);
-        setindex(index)
-      } else {
-        setnationality('')
-      }
-      setgender(res.data.data['gender'])
-      setaddress(res.data.data['address'])
-      setcurrent_job(res.data.data['current_job'])
-      setschooluni(res.data.data['school_uni_name'])
-      setmajor(res.data.data.major)
-      setbirthday(res.data.data['birthdate'])
-      setplaceofbirth(res.data.data['place_of_birth'])
-      setreading_level(res.data.data['reading_level'])
-      setstudent_level_status(res.data.data['student_level_status'])
-      setmemorizing(res.data.data['memorizing'])
-      setbloodtype(res.data.data['blood_type'])
-      setmartialstatus(res.data.data['marital_status'])
-      setPhone_number(res.data.data['phone_number'])
-      setwork_number(res.data.data['work_number'])
-      sethome_number(res.data.data['home_number'])
-      setTeacher_id(res.data.data['teacher_id'])
-      setCenter_id(res.data.data.center_id)
-      const sheikh_names = res.data.data.sheikh_names ? res.data.data.sheikh_names.split(',').map(i => ({ label: i, value: i })) : []
-      setValue(sheikh_names)
-      const suitable_days = res.data.data.suitable_days ? res.data.data.suitable_days.split(',') : []
-      setsuitablesdays(suitable_days)
-      const suitable_times = res.data.data.suitable_times ? res.data.data.suitable_times.split(',') : []
-      setsuitablestimes(suitable_times)
-      setloading(false)
-    })
+    Api.get(`getstudentbyid/${student_id}`,
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }).then((res) => {
+        console.log({ res });
+        setstudent(res.data.data)
+        setRegistrationDate(res.data.data.registration_date)
+        setFirst_name(res.data.data['first_name'])
+        setMiddle_name(res.data.data['middle_name'])
+        setLast_name(res.data.data['last_name'])
+        setmothername(res.data.data['mother_name'])
+        const oldNationality = countries.find(country => country.code === res.data.data['nationality']);
+        if (oldNationality !== undefined) {
+          const index = countries.findIndex(item => item.name === oldNationality.name);
+          setOldNationalityName(oldNationality.name);
+          setindex(index)
+        } else {
+          setnationality('')
+        }
+        setgender(res.data.data['gender'])
+        setaddress(res.data.data['address'])
+        setcurrent_job(res.data.data['current_job'])
+        setschooluni(res.data.data['school_uni_name'])
+        setmajor(res.data.data.major)
+        setbirthday(res.data.data['birthdate'])
+        setplaceofbirth(res.data.data['place_of_birth'])
+        setreading_level(res.data.data['reading_level'])
+        setstudent_level_status(res.data.data['student_level_status'])
+        setmemorizing(res.data.data['memorizing'])
+        setbloodtype(res.data.data['blood_type'])
+        setmartialstatus(res.data.data['marital_status'])
+        setPhone_number(res.data.data['phone_number'])
+        setwork_number(res.data.data['work_number'])
+        sethome_number(res.data.data['home_number'])
+        setTeacher_id(res.data.data['teacher_id'])
+        setCenter_id(res.data.data.center_id)
+        const sheikh_names = res.data.data.sheikh_names ? res.data.data.sheikh_names.split(',').map(i => ({ label: i, value: i })) : []
+        setValue(sheikh_names)
+        const suitable_days = res.data.data.suitable_days ? res.data.data.suitable_days.split(',') : []
+        setsuitablesdays(suitable_days)
+        const suitable_times = res.data.data.suitable_times ? res.data.data.suitable_times.split(',') : []
+        setsuitablestimes(suitable_times)
+        setloading(false)
+      })
   }
+
+  const editPdf = (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append('previous_path',student.pathpdf)
+    formData.append('file', file);
+    Api.post(`editPdf/${student.id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`
+      }
+    }).then((res) => {
+      if(res.data.success){
+        getStudentById(id)
+        Swal.fire(res.data.message,'','success')
+        setPdf_file('download')
+      }else{
+        Swal.fire(res.data,'','error')
+      }
+    }).catch(function(err){console.log(err);})
+  }
+
+  const handleDownload = () => {
+    window.open(student.pathpdf);
+  };
 
   useEffect(() => {
     getStudentById(id)
@@ -677,7 +705,58 @@ export default function EditStudent() {
                     id="home_number" />
                 </div>
 
+
               </div>
+
+              {student?.path ?
+                <div className='row '>
+                  <div className='col-md'>
+                    <div className='d-md-flex align-items-center justify-content-between p-3 border'>
+                      <div >
+                        <p className='my-2'>تحميل الاجازة او تعديلها؟</p>
+
+                        <div>
+                          <div>
+                            <input type="radio"
+                              id='edit'
+                              name='pdf_file'
+                              value='edit'
+                              checked={pdf_file === 'edit'}
+                              onChange={(e) => setPdf_file(e.target.value)}
+                            />
+                            <label htmlFor='edit' className='mx-1'>تعديل الملف</label>
+                          </div>
+
+                          <div className=' my-2' >
+                            <input type="radio"
+                              id='download'
+                              name='pdf_file'
+                              value='download'
+                              checked={pdf_file === 'download'}
+                              onChange={(e) => setPdf_file(e.target.value)} />
+                            <label htmlFor='download' className='mx-1'>تحميل الملف</label>
+
+
+                          </div>
+                        </div>
+
+                      </div>
+
+                      <div className='mx-md-4'>
+                        {pdf_file == 'download' ?
+                          <button className='btn btn-success' onClick={handleDownload}>تحميل </button>
+                          :
+                          <div className='d-md-flex border rounded p-3'>
+                            <input type='file' accept=".pdf" onChange={e => setFile(e.target.files[0])} />
+                            <button className='btn btn-primary mt-3 mt-md-0' onClick={editPdf}>تعديل </button>
+                          </div>
+                        }
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+                : ''}
 
               <div className='row'>
                 <div className='col my-2'>

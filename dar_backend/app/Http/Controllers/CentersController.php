@@ -125,7 +125,7 @@ class CentersController extends Controller
             $checkcenter = Students_Centers_Teachers::where('center_id', $center['id'])->get();
             if (count($checkcenter) == 0) {
                 if ($center) {
-                    $center->update(['is_deleted' => 1]);
+                    $center->delete();
                     return response([
                         'message' => __('message.center_deleted'),
                         'success' => true

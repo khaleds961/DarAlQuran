@@ -45,6 +45,7 @@ export default function RingsTable() {
   const [isactive, setisactive] = useState(null)
   const [page, setpage] = useState(1)
   const [total, settotal] = useState(1)
+  const [filter_ring, setFilter_ring] = useState('choose')
 
   const showModal = () => {
     setIsOpen(true);
@@ -62,10 +63,13 @@ export default function RingsTable() {
     setfiltercenterid(center_id)
     setfilterteacherid(0)
     getTeachersFilterByCenter(center_id)
+    getringsbycenterpagination(center_id, 1)
+    setFilter_ring('choose')
   }
 
   const getfilterteacherid = (teacher_id) => {
     setfilterteacherid(teacher_id)
+    setFilter_ring('choose')
   }
 
   const getcenterid = (center_id) => {
@@ -103,6 +107,21 @@ export default function RingsTable() {
     }).then((res) => {
       setteachers_filter(res.data.data);
     })
+  }
+
+  const getringsbycenterpagination = (center_id, p) => {
+    setLoading(true)
+    console.log('enter');
+    Api.get(`getringsbycenterpagination/${center_id}?page=${p}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then((res) => {
+      if (res.data.success) {
+        console.log({ res });
+        setrings(res.data.data.data)
+        settotal(Math.ceil(res.data.data.total / 10))
+        setLoading(false)
+      }
+    }).catch(function (err) { console.log(err) })
   }
 
   const addRing = () => {
@@ -206,13 +225,22 @@ export default function RingsTable() {
 
   const changePage = (e, value) => {
     setpage(value)
-    if (filterteacherid !== 0) {
-      getringsbyteacher(filterteacherid, value)
+    if (filter_ring !== 'choose') {
+      filterRings(filter_ring, value)
     } else {
-      if (role_id === 4) {
-        getringsbyteacher(user_id, value)
+      console.log('shu');
+      if (filtercenterid !== 0) {
+        getringsbycenterpagination(filtercenterid, value)
       } else {
-        getRings(value)
+        if (filterteacherid !== 0) {
+          getringsbyteacher(filterteacherid, value)
+        } else {
+          if (role_id === 4) {
+            getringsbyteacher(user_id, value)
+          } else {
+            getRings(value)
+          }
+        }
       }
     }
   }
@@ -228,8 +256,29 @@ export default function RingsTable() {
     }).catch(function (err) { console.log(err) })
   }
 
-  const handleNavigate = (ring_id) => {
-    navigate('/ringstudents', { state: { ringid: ring_id } })
+  const handleNavigate = (ring_id, center_id) => {
+    navigate('/ringstudents', { state: { ringid: ring_id, center_id: center_id } })
+  }
+
+  const filterRings = (filter_ring, p) => {
+    setLoading(true)
+    let teacher_id = filterteacherid === null ? 0 : filterteacherid
+    Api.get(`filterRings/${filtercenterid}/${teacher_id}/${filter_ring}?page=${p}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then((res) => {
+        if (res.data.success) {
+          setrings(res.data.data.data)
+          settotal(Math.ceil(res.data.data.total / 10))
+          setLoading(false)
+        }
+      }).catch(function (err) { console.log(err); })
+  }
+
+  const changeRingFilter = (value) => {
+    setpage(1)
+    setFilter_ring(value)
+    filterRings(value, 1)
   }
 
   useEffect(() => {
@@ -260,33 +309,46 @@ export default function RingsTable() {
 
   return (
     <div>
-      <div className='d-flex'>
-        <button type="button" className="btn btn-success mb-3 d-flex align-items-center" onClick={showModal}>
-          <BsPlusCircle className='text-white' />
-          <span className='px-2'>
-            اضافة حلقة جديدة
-          </span>
-        </button>
-
-        <NavLink to='/ringstudents'>
-          <button type="button" className="btn btn-primary mb-3 d-flex align-items-center mx-2">
-            <AiOutlineEye className='text-white' />
-            <span className='px-2'>
-              طلاب الحلقات
+      <div>
+        <div className='d-md-flex'>
+          <button type="button" className="btn btn-success mb-3 d-flex align-items-center responsive_width" onClick={showModal}>
+            <BsPlusCircle className='text-white' />
+            <span className='px-2 col-md-auto mx-auto mb-md-0'>
+              اضافة حلقة جديدة
             </span>
           </button>
-        </NavLink>
-      </div>
 
-      <div className='d-flex flex-row-reverse'>
-        <div className='mx-2'>
-          {role_id === 3 ?
-            <TeacherSelect teachers={teachers} teacher_id={getfilterteacherid} tid={filterteacherid} fromquransession={true} />
-            :
-            <TeacherSelect teachers={teachers_filter} teacher_id={getfilterteacherid} tid={filterteacherid} fromquransession={true} />
-          }
+          <NavLink to='/ringstudents'>
+            <button type="button" className="btn btn-primary mb-3 d-flex align-items-center mx-md-2 responsive_width">
+              <AiOutlineEye className='text-white' />
+              <span className='px-2 col-md-auto mx-auto mb-md-0'>
+                طلاب الحلقات
+              </span>
+            </button>
+          </NavLink>
         </div>
-        <CenterSelect c_id={filtercenterid} data={getfiltercenter} fromstudent={true} />
+
+        <div className='d-md-flex justify-content-end'>
+          <CenterSelect c_id={filtercenterid} data={getfiltercenter} fromstudent={true} />
+
+          <div className='mx-md-2 mb-3 responsive_width'>
+            {role_id === 3 ?
+              <TeacherSelect teachers={teachers} teacher_id={getfilterteacherid} tid={filterteacherid} fromquransession={true} />
+              :
+              <TeacherSelect teachers={teachers_filter} teacher_id={getfilterteacherid} tid={filterteacherid} fromquransession={true} />
+            }
+          </div>
+
+          <div className='responsive-width mb-3'>
+            <select className='form-control my-2' value={filter_ring}
+              onChange={(e) => changeRingFilter(e.target.value)}>
+              <option value='choose' disabled>-- اختر الحالة --</option>
+              <option value="all">الكل</option>
+              <option value={1}>نشط</option>
+              <option value={0}>غير نشط</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       <Modal show={isOpen} onHide={hideModal}>
@@ -310,9 +372,9 @@ export default function RingsTable() {
           <thead>
             <tr>
               <th scope="col">اسم الحلقة</th>
-              <th scope="col">المركز</th>
-              <th scope="col">الاستاذ</th>
-              <th scope="col">الحالة</th>
+              <th scope="col" className='d-none d-md-table-cell'>المركز</th>
+              <th scope="col" className='d-none d-md-table-cell'>الاستاذ</th>
+              <th scope="col" className='d-none d-md-table-cell'>الحالة</th>
               <th scope="col">التاريخ</th>
               <th scope="col"></th>
             </tr>
@@ -320,9 +382,9 @@ export default function RingsTable() {
           <tbody>
             {loading ?
               <tr>
-                <td colSpan={3}></td>
+                <td colSpan={2} className='d-none d-md-table-cell'></td>
                 <td>
-                  <Spinner animation="border" variant="primary" />
+                  <Spinner animation="border" variant="primary" colSpan={2} />
                 </td>
                 <td colSpan={3}></td>
               </tr>
@@ -330,13 +392,19 @@ export default function RingsTable() {
               rings.length > 0 ? rings.map(ring =>
                 <tr key={ring.id}>
                   <th>
-                    <span className='cursor_pointer' onClick={() => handleNavigate(ring.id)}>
-                      {ring.name}
-                    </span>
+                    <>
+                      {ring.is_active ?
+                        <span className='cursor_pointer' onClick={() => handleNavigate(ring.id, ring.center_id)}>
+                          {ring.name}
+                        </span> :
+                        <span >
+                          {ring.name}
+                        </span>}
+                    </>
                   </th>
-                  <td>{ring.center_name}</td>
-                  <td>{ring.teacher_fn} {ring.teacher_mn} {ring.teacher_ln}</td>
-                  <td>{ring.is_active ? 'نشط' : 'غير نشط'}</td>
+                  <td className='d-none d-md-table-cell'>{ring.center_name}</td>
+                  <td className='d-none d-md-table-cell'>{ring.teacher_fn} {ring.teacher_mn} {ring.teacher_ln}</td>
+                  <td className='d-none d-md-table-cell'>{ring.is_active ? 'نشط' : 'غير نشط'}</td>
                   <td>
                     <Moment format="YYYY/MM/DD">
                       {ring.created_at}
