@@ -96,7 +96,6 @@ export default function RingsTable() {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => {
       setteachers(res.data.data);
-      console.log({ res });
     })
   }
 
@@ -111,12 +110,10 @@ export default function RingsTable() {
 
   const getringsbycenterpagination = (center_id, p) => {
     setLoading(true)
-    console.log('enter');
     Api.get(`getringsbycenterpagination/${center_id}?page=${p}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => {
       if (res.data.success) {
-        console.log({ res });
         setrings(res.data.data.data)
         settotal(Math.ceil(res.data.data.total / 10))
         setLoading(false)
@@ -228,7 +225,6 @@ export default function RingsTable() {
     if (filter_ring !== 'choose') {
       filterRings(filter_ring, value)
     } else {
-      console.log('shu');
       if (filtercenterid !== 0) {
         getringsbycenterpagination(filtercenterid, value)
       } else {
@@ -311,6 +307,7 @@ export default function RingsTable() {
     <div>
       <div>
         <div className='d-md-flex'>
+        
           <button type="button" className="btn btn-success mb-3 d-flex align-items-center responsive_width" onClick={showModal}>
             <BsPlusCircle className='text-white' />
             <span className='px-2 col-md-auto mx-auto mb-md-0'>

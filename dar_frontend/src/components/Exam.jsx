@@ -1,19 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react'
 import Checkbox from '@mui/material/Checkbox';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
 import Autocomplete from '@mui/material/Autocomplete';
-import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import Api from '../Api';
 import Swal from 'sweetalert2';
 import moment from 'moment';
 import SessionContext from '../session/SessionContext'
-
-
-
-const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
-const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 export default function Exam() {
 
@@ -155,98 +147,6 @@ export default function Exam() {
             id: 26
         },
     ]
-
-    const ajzaa = [
-        {
-            name: 'الاول',
-            id: 1
-        },
-        {
-            name: 'الثاني ',
-            id: 2
-        }
-        ,
-        {
-            name: 'الثالث',
-            id: 3
-        }
-        ,
-        {
-            name: 'الرابع',
-            id: 4
-        }
-        ,
-        {
-            name: 'الخامس ',
-            id: 5
-        }
-
-        ,
-        {
-            name: 'السادس',
-            id: 6
-        }
-        ,
-        {
-            name: 'السابع ',
-            id: 7
-        }
-        ,
-        {
-            name: 'الثامن',
-            id: 8
-        }
-        ,
-        {
-            name: 'التاسع',
-            id: 9
-        }
-        , {
-            name: 'العاشر',
-            id: 10
-        }
-        , {
-            name: 'الحادي عشر',
-            id: 11
-        }
-        , {
-            name: 'الثاني عشر',
-            id: 12
-        }
-        , {
-            name: 'الثالث عشر',
-            id: 13
-        }
-        , {
-            name: 'الرابع عشر ',
-            id: 14
-        }
-        , {
-            name: 'الخامس عشر',
-            id: 15
-        }
-        , {
-            name: 'السادس عشر',
-            id: 16
-        }
-        , {
-            name: 'السابع عشر',
-            id: 17
-        }
-        , {
-            name: 'الثامن عشر',
-            id: 18
-        }
-        , {
-            name: 'التاسع عشر',
-            id: 19
-        }
-        , {
-            name: 'العشرين',
-            id: 20
-        },
-    ]
-
 
     const getAllTeachers = () => {
         Api.get(`allteachers`, {
@@ -393,8 +293,6 @@ export default function Exam() {
         }
     };
 
-
-
     useEffect(() => {
         getAllTeachers()
         getAllStudents()
@@ -402,7 +300,7 @@ export default function Exam() {
     }, [])
 
     return (
-        <div className='responsive_exam ok'>
+        <div className='responsive_exam'>
             <div className='row mb-5'>
                 <div>
                     <p className='h6 my-3'>عقدت اللجنة العلمية في دار القرآن الكريم المؤلفة من :</p>
@@ -457,7 +355,6 @@ export default function Exam() {
                             disablePortal
                             id="combo-box-demo"
                             options={students}
-                            // sx={{ width: 400 }}
                             getOptionLabel={(option) => option.student_name}
                             renderInput={(params) => <TextField {...params} label="اسماء الطلاب" />}
                             value={selectedStudents}
@@ -480,7 +377,6 @@ export default function Exam() {
                         disablePortal
                         id="combo-box-demo"
                         options={riwayat}
-                        // sx={{ width: 400 }}
                         getOptionLabel={(option) => option.name}
                         renderInput={(params) => <TextField {...params} label="الروايات" />}
                         value={selectedRiwaya}
@@ -494,7 +390,6 @@ export default function Exam() {
                         disablePortal
                         id="combo-box-demo"
                         options={teachers}
-                        // sx={{ width: 400 }}
                         getOptionLabel={(option) => option.teacher_name}
                         renderInput={(params) => <TextField {...params} label="شيخ الطالب" />}
                         value={teacher_student}
@@ -508,7 +403,6 @@ export default function Exam() {
                         disablePortal
                         id="combo-box-demo"
                         options={centers}
-                        // sx={{ width: 400 }}
                         getOptionLabel={(option) => option.name}
                         renderInput={(params) => <TextField {...params} label="مركز" />}
                         value={selectedcenter}
@@ -613,6 +507,7 @@ export default function Exam() {
                                 </label>
                                 <input type="date" className='form-control' id='receive_ijaza_date'
                                     value={recieve_ijaza_date}
+                                    max={moment().format('YYYY-MM-DD')}
                                     onChange={(e) => setrecieve_ijaza_date(e.target.value)} />
                             </div>
                             : ''}

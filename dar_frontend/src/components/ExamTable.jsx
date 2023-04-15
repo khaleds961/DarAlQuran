@@ -2,11 +2,11 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Spinner } from 'react-bootstrap'
 import { AiFillPlusCircle } from 'react-icons/ai'
 import { BsTrash } from 'react-icons/bs'
-import { TbPencil } from 'react-icons/tb'
 import { NavLink } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import Api from '../Api'
 import SessionContext from '../session/SessionContext'
+import EditExam from './EditExam'
 
 
 export default function ExamTable() {
@@ -47,6 +47,12 @@ export default function ExamTable() {
             }
         })
 
+    }
+
+    const examSuccessChange = (bool) =>{
+        if(bool){
+            getStudents()
+        }
     }
 
     useEffect(() => {
@@ -97,10 +103,9 @@ export default function ExamTable() {
                                             <span className='mx-2 cursor_pointer' onClick={() => deleteexam(student.exam_id)}>
                                                 <BsTrash />
                                             </span>
-                                            <span className='text-white cursor_pointer'>
-                                                <TbPencil />
-                                            </span>
+                                            <EditExam student={student} examSuccessChange={examSuccessChange}/>
                                         </td>
+
                                     </tr>) :
                                 <tr>
                                     <td colSpan={2}></td>

@@ -1,0 +1,614 @@
+import React, { useState, useContext, useEffect } from 'react'
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import { TbPencil } from 'react-icons/tb'
+import Checkbox from '@mui/material/Checkbox';
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
+import Api from '../Api';
+import Swal from 'sweetalert2';
+import moment from 'moment';
+import SessionContext from '../session/SessionContext'
+import { Spinner } from 'react-bootstrap';
+
+
+export default function EditExam({ student, examSuccessChange }) {
+    const { session: { token } } = useContext(SessionContext)
+
+    const [show, setShow] = useState(false);
+    const [selectedStudentId, setSelectedStudentId] = useState(null);
+    const [teachers, setteachers] = useState([])
+    const [selectedTeachers, setSelectedTeachers] = useState([])
+    const [teacher_id, setTeahcer_id] = useState([])
+    const [students, setstudents] = useState([])
+    const [selectedStudents, setSelectedStudents] = useState(null)
+    const [selected_student_id, setselected_student_id] = useState('')
+    const [selectedRiwaya, setselectedRiwaya] = useState(null)
+    const [selectedRiwaya_id, setselectedRiwaya_id] = useState('')
+    const [teacher_student, setteacher_student] = useState(null)
+    const [teacher_student_id, setteacher_student_id] = useState(0)
+    const [centers, setcenters] = useState([])
+    const [selectedcenter, setselectedcenter] = useState(null)
+    const [centerid, setcenterid] = useState('')
+    const [get_ijaza, setget_ijaza] = useState('')
+    const [answers, setAnswers] = useState([])
+    const [date, setdate] = useState('')
+    const [grade, setgrade] = useState(0)
+    const [has_receive_ijaza, setHas_receive_ijaza] = useState('')
+    const [recieve_ijaza_date, setrecieve_ijaza_date] = useState('')
+    const [ijaza_in, setijaza_in] = useState('')
+    const [studentById, setStudentById] = useState([])
+    const [loading, setloading] = useState(true)
+    const [indexStudent, setIndexStudent] = useState(null)
+
+    const riwayat = [
+        {
+            name: ' حفص عن عاصم ',
+            id: 1
+        },
+        {
+            name: ' أبي الحارث عن الكسائي ',
+            id: 2
+        }
+        ,
+        {
+            name: ' إدريس عن خلف البزار',
+            id: 3
+        }
+        ,
+        {
+            name: ' إسحاق الوراق عن خلف البزار',
+            id: 4
+        }
+        ,
+        {
+            name: ' روح عن يعقوب الحضرمي ',
+            id: 5
+        }
+
+        ,
+        {
+            name: ' قنبل عن ابن كثير ',
+            id: 6
+        }
+        ,
+        {
+            name: ' قالون عن نافع ',
+            id: 7
+        }
+        ,
+        {
+            name: '   رويس عن يعقوب الحضرمي ',
+            id: 8
+        }
+        ,
+        {
+            name: ' هشام عن ابن عامر ',
+            id: 9
+        }
+        , {
+            name: ' خلف عن حمزة ',
+            id: 10
+        }
+        , {
+            name: ' خلاد عن حمزة ',
+            id: 11
+        }
+        , {
+            name: ' ورش عن نافع',
+            id: 12
+        }
+        , {
+            name: ' الدوري عن أبي عمر',
+            id: 13
+        }
+        , {
+            name: ' شعبة عن عاصم ',
+            id: 14
+        }
+        , {
+            name: ' السوسي عن أبي عمر',
+            id: 15
+        }
+        , {
+            name: ' الدوري عن الكسائي ',
+            id: 16
+        }
+        , {
+            name: ' البزي عن ابن كثير',
+            id: 17
+        }
+        , {
+            name: ' ابن وردان عن أبي جعفر',
+            id: 18
+        }
+        , {
+            name: ' ابن ذكوان عن ابن عامر ',
+            id: 19
+        }
+        , {
+            name: '  ابن جماز عن أبي جعفر',
+            id: 20
+        },
+        {
+            name: 'القراءات العشر من طريقي الشاطبية والدرة',
+            id: 21
+        },
+        {
+            name: 'القراءات العشر من طريق طيبة النشر',
+            id: 22
+        },
+        {
+            name: 'ورش من طريق الازرق',
+            id: 23
+        },
+        {
+            name: 'ورش من طريق الاصبهاني',
+            id: 24
+        },
+        {
+            name: 'الكوفيين',
+            id: 25
+        },
+        {
+            name: 'حفص عن عاصم من طريق الشاطبية  ',
+            id: 26
+        },
+    ]
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
+    const editExam = (exam_id) => {
+        if (teacher_id.length > 0 && selectedRiwaya_id !== 0 && grade > 0
+            && teacher_student_id !== 0 && centerid !== 0 && date) {
+            Api.post(`editExam/${exam_id}`, {
+                teacher_id_1: teacher_id[0],
+                teacher_id_2: teacher_id[1],
+                teacher_id_3: teacher_id.length === 2 ? '' : teacher_id[2],
+                tarik: selectedRiwaya_id,
+                grade: grade,
+                teacher_student: teacher_student_id,
+                student_id: selected_student_id,
+                center_id: centerid,
+                decision: get_ijaza,
+                ijaza_in: ijaza_in,
+                note: answers.length > 0 ? answers.toString() : null,
+                date: date,
+                recieve_ijaza_date: recieve_ijaza_date,
+                has_receive_ijaza: has_receive_ijaza
+            },
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }).then((res) => {
+                    if (res.data.success) {
+                        handleClose()
+                        examSuccessChange(true)
+                        Swal.fire('تم التعديل بنجاح', '', 'success')
+                    }
+                }).catch(function (err) { console.log(err); })
+        }
+    }
+
+    const getExamById = (exam_id, teachers) => {
+        Api.get(`getExamById/${exam_id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then((res) => {
+            if (res.data.success) {
+                setStudentById(res.data.data)
+                const oldstudent = students.find(student => student.id === res?.data?.data?.student_id);
+                setselected_student_id(res?.data?.data?.student_id)
+                if (oldstudent !== undefined) {
+                    const indexStudent = students.findIndex(item => item.id === oldstudent.id);
+                    setIndexStudent(indexStudent)
+                }
+                setSelectedStudents(res?.data?.data?.student_id)
+                var arr_teachers = [res?.data?.data?.teacher_id_1, res?.data?.data?.teacher_id_2, res?.data?.data?.teacher_id_3]
+                setTeahcer_id(arr_teachers)
+                const filteredTeachers = teachers.filter((teacher) =>
+                    arr_teachers.includes(teacher.id)
+                );
+                setSelectedTeachers(filteredTeachers)
+                setdate(res?.data?.data?.date)
+                const riwaya_id = res?.data?.data?.tarik
+                setselectedRiwaya_id(riwaya_id)
+                const filteredValue = riwayat.find(r => r.id === parseInt(riwaya_id));
+                setselectedRiwaya(filteredValue)
+                var oldTeacher_id = res?.data?.data?.teacher_student
+                setteacher_student_id(oldTeacher_id)
+                var student_teacher = teachers.find(teacher => teacher.id === parseInt(oldTeacher_id))
+                setteacher_student(student_teacher)
+                var oldCenterId = res?.data?.data?.center_id
+                setcenterid(oldCenterId)
+                var old_center_id = centers.find(center => center.id === parseInt(oldCenterId))
+                setselectedcenter(old_center_id)
+                setijaza_in(res?.data?.data?.ijaza_in)
+                setgrade(res?.data?.data?.grade)
+                setget_ijaza(res?.data?.data?.decision)
+                setHas_receive_ijaza(res?.data?.data?.has_receive_ijaza)
+                setrecieve_ijaza_date(res?.data?.data?.recieve_ijaza_date)
+                const notes = res?.data?.data?.note
+                if (notes !== null) {
+                    const notes_array = notes.split(',')
+                    setAnswers(notes_array)
+                }
+                setloading(false)
+            }
+
+        })
+    }
+    const getAllTeachers = () => {
+        Api.get(`allteachers`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then((res) => {
+            if (res.data.success) {
+                setteachers(res.data.data)
+            }
+        })
+    }
+
+    const getAllStudents = () => {
+        Api.get(`allstudents`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then((res) => {
+            if (res.data.success) {
+                setstudents(res.data.data)
+            }
+        })
+    }
+
+    const getallcenters = () => {
+        Api.get(`getcenters`, {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then((res) => {
+            setcenters(res.data.data)
+        })
+    }
+
+    const handleChange = (event, value) => {
+        if (value.length > 3) {
+            // Get the first three selected options
+            const selected = value.slice(0, 3);
+            console.log(selected, 'selected');
+            const teacher_ids = selected.map((option) => option.id)
+            setTeahcer_id(teacher_ids)
+            setSelectedTeachers(selected);
+        } else {
+            console.log(value, 'selected');
+            setSelectedTeachers(value);
+            const teacher_ids = value.map((option) => option.id)
+            setTeahcer_id(teacher_ids)
+        }
+    };
+
+    const handleChangeStudents = (event, value) => {
+        if (value) {
+            setselected_student_id(value.id)
+            const student_index = students.findIndex(student => student.id === value.id)
+            setIndexStudent(student_index)
+            setSelectedStudents(value);
+            return
+        }
+        setselected_student_id('')
+        setSelectedStudents(null);
+    };
+
+    const handleChangeRiwayah = (event, value) => {
+        if (value) {
+            setselectedRiwaya(value)
+            setselectedRiwaya_id(value.id);
+            return
+        }
+        setselectedRiwaya(null)
+        setselectedRiwaya_id('');
+    };
+
+    const handleChangeTeacher = (event, value) => {
+        if (value) {
+            setteacher_student(value)
+            setteacher_student_id(value.id);
+            return
+        }
+        setteacher_student(null)
+        setteacher_student_id('');
+    };
+
+    const handleChangeCenter = (event, value) => {
+        if (value) {
+            setselectedcenter(value)
+            setcenterid(value.id);
+            return
+        }
+        setselectedcenter(null)
+        setcenterid('');
+    };
+
+    const handleAddAnswer = () => {
+        setAnswers([...answers, '']);
+    };
+
+    const handleAnswerChange = (index, value) => {
+        const newAnswers = [...answers];
+        newAnswers[index] = value;
+        setAnswers(newAnswers);
+    };
+
+    const handleRemoveAnswer = (index) => {
+        const newAnswers = [...answers];
+        newAnswers.splice(index, 1);
+        setAnswers(newAnswers);
+    };
+
+    useEffect(() => {
+        getAllTeachers()
+        getAllStudents()
+        getallcenters()
+    }, [])
+
+    useEffect(() => {
+        if (students && students.length > 0 && centers && centers.length > 0 && teachers && teachers.length > 0) {
+            getExamById(student.exam_id, teachers)
+        }
+    }, [teachers, students, centers])
+
+    return (
+        <>
+            <span className='text-white cursor_pointer'
+                onClick={() => {
+                    setSelectedStudentId(student.exam_id);
+                    handleShow();
+                }}>
+                <TbPencil />
+            </span>
+            <Modal show={show && student.exam_id === selectedStudentId} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title> تعديل اجازة الطالب</Modal.Title>
+                </Modal.Header>
+                {loading ?
+                    <div className='text-center mt-5'>
+                        <Spinner />
+                    </div>
+                    :
+                    <>
+                        {studentById ?
+                            <>
+                                <Modal.Body className='rtl'>
+                                    <div>
+                                        <div className='row mb-5'>
+                                            <div>
+                                                <p className='h6 my-3'>عقدت اللجنة العلمية في دار القرآن الكريم المؤلفة من :</p>
+                                                <div className=''>
+                                                    <Autocomplete
+                                                        multiple
+                                                        id="checkboxes-tags-demo"
+                                                        options={teachers}
+                                                        disableCloseOnSelect
+                                                        getOptionLabel={(option) => option.teacher_name}
+                                                        renderOption={(props, option, { selected }) => (
+                                                            <li {...props}>
+                                                                <Checkbox
+                                                                    checked={selected}
+                                                                    color="primary"
+                                                                    style={{ marginRight: 8 }}
+                                                                    // Add the value to the selected array when checked
+                                                                    onClick={(event) => {
+                                                                        if (!selected) {
+                                                                            handleChange(event, [...selectedTeachers, option]);
+                                                                        }
+                                                                    }}
+                                                                    // Remove the value from the selected array when unchecked
+                                                                    onChange={(event) => {
+                                                                        if (selected) {
+                                                                            handleChange(
+                                                                                event,
+                                                                                selectedTeachers.filter((teacher) => teacher !== option),
+                                                                            );
+                                                                        }
+                                                                    }}
+                                                                />
+                                                                {option.teacher_name}
+                                                            </li>
+                                                        )}
+                                                        // style={{ width: 400 }}
+                                                        renderInput={(params) => (
+                                                            <TextField {...params} label="اسماء المشايخ" placeholder="" />
+                                                        )}
+                                                        // Use the onChange event to update the selectedTeachers state
+                                                        onChange={handleChange}
+                                                        // Pass the selectedTeachers state as the value prop
+                                                        value={selectedTeachers}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <p className='h6 my-3'>جلسة اختبار الطالب(ة) :</p>
+                                                <div className=''>
+                                                    <Autocomplete
+                                                        disablePortal
+                                                        id="combo-box-demo"
+                                                        options={students}
+                                                        getOptionLabel={(option) => option.student_name || ''}
+                                                        renderInput={(params) => <TextField {...params} label="اسماء الطلاب" />}
+                                                        value={students[indexStudent] ?? null}
+                                                        onChange={handleChangeStudents}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <p className='h6 my-3'>بتاريخ : </p>
+                                                <input type="date" className='form-control'
+                                                    max={moment().format('YYYY-MM-DD')}
+                                                    value={date}
+                                                    onChange={(e) => setdate(e.target.value)} />
+                                            </div>
+
+                                            <div>
+                                                <p className='h6 my-3'>حيث قرأت ختمة كاملة برواية : </p>
+                                                <Autocomplete
+                                                    disablePortal
+                                                    id="combo-box-demo"
+                                                    options={riwayat}
+                                                    getOptionLabel={(option) => option.name}
+                                                    renderInput={(params) => <TextField {...params} label="الروايات" />}
+                                                    value={selectedRiwaya}
+                                                    onChange={handleChangeRiwayah}
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <p className='h6 my-3'>على : </p>
+                                                <Autocomplete
+                                                    disablePortal
+                                                    id="combo-box-demo"
+                                                    options={teachers}
+                                                    getOptionLabel={(option) => option.teacher_name}
+                                                    renderInput={(params) => <TextField {...params} label="شيخ الطالب" />}
+                                                    value={teacher_student}
+                                                    onChange={handleChangeTeacher}
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <p className='h6 my-3'>في مركز : </p>
+                                                <Autocomplete
+                                                    disablePortal
+                                                    id="combo-box-demo"
+                                                    options={centers}
+                                                    getOptionLabel={(option) => option.name}
+                                                    renderInput={(params) => <TextField {...params} label="مركز" />}
+                                                    value={selectedcenter}
+                                                    onChange={handleChangeCenter}
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <p className='h6 my-3'>وكان الاختبار في :  </p>
+                                                <div className='row'>
+                                                    <div className='col'>
+                                                        <select name="" id="" className='form-control' value={ijaza_in}
+                                                            onChange={(e) => setijaza_in(e.target.value)}>
+                                                            <option value="" disabled>-- ضع خيارا -- </option>
+                                                            <option value="full_quran">القرآن كاملا</option>
+                                                            <option value="last_ten">العشر الاواخر</option>
+                                                            <option value="albaqara">سورة البقرة</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className='mx-1'>
+                                                <p className='h6 my-3'>وبلغ مجموع الدرجات :
+                                                    <input className='my-2 py-2 mx-2 text-dark text-center'
+                                                        value={grade}
+                                                        onChange={(e) => setgrade(parseInt(e.target.value))}
+                                                        type="number"
+                                                        min='0'
+                                                        max='100'
+                                                        style={{ border: '0', outline: '0', backgroundColor: '#EEEEEE' }} />
+                                                    <span className='mx-2'>
+                                                        من 100.
+                                                    </span>
+                                                </p>
+                                            </div>
+
+                                            <div>
+                                                <p className='h6 my-3'>وقد قررت اللجنة ما يلي : </p>
+                                                <div>
+                                                    <div className='mb-2 d-flex align-items-center'>
+                                                        <input type="radio" name='receive_ijaza'
+                                                            className='mx-2'
+                                                            id='get_ijaza'
+                                                            value='yes'
+                                                            checked={get_ijaza === 'yes'}
+                                                            onChange={(e) => setget_ijaza(e.target.value)}
+                                                        />
+                                                        <label htmlFor="get_ijaza">
+                                                            منح الاجازة بالسند المتصل الى حضرة النبي عليه الصلاة والسلام.
+                                                        </label>
+                                                    </div>
+
+                                                    <div>
+                                                        <input type="radio"
+                                                            name='receive_ijaza'
+                                                            className='mx-2' id='get_not_ijaza'
+                                                            value='no'
+                                                            checked={get_ijaza === 'no'}
+                                                            onChange={(e) => setget_ijaza(e.target.value)} />
+                                                        <label htmlFor="get_not_ijaza">
+                                                            اعادة الاختبار للاسباب التالية :
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            {get_ijaza === 'no' ?
+                                                <div>
+                                                    {answers.map((answer, index) => (
+                                                        <div key={index}>
+                                                            <TextField
+                                                                label={`اجابة ${index + 1}`}
+                                                                value={answer}
+                                                                onChange={(event) => handleAnswerChange(index, event.target.value)}
+                                                                variant="outlined"
+                                                                margin="normal"
+                                                            />
+                                                            <button className='btn btn-success mx-2 mt-4' onClick={() => handleRemoveAnswer(index)}>حذف</button>
+                                                        </div>
+                                                    ))}
+                                                    <div className='my-2'>
+                                                        <button className='btn btn-primary mx-2' onClick={handleAddAnswer}>اضافة سبب</button>
+                                                    </div>
+
+                                                </div> :
+
+                                                <div className='my-3'>
+                                                    <label htmlFor="has_receive_ijaza my-2" />
+                                                    <b>هل استلم اجازته؟</b>
+                                                    <select id="has_receive_ijaza" name='ijaza_info' className='form-control my-2'
+                                                        value={has_receive_ijaza}
+                                                        onChange={(e) => setHas_receive_ijaza(e.target.value)}>
+                                                        <option value="" disabled>-- اختر احد الخيارات --</option>
+                                                        <option value={0}>كلا</option>
+                                                        <option value={1}>نعم</option>
+                                                    </select>
+
+                                                    {has_receive_ijaza == 1 ?
+                                                        <div className='my-2'>
+                                                            <label htmlFor="receive_ijaza_date" className='my-2'>
+                                                                <b>  تاريخ الاستلام</b>
+                                                            </label>
+                                                            <input type="date" className='form-control' id='receive_ijaza_date'
+                                                                value={recieve_ijaza_date}
+                                                                max={moment().format('YYYY-MM-DD')}
+                                                                onChange={(e) => setrecieve_ijaza_date(e.target.value)} />
+                                                        </div>
+                                                        : ''}
+                                                </div>
+
+
+                                            }
+
+                                            {/* <div className=' my-4 mx-2 row'>
+                                <button className='btn btn-success' onClick={handleSubmit}>اضافة</button>
+                            </div> */}
+                                        </div>
+                                    </div>
+                                </Modal.Body>
+                                <Modal.Footer>
+                                    <Button variant="dark" onClick={handleClose}>
+                                        تراجع
+                                    </Button>
+                                    <Button variant="success" onClick={() => editExam(student.exam_id)}>
+                                        حفظ
+                                    </Button>
+                                </Modal.Footer>
+                            </> : ''}
+                    </>
+                }
+            </Modal>
+        </>
+    )
+}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState, useContext, useRef } from 'react'
 import { Spinner } from 'react-bootstrap'
 import Api from '../Api'
 import SessionContext from '../session/SessionContext'
@@ -7,6 +7,10 @@ import TeacherSelect from './TeacherSelect'
 import { Pagination } from '@mui/material'
 import Swal from 'sweetalert2'
 import { AiOutlineArrowLeft } from 'react-icons/ai'
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+
+
 
 
 export default function MonthlyRingReport() {
@@ -32,7 +36,6 @@ export default function MonthlyRingReport() {
   const [reportComment, setReportComment] = useState('')
   const [loading, setloading] = useState(false)
 
-
   const getsessions = (ring_id, startdate, enddate, p) => {
     setloading(true)
     Api.post(`monthlyRingReport?page=${p}`, {
@@ -43,7 +46,6 @@ export default function MonthlyRingReport() {
       headers: { Authorization: `Bearer ${token}` }
     }).then(
       (res) => {
-        console.log({ res });
         console.log(res.data.report_comment);
         setReportComment(res.data.report_comment)
         const sessions = res.data.data.data
@@ -117,113 +119,115 @@ export default function MonthlyRingReport() {
   }, [teacher_id])
 
   return (
-    <div>
-      <div className='my-3'>
+    <>
+      <div>
+        <div className='my-3'>
+          <div className='row'>
+            {role_id === 1 || role_id === 2 ?
+              <div className='col-lg'>
+                <label htmlFor=""></label>
+                <CenterSelect center_id={getcenterid} c_id={centerid} monthlyreport={true} />
+              </div>
+              : ''}
+            {role_id !== 4 ?
+              <div className='col-lg'>
+                <label htmlFor=""></label>
+                <TeacherSelect teachers={teachers} teacher_id={getfilterteacher} tid={teacher_id} fromquransession={true} />
+              </div>
+              : ''}
 
-        <div className='row'>
-          {role_id === 1 || role_id === 2 ?
-            <div className='col-lg'>
+            <div className='col-lg my-2'>
               <label htmlFor=""></label>
-              <CenterSelect center_id={getcenterid} c_id={centerid} monthlyreport={true} />
+              <select className='form-control' value={ring_id}
+                onChange={(e) => setring_id(e.target.value)}>
+                <option value={0} disabled>اختر احد الحلقات</option>
+                {rings && rings.length > 0 ?
+                  rings.map((ring) =>
+                    <option key={ring.id} value={ring.id}>{ring.name}</option>) :
+                  <option disabled>لا يوجد</option>
+                }
+              </select>
             </div>
-            : ''}
-          {role_id !== 4 ?
-            <div className='col-lg'>
-              <label htmlFor=""></label>
-              <TeacherSelect teachers={teachers} teacher_id={getfilterteacher} tid={teacher_id} fromquransession={true} />
+
+            <div className='col-lg my-2'>
+              <label style={{ marginBottom: '3px' }}>من تاريخ</label>
+              <input type="date" className='form-control'
+                value={startdate}
+                onChange={(e) => setstartdate(e.target.value)} />
             </div>
-            : ''}
+            <div className='col-lg my-2'>
+              <label style={{ marginBottom: '3px' }}>الى تاريخ</label>
+              <input type="date" className='form-control'
+                value={enddate}
+                onChange={(e) => setenddate(e.target.value)} />
+            </div>
 
-          <div className='col-lg my-2'>
-            <label htmlFor=""></label>
-            <select className='form-control' value={ring_id}
-              onChange={(e) => setring_id(e.target.value)}>
-              <option value={0} disabled>اختر احد الحلقات</option>
-              {rings && rings.length > 0 ?
-                rings.map((ring) =>
-                  <option key={ring.id} value={ring.id}>{ring.name}</option>) :
-                <option disabled>لا يوجد</option>
-              }
-            </select>
-          </div>
+            <div className='col-md my-2'>
+              <button className='btn btn-dark px-4 my-sm-2 my-md-4 form-control' onClick={search}>بحث</button>
+            </div>
 
-          <div className='col-lg my-2'>
-            <label style={{ marginBottom: '3px' }}>من تاريخ</label>
-            <input type="date" className='form-control'
-              value={startdate}
-              onChange={(e) => setstartdate(e.target.value)} />
-          </div>
-          <div className='col-lg my-2'>
-            <label style={{ marginBottom: '3px' }}>الى تاريخ</label>
-            <input type="date" className='form-control'
-              value={enddate}
-              onChange={(e) => setenddate(e.target.value)} />
-          </div>
-
-          <div className='col-md my-2'>
-            <button className='btn btn-dark px-4 my-sm-2 my-md-4 form-control' onClick={search}>بحث</button>
           </div>
         </div>
-      </div>
 
-      {loading ? <div className='mt-5 text-center'><Spinner /></div> :
-        sessions.length > 0 ?
-          <>
-            <div className='my-4 px-2 py-3 border rounded' style={{ backgroundColor: 'DodgerBlue' }}>
-              <div className='text-center text-white h5'>تعليق الادارة : </div>
-              <span className='text-white' key={reportComment.id}>{reportComment?.comment}</span>
-            </div>
-            {sessions.map((session) =>
-              <>
-                <div key={session.student_id} className="table-responsive">
-                  <table className='table table-secondary text-center'>
-                    <thead>
-                      <tr>
-                        <td colSpan={8} className='bg-info text-white'>
-                          {session.full_name}
-                        </td>
-                      </tr>
-                      <tr>
-                        <th>التاريخ</th>
-                        <th>حضور/غياب</th>
-                        <th>تسميع/حفظ</th>
-                        <th>من السورة</th>
-                        <th>
-                        <span>من الاية</span>
-                        <span className='text-danger d-md-none'><AiOutlineArrowLeft/></span>
-                        </th>
-                        <th>الى السورة</th>
-                        <th>الى الاية</th>
-                      </tr>
-                    </thead>
-                    {session.sessions.map((s) =>
-                      <tbody key={s.revision_id}>
+        {loading ? <div className='mt-5 text-center'><Spinner /></div> :
+          sessions.length > 0 ?
+            <>
+              <div className='my-4 px-2 py-3 border rounded' style={{ backgroundColor: 'DodgerBlue' }}>
+                <div className='text-center text-white h5'>تعليق الادارة : </div>
+                <span className='text-white' key={reportComment.id}>{reportComment?.comment}</span>
+              </div>
+              {sessions.map((session) =>
+                <>
+                  <div key={session.student_id} className="table-responsive">
+                    <table className='table table-secondary text-center'>
+                      <thead>
                         <tr>
-                          <td>{s.revision_date}</td>
-                          <td>{s.attendance === 0 ? 'غياب' : 'حضور'}</td>
-                          <td>{s.type === 'recite' ? 'حفظ' : s.type === 'revision' ? 'مراجعة' : ''}</td>
-                          <td>{s.from_surrah}</td>
-                          <td>{s.from_ayyah}</td>
-                          <td>{s.to_surrah}</td>
-                          <td>{s.to_ayyah}</td>
+                          <td colSpan={8} className='bg-info text-white'>
+                            {session.full_name}
+                          </td>
                         </tr>
-                      </tbody>
-                    )}
-                  </table>
-                </div>
-              </>
-            )}
-            <Pagination
-              shape="rounded"
-              count={total}
-              page={page}
-              size="small"
-              onChange={changePage}
-              variant="outlined"
-            />
-          </>
-          : <p className='text-center'><b>لا يوجد اي جلسة بعد</b></p>
-      }
-    </div>
+                        <tr>
+                          <th>التاريخ</th>
+                          <th>حضور/غياب</th>
+                          <th>تسميع/حفظ</th>
+                          <th>من السورة</th>
+                          <th>
+                            <span>من الاية</span>
+                            <span className='text-danger d-md-none'><AiOutlineArrowLeft /></span>
+                          </th>
+                          <th>الى السورة</th>
+                          <th>الى الاية</th>
+                        </tr>
+                      </thead>
+                      {session.sessions.map((s) =>
+                        <tbody key={s.revision_id}>
+                          <tr>
+                            <td>{s.revision_date}</td>
+                            <td>{s.attendance === 0 ? 'غياب' : 'حضور'}</td>
+                            <td>{s.type === 'recite' ? 'حفظ' : s.type === 'revision' ? 'مراجعة' : ''}</td>
+                            <td>{s.from_surrah}</td>
+                            <td>{s.from_ayyah}</td>
+                            <td>{s.to_surrah}</td>
+                            <td>{s.to_ayyah}</td>
+                          </tr>
+                        </tbody>
+                      )}
+                    </table>
+                  </div>
+                </>
+              )}
+              <Pagination
+                shape="rounded"
+                count={total}
+                page={page}
+                size="small"
+                onChange={changePage}
+                variant="outlined"
+              />
+            </>
+            : <p className='text-center'><b>لا يوجد اي جلسة بعد</b></p>
+        }
+      </div>
+    </>
   )
 }

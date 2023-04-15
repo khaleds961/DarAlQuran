@@ -60,7 +60,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/addstudent', [StudentsController::class, 'store']);
     Route::post('/searchforstudent', [StudentsController::class, 'searchforstudent']);
     Route::post('/editstudent/{id}', [StudentsController::class, 'update']);
-    Route::post('/editPdf/{id}',[StudentsController::class, 'editPdf']);
+    Route::post('/editPdf/{id}', [StudentsController::class, 'editPdf']);
     Route::delete('/deletestudent/{id}/{center_id}', [StudentsController::class, 'destroy']);
 
 
@@ -111,6 +111,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     //Exams
     Route::post('/addexam', [ExamController::class, 'store']);
+    Route::post('/editExam/{exam_id}', [ExamController::class, 'editExam']);
     Route::get('/moujazstudents', [ExamController::class, 'moujazstudents']);
+    Route::get('/getExamById/{exam_id}', [ExamController::class, 'getExamById']);
     Route::delete('/deleteexam/{exam_id}', [ExamController::class, 'destroy']);
 });

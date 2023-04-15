@@ -602,6 +602,7 @@ export default function AddStudentForm() {
                     <div className="col-md">
                         <label >تاريخ الولادة</label>
                         <input type="date" className="form-control my-2"
+                            max={moment().subtract(5, 'years').format('YYYY-MM-DD')}
                             value={birthday}
                             onChange={(e) => setbirthday(e.target.value)}
                         />

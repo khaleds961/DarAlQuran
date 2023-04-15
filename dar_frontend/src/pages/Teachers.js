@@ -30,7 +30,7 @@ function Teachers() {
       <div className="row flex-nowrap">
       <SideBar clicked={clicked} clicked_md={clicked_md} />
         <div className="col py-3" style={{ background: '#EEEEEE' }}>
-          <h3 className='mb-5 text-center'>الاساتذة</h3>
+          <h3 className='mb-5 text-center' >الاساتذة</h3>
           <TeachersTable />
         </div>
       </div>

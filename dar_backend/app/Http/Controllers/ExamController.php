@@ -155,4 +155,52 @@ class ExamController extends Controller
             return response($e->getMessage());
         }
     }
+
+    public function getExamById($exam_id)
+    {
+        try {
+            $exam = Exams::find($exam_id);
+            if ($exam->id) {
+                return response([
+                    'data' => $exam,
+                    'success' => true
+                ]);
+            }
+        } catch (Exception $e) {
+            return response($e->getMessage());
+        }
+    }
+
+    public function editExam(Request $request, $exam_id)
+    {
+        try {
+            $exam = Exams::find($exam_id);
+            if ($exam->id) {
+                $exam->update([
+                    'teacher_id_1'      => $request->teacher_id_1,
+                    'teacher_id_2'      => $request->teacher_id_2,
+                    'teacher_id_3'      => $request->teacher_id_3,
+                    'teacher_student'   => $request->teacher_student,
+                    'center_id'         => $request->center_id,
+                    'student_id'        => $request->student_id,
+                    'tarik'             => $request->tarik,
+                    'grade'             => $request->grade,
+                    'ijaza_in'          => $request->ijaza_in,
+                    'decision'          => $request->decision,
+                    'date'              => $request->date,
+                    'note'              => $request->note,
+                    'has_receive_ijaza' => $request->has_receive_ijaza,
+                    'recieve_ijaza_date' => $request->recieve_ijaza_date
+                ]);
+                if ($exam->wasChanged()) {
+                    return response([
+                        'message' => 'great',
+                        'success' => true
+                    ]);
+                }
+            }
+        } catch (Exception $e) {
+            return response($e->getMessage());
+        }
+    }
 }

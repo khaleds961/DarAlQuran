@@ -29,7 +29,6 @@ function StudentsTable() {
 
 
   const location = useLocation()
-  console.log(location);
   const default_teacher_id = location?.state?.teacher_id ?? 0
   const defualt_center_id = role_id === 1 || role_id === 2 ? location?.state?.center_id ?? 0 : centers[0]?.center_id;
 
@@ -91,7 +90,6 @@ function StudentsTable() {
       if (filterteacher !== 0) {
         getstudentbyteacher(filterteacher, value)
       } else {
-        console.log(center_id, 'alo2');
         getStudentsByCenter(center_id, value)
       }
     }
@@ -126,7 +124,6 @@ function StudentsTable() {
       headers: { Authorization: `Bearer ${token}` }
     }).then(
       (res) => {
-        console.log(res.data);
         setStudents(res.data.data.data);
         setTotal(Math.ceil(res.data.data.total / 10))
         setLoading(false)
@@ -183,7 +180,6 @@ function StudentsTable() {
       }
     })
   }
-  console.log(center_id, 'centerrrr');
   useEffect(() => {
     if (role_id === 4) {
       getstudentbyteacher(id, 1)
