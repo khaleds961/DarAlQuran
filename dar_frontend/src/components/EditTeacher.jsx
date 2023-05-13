@@ -24,6 +24,7 @@ export default function EditTeacher() {
     const [newpassword, setnewpassword] = useState('')
     const [newphone_number, setnewphone_number] = useState('')
     const [newcenterid, setnewcenterid] = useState(0)
+    const [userrole, setUserRole] = useState(0)
     const [loading, setLoading] = useState(true)
 
 
@@ -63,6 +64,7 @@ export default function EditTeacher() {
                     setnewpassword(res.data.data.password)
                     setnewphone_number(res.data.data.phone_number)
                     setnewcenterid(res.data.data.center_id)
+                    setUserRole(res.data.data.role_id)
                     setLoading(false)
                 }
             ).catch(function (err) { console.log(err) })
@@ -81,7 +83,8 @@ export default function EditTeacher() {
             last_name: newlast_name,
             username: newusername,
             password: newpassword,
-            phone_number: newphone_number
+            phone_number: newphone_number,
+            role_id: userrole
         }, {
             headers: { Authorization: `Bearer ${token}` }
         }).then((res) => {
@@ -168,6 +171,20 @@ export default function EditTeacher() {
                             </div>
 
                             <CenterSelect c_id={newcenterid} center_id={getnewcenterid} />
+
+                            {role_id === 1 || role_id === 2 ?
+                                <div className='form-group-row'>
+                                    <div className='col'>
+                                        <label className='my-2'>نوع المستخدم</label>
+                                        <select className="form-control col my-2 responsive_width" value={userrole} onChange={(e) => setUserRole(e.target.value)}>
+                                            <option disabled="disabled" value={0}>اختر نوع المستخدم</option>
+                                            <option value={4}>استاذ</option>
+                                            <option value={3}>مشرف</option>
+                                        </select>
+                                    </div>
+                                </div> : ''}
+
+
 
                             <div>
                                 <button className='btn btn-success mt-3 px-3' onClick={() => editTeacher(teacher.id)}>تعديل</button>

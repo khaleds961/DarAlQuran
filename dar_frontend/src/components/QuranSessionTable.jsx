@@ -313,6 +313,7 @@ function QuranSessionTable() {
         ).catch(function (err) { console.log(err) })
     }
 
+
     const is_session_added = (bo) => {
         if (bo) {
             getSessions(page)
@@ -346,35 +347,35 @@ function QuranSessionTable() {
     return (
         <div>
             <div className='d-md-flex justify-content-between'>
-            <AddSessionModal addSession={is_session_added} />
+                <AddSessionModal addSession={is_session_added} />
 
-            {role_id === 3 || role_id === 4 ?
-                <div>
-                    {
-                        loading ? '' :
-                            <div className='d-flex flex-row'>
-                                <TeacherSelect teachers={teachers} teacher_id={getteacherid} tid={filterteacher_id} fromquransession={true} />
-                            </div>
-                    }
-                </div>
-                :
-                <div>
-                    <div className='d-md-flex flex-row'>
-                        <CenterSelect c_id={id_center} data={getfiltercenterid} fromstudent={true} />
-                        {id_center !== 0 ?
-                            <select className="btn bg-white text-dark my-2 px-md-2 mx-md-3 responsive_width"
-                                value={filterteacher_id}
-                                onChange={(e) => setfilterteacher_id(e.target.value)}>
-                                <option value={0} disabled> اختر احد الاساتذة</option>
-                                {teachers ? teachers.map((teacher) =>
-                                    <option key={teacher.id} value={teacher.id}>{teacher.first_name} {teacher.middle_name} {teacher.last_name}</option>) :
-                                    <option disabled> ...تحميل</option>}
-                            </select>
-                            : ''}
+                {role_id === 3 || role_id === 4 ?
+                    <div>
+                        {
+                            loading ? '' :
+                                <div className='d-flex flex-row'>
+                                    <TeacherSelect teachers={teachers} teacher_id={getteacherid} tid={filterteacher_id} fromquransession={true} />
+                                </div>
+                        }
                     </div>
+                    :
+                    <div>
+                        <div className='d-md-flex flex-row'>
+                            <CenterSelect c_id={id_center} data={getfiltercenterid} fromstudent={true} />
+                            {id_center !== 0 ?
+                                <select className="btn bg-white text-dark my-2 px-md-2 mx-md-3 responsive_width"
+                                    value={filterteacher_id}
+                                    onChange={(e) => setfilterteacher_id(e.target.value)}>
+                                    <option value={0} disabled> اختر احد الاساتذة</option>
+                                    {teachers ? teachers.map((teacher) =>
+                                        <option key={teacher.id} value={teacher.id}>{teacher.first_name} {teacher.middle_name} {teacher.last_name}</option>) :
+                                        <option disabled> ...تحميل</option>}
+                                </select>
+                                : ''}
+                        </div>
 
-                </div>
-            }
+                    </div>
+                }
             </div>
 
             {/* modal */}
@@ -472,15 +473,15 @@ function QuranSessionTable() {
                                             <tr key={session.session_id} className='text-center'>
                                                 <td>
                                                     <div ref={ref}>
-
-                                                        <Button variant="success" onClick={(e) => handleClick(e, session.session_id)}>جلسة</Button>
-
+                                                        
+                                                            <Button variant="success" onClick={(e) => handleClick(e, session.session_id)} id='clickbox'>جلسة</Button>
                                                         <Overlay
                                                             show={show}
                                                             target={target}
                                                             placement="bottom"
                                                             container={ref}
                                                             containerPadding={20}
+
                                                         >
                                                             <Popover id="popover-contained">
                                                                 <Popover.Body>

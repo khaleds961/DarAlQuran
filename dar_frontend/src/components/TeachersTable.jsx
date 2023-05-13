@@ -72,7 +72,7 @@ function TeachersTable() {
   };
 
   const addTeacher = () => {
-
+    if(fname && lname && phone_number && center_id ){
     Api.post("/addteacher", {
       username: username,
       password: password,
@@ -99,7 +99,7 @@ function TeachersTable() {
             setUser_role(0)
           }
         } else {
-          console.log(response);
+          Swal.fire(response.data.message, '', 'warning')
         }
       })
       .catch(function (error) {
@@ -111,6 +111,9 @@ function TeachersTable() {
         errors_array?.last_name ? setLname_error(errors_array.last_name) : setLname_error('')
         errors_array?.phone_number ? setPhone_error(errors_array.phone_number) : setPhone_error('')
       });
+    }else{
+      Swal.fire('ادخل المعلومات كاملة','','warning')
+    }
   }
 
   const getTeachers = (p) => {
@@ -259,6 +262,7 @@ function TeachersTable() {
               <label htmlFor="first_name">اسم الاول</label>
               <input type='text' id="first_name" className='form-control rtl my-2'
                 name='first_name'
+                required
                 onChange={(e) => setFname(e.target.value)}
               ></input>
               {fname_error ? <p><b className='text-danger'>{fname_error}</b></p> : ''}
@@ -280,6 +284,7 @@ function TeachersTable() {
               <label htmlFor="phone_number">رقم الهاتف</label>
               <input type='text' id="phone_number" className='form-control rtl my-2'
                 name='phone_number'
+                required
                 onChange={(e) => setPhone_number(e.target.value)}
               ></input>
               {phone_error ? <p><b className='text-danger'>{phone_error}</b></p> : ''}

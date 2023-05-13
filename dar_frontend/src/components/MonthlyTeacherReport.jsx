@@ -8,9 +8,6 @@ import { Pagination } from '@mui/material'
 import Swal from 'sweetalert2'
 import { AiOutlineArrowLeft } from 'react-icons/ai'
 
-
-
-
 export default function MonthlyTeacherReport() {
 
     const { session: { token } } = useContext(SessionContext)
@@ -75,6 +72,7 @@ export default function MonthlyTeacherReport() {
             }
         )
     }
+
     const search = () => {
         setpage(1)
         if (centerid !== 0 && teacher_id !== 0 && startdate && enddate) {
@@ -93,7 +91,6 @@ export default function MonthlyTeacherReport() {
     return (
         <div>
             <div className='my-3'>
-
                 <div className='row'>
                     {role_id === 1 || role_id === 2 ?
                         <div className='col-md'>
@@ -127,6 +124,7 @@ export default function MonthlyTeacherReport() {
                     </div>
                 </div>
             </div>
+
             {loading ? <div className='mt-5 text-center'><Spinner /></div> :
                 sessions.length > 0 ?
                     <>

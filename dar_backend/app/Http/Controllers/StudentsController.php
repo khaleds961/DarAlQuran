@@ -88,6 +88,16 @@ class StudentsController extends Controller
     public function store(Request $request)
     {
         try {
+            $check_name = Students::where('first_name',str_replace(' ', '', $request->first_name))
+                                    ->where('middle_name',str_replace(' ', '', $request->middle_name))
+                                    ->where('last_name',str_replace(' ', '', $request->last_name))
+                                    ->first();
+            if($check_name){
+                return response([
+                    'message' => 'الاسم الثلاثي مكرر',
+                    'success' => false
+                ]);
+            }
             if ($request->is_ring == 1) {
                 $student = Students::create([
                     'registration_date' => $request->registration_date,

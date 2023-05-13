@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Centers;
+use App\Models\Roles;
 use App\Models\Students;
 use App\Models\Students_Centers_Teachers;
 use App\Models\Users;
@@ -122,6 +123,7 @@ class UsersController extends Controller
             $teacher->last_name = $request->last_name;
             $teacher->username = $request->username;
             $teacher->phone_number = $request->phone_number;
+            $teacher->role_id = $request->role_id;
             if ($request->password) {
                 if (!Hash::check($request['password'], $teacher->password)) {
                     $teacher->password = bcrypt($request->password);
@@ -216,6 +218,13 @@ class UsersController extends Controller
         );
 
         if ($request['username'] && $request['password']) {
+            $check_username = Users::where('username',strtolower($request->username))->first();
+            if($check_username){
+                return response([
+                    'message' => 'هذا الحساب موجود مسبقا',
+                    'success' => false
+                ]);
+            }
             $user = Users::create([
                 'username'  => $request['username'],
                 'password' => bcrypt($request['password']),

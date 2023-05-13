@@ -158,68 +158,72 @@ export default function AddStudentForm() {
         e.preventDefault();
         const skills_arr = []
         value.map(v => skills_arr.push(v.value))
-        Api.post('addstudent', {
-            registration_date: registration_date,
-            first_name: first_name,
-            middle_name: middle_name,
-            last_name: last_name,
-            mother_name: mothername,
-            mother_work: motherjob,
-            father_work: fatherjob,
-            birthdate: birthday,
-            school_uni_name: schooluni,
-            major: major,
-            rate: rate,
-            gender: gender,
-            nationality: nationality,
-            phone_number: phone_number,
-            father_number: fatherphonenumber,
-            mother_number: motherphonenumber,
-            center_id: center_id,
-            ring_id: ringid,
-            notes: notes,
-            address: address,
-            skills: skills_arr.toString(),
-            memorizing: memorizing,
-            is_ring: 1
-        }, {
-            headers: { Authorization: `Bearer ${token}` }
-        }).then(
-            (res) => {
-                if (res.data.success) {
-                    Swal.fire(res.data.message, '', 'success')
-                    setFirst_name('')
-                    setMiddle_name('')
-                    setLast_name('')
-                    setmothername('')
-                    setnationality('')
-                    setSelectednationality(null)
-                    setgender('male')
-                    setaddress('')
-                    setPhone_number('')
-                    setmotherphonenumber('')
-                    setfatherphonenumber('')
-                    setschooluni('')
-                    setmajor('')
-                    setbirthday('')
-                    setValue([])
-                    setmemorizing('')
-                    setnotes('')
-                    setmotherjob('')
-                    setfatherjob('')
-                    setrate('')
-                    setringid(0)
-                    if (role_id === 1 || role_id === 2) {
-                        setCenter_id(0)
+        if (first_name && last_name && ringid != 0) {
+            Api.post('addstudent', {
+                registration_date: registration_date,
+                first_name: first_name,
+                middle_name: middle_name,
+                last_name: last_name,
+                mother_name: mothername,
+                mother_work: motherjob,
+                father_work: fatherjob,
+                birthdate: birthday,
+                school_uni_name: schooluni,
+                major: major,
+                rate: rate,
+                gender: gender,
+                nationality: nationality,
+                phone_number: phone_number,
+                father_number: fatherphonenumber,
+                mother_number: motherphonenumber,
+                center_id: center_id,
+                ring_id: ringid,
+                notes: notes,
+                address: address,
+                skills: skills_arr.toString(),
+                memorizing: memorizing,
+                is_ring: 1
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            }).then(
+                (res) => {
+                    if (res.data.success) {
+                        Swal.fire(res.data.message, '', 'success')
+                        setFirst_name('')
+                        setMiddle_name('')
+                        setLast_name('')
+                        setmothername('')
+                        setnationality('')
+                        setSelectednationality(null)
+                        setgender('male')
+                        setaddress('')
+                        setPhone_number('')
+                        setmotherphonenumber('')
+                        setfatherphonenumber('')
+                        setschooluni('')
+                        setmajor('')
+                        setbirthday('')
+                        setValue([])
+                        setmemorizing('')
+                        setnotes('')
+                        setmotherjob('')
+                        setfatherjob('')
+                        setrate('')
+                        setringid(0)
+                        if (role_id === 1 || role_id === 2) {
+                            setCenter_id(0)
+                        }
+                        setRegistrationDate(moment().format('YYYY-MM-DD'))
+                    } else {
+                        Swal.fire(res.data.message, '', 'error')
                     }
-                    setRegistrationDate(moment().format('YYYY-MM-DD'))
-                } else {
-                    console.log({ res });
                 }
-            }
-        ).catch(function (error) {
-            console.log(error)
-        })
+            ).catch(function (error) {
+                console.log(error)
+            })
+        }else{
+            Swal.fire('اسم الاب والعائلة ضروري, ويجب اختار احد الحلقات اولا','','error')
+        }
     }
     const getcenterid = (id) => {
         setTeacher_id(0)
@@ -231,7 +235,8 @@ export default function AddStudentForm() {
 
         const sheikh_names_arr = []
         value.map(v => sheikh_names_arr.push(v.value))
-        if (teacher_id !== 0 && center_id !== 0) {
+        if(first_name && last_name && phone_number && teacher_id != 0 && center_id != 0){
+        if ( teacher_id != 0 && center_id != 0) {
             const formData = new FormData();
             formData.append('registration_date', registration_date);
             formData.append('file', file);
@@ -309,7 +314,7 @@ export default function AddStudentForm() {
                     settype_kiraat(0)
                     setFile(null)
                 } else {
-                    console.log({ res });
+                    Swal.fire(res.data.message, '', 'error');
                 }
 
 
@@ -317,6 +322,9 @@ export default function AddStudentForm() {
         } else {
             console.log('student id or center id are null');
         }
+    }else{
+        Swal.fire('الاسم والعائلة اجباري, مع المركز والاستاذ, وينبغي ادخال رقم الهاتف اولا','','error')
+    }
     }
     const handleChange = (event) => {
         const {
