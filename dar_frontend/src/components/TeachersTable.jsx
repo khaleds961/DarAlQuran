@@ -23,7 +23,7 @@ function TeachersTable() {
 
   const navigate = useNavigate();
 
-  const handleNavigate = (teacher_id,center_id) => {
+  const handleNavigate = (teacher_id, center_id) => {
     navigate(`/students`, { state: { teacher_id: teacher_id, center_id: center_id } })
   }
 
@@ -90,7 +90,6 @@ function TeachersTable() {
           hideModal()
           Swal.fire(response.data.message, '', 'success')
           if (role_id === 3) {
-            console.log(center_id, page, 'herererer');
             getTeachersByCenter(center_id, 1)
           } else {
             getTeachers(1)
@@ -117,7 +116,7 @@ function TeachersTable() {
   const getTeachers = (p) => {
     setLoading(true)
     setnoteacher(false)
-    Api.get(`getTeachersByCenter/${center_id}?page=${p}`, {
+    Api.get(`getTeachersByCenter/${center_id == 'all' ? 0 : center_id}?page=${p}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then(
       res => {
@@ -141,7 +140,12 @@ function TeachersTable() {
   }
   const getTeachersByCenter = (id_center, p) => {
     setnoteacher(false)
-    Api.get(`getTeachersByCenter/${id_center}?page=${p}`, {
+    setLoading(true)
+    const center_id = id_center == 'all' ? 0 : id_center
+    console.log(center_id, 'center_id');
+    console.log(p, 'p');
+
+    Api.get(`getTeachersByCenter/${center_id}?page=${p}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then(
       (res) => {
@@ -150,6 +154,7 @@ function TeachersTable() {
         setLoading(false)
         if (res.data.data.data.length === 0) {
           setnoteacher(true)
+          setLoading(false)
         }
       }
     )
@@ -215,6 +220,7 @@ function TeachersTable() {
                 <option disabled="disabled" value='0'>
                   اختر احد المراكز
                 </option>
+                <option value='all'>الكل</option>
                 {allcenters ? allcenters.map((center) =>
                   <option key={center.id} value={center.id}>{center.name}</option>) :
                   'تحميل ...'}
@@ -333,7 +339,7 @@ function TeachersTable() {
                 : teachers.length > 0 ? teachers.map(teacher =>
                   <tr key={teacher.id}>
                     <th>
-                      <span className='cursor_pointer' onClick={() => handleNavigate(teacher.id,teacher.center_id)}>
+                      <span className='cursor_pointer' onClick={() => handleNavigate(teacher.id, teacher.center_id)}>
                         {teacher.first_name} {teacher.middle_name} {teacher.last_name}
                       </span>
                     </th>

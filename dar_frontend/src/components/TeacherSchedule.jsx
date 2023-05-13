@@ -61,9 +61,15 @@ function TeacherSchedule() {
     setid_center(center_id)
   }
   const is_session_added = (bo) => {
+    console.log(id_center);
+    console.log(filterteacher_id);
     if (bo) {
       if (id_center !== 0 && filterteacher_id !== 0) {
         getSchedule(filterteacher_id)
+      }else{
+        if(role_id === 4){
+          getSchedule(user_id)
+        }
       }
     }
   }

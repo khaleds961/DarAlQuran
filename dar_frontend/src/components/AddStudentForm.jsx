@@ -24,8 +24,9 @@ export default function AddStudentForm() {
     const { session: { token } } = useContext(SessionContext)
     const { session: { user: { role_id } } } = useContext(SessionContext);
     const { session: { user: { centers } } } = useContext(SessionContext);
+    const { session: { user: { id: user_id } } } = useContext(SessionContext);
     const defaultvalue = role_id === 3 || role_id === 4 ? centers[0]['center_id'] : 0;
-
+    const default_teacher_id = role_id === 4 ? user_id : 0;
     const arraybloodtypes = [
         { 'id': 1, 'value': 'A+' },
         { 'id': 2, 'value': 'A-' },
@@ -69,7 +70,7 @@ export default function AddStudentForm() {
     const [memorizing, setmemorizing] = useState('')
     const [center_id, setCenter_id] = useState(defaultvalue)
     const [teachers, setTeachers] = useState([])
-    const [teacher_id, setTeacher_id] = useState(0)
+    const [teacher_id, setTeacher_id] = useState(default_teacher_id)
     const [suitabledays, setsuitablesdays] = useState([])
     const [suitabletimes, setsuitablestimes] = useState([])
     const [student_isring, setstudent_isring] = useState('no')
@@ -302,7 +303,9 @@ export default function AddStudentForm() {
                     if (role_id === 1 || role_id === 2) {
                         setCenter_id(0)
                     }
-                    setTeacher_id(0)
+                    if (role_id !== 4) {
+                        setTeacher_id(0)
+                    }
                     settype_kiraat(0)
                     setFile(null)
                 } else {

@@ -121,6 +121,7 @@ export default function AddSessionModal({ addsession }) {
     }
 
     const addSession = () => {
+        if(id_center && teacher_id && student_id && time && day){
         Api.post('addsession', {
             center_id: id_center,
             user_id: teacher_id,
@@ -135,12 +136,6 @@ export default function AddSessionModal({ addsession }) {
         ).then((res) => {
             if (res.data.success) {
                 Swal.fire(res.data.message, '', 'success')
-                // if (role_id === 1 || role_id === 2) {
-                //     setid_center(0)
-                // }
-                // if (role_id !== 4) {
-                //     setTeacher_id(0)
-                // }
                 setStudent_id('')
                 setTime(0)
                 setDay(0)
@@ -153,6 +148,9 @@ export default function AddSessionModal({ addsession }) {
         }).catch(function (error) {
             console.log(error);
         })
+    }else{
+        Swal.fire('ادخل المعلومات كافة','','warning')
+    }
     }
 
     const showModal = () => {

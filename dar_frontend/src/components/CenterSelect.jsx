@@ -37,6 +37,7 @@ function CenterSelect({ center_id, fromstudent = false, data, c_id, monthlyrepor
                             <div>
                                 <select className="form-control col my-2 responsive_width" value={c_id} onChange={(e) => center_id(e.target.value)}>
                                     <option disabled="disabled" value={0}>اختر احد المراكز</option>
+                                    {/* <option value='all'>الكل</option> */}
                                     {allcenters ? allcenters.map((center) =>
                                         <option key={center.id} value={center.id}>{center.name}</option>) :
                                         'تحميل ...'}
@@ -47,6 +48,7 @@ function CenterSelect({ center_id, fromstudent = false, data, c_id, monthlyrepor
                         <div>
                             <select className="btn bg-white text-dark my-2 px-2 responsive_width" value={c_id} onChange={(e) => data(e.target.value)}>
                                 <option disabled="disabled" value={0}>اختر احد المراكز</option>
+                                {/* <option value='all'>الكل</option>    */}
                                 {allcenters ? allcenters.map((center) =>
                                     <option key={center.id} value={center.id}>{center.name}</option>) :
                                     'تحميل ...'}

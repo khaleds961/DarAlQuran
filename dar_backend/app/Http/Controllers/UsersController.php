@@ -363,9 +363,15 @@ class UsersController extends Controller
     public function getAllTeachersByCenter($center_id)
     {
         try {
-            if ($center_id != 0) {
-                $center = Centers::find($center_id);
-                $teachers = $center->teachers()->get();
+            if ($center_id == 'all') { 
+                $teachers = Users::where('role_id',4)
+                ->where('is_deleted',0)
+                ->get();
+            } else {
+                if ($center_id != 0) {
+                    $center = Centers::find($center_id);
+                    $teachers = $center->teachers()->get();
+                }
             }
             return response([
                 'data' => $teachers,
@@ -441,14 +447,15 @@ class UsersController extends Controller
         }
     }
 
-    public function getCenterIdByTeacher($teacher_id){
-        try{
-            $center_id = Students_Centers_Teachers::where('user_id',$teacher_id)->first()->id;
+    public function getCenterIdByTeacher($teacher_id)
+    {
+        try {
+            $center_id = Students_Centers_Teachers::where('user_id', $teacher_id)->first()->id;
             return response([
                 'center_id' => $center_id,
                 'success' => true
             ]);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return response($e->getMessage());
         }
     }

@@ -426,7 +426,7 @@ class StudentsController extends Controller
     public function searchforstudent(Request $request)
     {
         try {
-            if ($request->student_name) {
+            // if ($request->student_name) {
                 $name = $request->student_name;
                 if ($request->role_id == 1 || $request->role_id == 2) {
                     $students = Students::join('students_centers_teachers', 'students_centers_teachers.student_id', '=', 'students.id')
@@ -443,7 +443,7 @@ class StudentsController extends Controller
                             'centers.name as center_name'
                         )
                         ->orderBy('id', 'desc')
-                        ->get();
+                        ->paginate(10);
                 } elseif ($request->role_id == 3) {
                     $center = Centers::find($request->center_id);
                     $students = $center->students()
@@ -460,7 +460,7 @@ class StudentsController extends Controller
                             'centers.name as center_name'
                         )
                         ->orderBy('id', 'desc')
-                        ->get();
+                        ->paginate(10);
                 } else {
                     // $teacher = Users::find($request->teacher_id);
                     $students = Students::join('students_centers_teachers', 'students_centers_teachers.student_id', '=', 'students.id')
@@ -477,14 +477,14 @@ class StudentsController extends Controller
                             'centers.name as center_name'
                         )->orderBy('id', 'desc')
                         ->where('users.id', $request->teacher_id)
-                        ->get();
+                        ->paginate(10);
                 }
 
                 return response([
                     'data' => $students,
                     'success' => true
                 ]);
-            }
+            // }
         } catch (Exception $e) {
             return response($e->getMessage());
         }

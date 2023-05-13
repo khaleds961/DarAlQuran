@@ -40,7 +40,6 @@ function StudentsTable() {
   const [teachers, setteachers] = useState([])
   const [filterteacher, setfilterteacher] = useState(default_teacher_id)
   const [studentfilter, setstudentfilter] = useState('')
-  const [hidepagination, setHidePagination] = useState(false)
   const [hideTeacher, setHideTeacher] = useState(true)
   const [teacherid, setteacherid] = useState(default_teacher_id)
 
@@ -67,8 +66,10 @@ function StudentsTable() {
   }
 
   const getStudentsByCenter = (c, p) => {
+    setstudentfilter('')
     setLoading(true)
-    Api.get(`getStudentsByCenter/${c}?page=${p}`, {
+    const center_id = c === 'all' ? 0 : c
+    Api.get(`getStudentsByCenter/${center_id}?page=${p}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => {
       setStudents(res.data.data.data);
@@ -83,17 +84,21 @@ function StudentsTable() {
 
   const changePage = (e, value) => {
     setPage(value);
-    if (role_id === 4) {
-      getstudentbyteacher(id, value)
+    if (studentfilter && studentfilter.trim().length > 0) {
+      searchforstudent(value)
     } else {
-
-      if (filterteacher !== 0) {
-        getstudentbyteacher(filterteacher, value)
+      if (role_id === 4) {
+        getstudentbyteacher(id, value)
       } else {
-        getStudentsByCenter(center_id, value)
+        if (filterteacher !== 0) {
+          getstudentbyteacher(filterteacher, value)
+        } else {
+          getStudentsByCenter(center_id, value)
+        }
       }
     }
   };
+
 
   const popup = () => {
     Swal.fire({
@@ -118,7 +123,7 @@ function StudentsTable() {
   }
 
   const getstudentbyteacher = (teacher_id, p) => {
-
+    setstudentfilter('')
     setLoading(true)
     Api.get(`getStudentsByTeacherPagination/${center_id}/${teacher_id}?page=${p}`, {
       headers: { Authorization: `Bearer ${token}` }
@@ -140,25 +145,30 @@ function StudentsTable() {
     })
   }
 
-  const searchforstudent = () => {
-    if (studentfilter) {
-      setLoading(true)
-      Api.post('searchforstudent', {
-        student_name: studentfilter,
-        center_id: center_id,
-        role_id: role_id,
-        teacher_id: id
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      }).then((res) => {
-        setStudents(res.data.data)
-        setHidePagination(true)
-        setLoading(false)
-      }
-      ).catch(function (err) { console.log(err) })
-    } else {
-      Swal.fire('ادخل الاسم قبل البحث', '', 'warning')
+  const searchforstudent = (p) => {
+    setLoading(true)
+    if(role_id == 1 || role_id == 2){
+      setCenter_id(0)
     }
+    setfilterteacher(0)
+    Api.post(`searchforstudent?page=${p}`, {
+      student_name: studentfilter,
+      center_id: center_id,
+      role_id: role_id,
+      teacher_id: id
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then((res) => {
+      setTotal(Math.ceil(res.data.data.total / 10))
+      setStudents(res.data.data.data)
+      setLoading(false)
+    }
+    ).catch(function (err) { console.log(err) })
+  }
+
+  const resetfilter = () => {
+    searchforstudent(1)
+    setPage(1)
   }
 
   const handleNavigate = (id) => {
@@ -235,16 +245,17 @@ function StudentsTable() {
           <div className='d-flex my-3 flex-md-row-reverse'>
 
             {/* medium screen and more */}
-            <button className='d-none d-md-block btn btn-dark text-white mx-md-2' onClick={searchforstudent}
+            <button className='d-none d-md-block btn btn-dark text-white mx-md-2' onClick={resetfilter}
             >بحث عن طالب
             </button>
 
             <input type="text" className='rounded border border-dark responsive_width'
+              placeholder='ابحث عن الطالب'
               value={studentfilter}
               onChange={(e) => setstudentfilter(e.target.value)} />
 
             {/* small screen*/}
-            <span className='d-md-none bg-dark text-center text-white p-2 rounded' style={{ marginRight: '1rem' }} onClick={searchforstudent}>
+            <span className='d-md-none bg-dark text-center text-white p-2 rounded' style={{ marginRight: '1rem' }} onClick={resetfilter}>
               <AiOutlineSearch />
             </span>
           </div>
@@ -271,43 +282,48 @@ function StudentsTable() {
                     </td>
                     <td colSpan={3}></td>
                   </tr>
-                </tbody> :
-                <tbody>
-                  {students?.map(student =>
-                    <tr key={student.id}>
-                      <th scope="row">{student.first_name} {student.middle_name} {student.last_name}</th>
-                      <td className="d-none d-md-table-cell">{student.nationality}</td>
-                      <td>{student.phone_number}</td>
-                      <td className={`d-${hideTeacher ? 'none' : 'table-cell'} d-md-table-cell`}>{student.teacher_fn} {student.teacher_mn} {student.teacher_ln}</td>
-                      <td>{student.center_name}</td>
-                      <td>
-                        <span className='mx-2 cursor_pointer' onClick={() => deleteStudent(student.id, student.center_id)}>
-                          <BsTrash />
-                        </span>
-                        <span className='text-white cursor_pointer' onClick={() => handleNavigate(student.id)}>
-                          <TbPencil />
-                        </span>
+                </tbody> : (students && students.length > 0 ?
+                  < tbody >
+                    {students?.map(student =>
+                      <tr key={student.id}>
+                        <th scope="row">{student.first_name} {student.middle_name} {student.last_name}</th>
+                        <td className="d-none d-md-table-cell">{student.nationality}</td>
+                        <td>{student.phone_number}</td>
+                        <td className={`d-${hideTeacher ? 'none' : 'table-cell'} d-md-table-cell`}>{student.teacher_fn} {student.teacher_mn} {student.teacher_ln}</td>
+                        <td>{student.center_name}</td>
+                        <td>
+                          <span className='mx-2 cursor_pointer' onClick={() => deleteStudent(student.id, student.center_id)}>
+                            <BsTrash />
+                          </span>
+                          <span className='text-white cursor_pointer' onClick={() => handleNavigate(student.id)}>
+                            <TbPencil />
+                          </span>
 
-                        <div className='text-white cursor_pointer d-sm-block d-md-none' onClick={() => handlehideTeacher()}>
-                          <FiMoreHorizontal />
-                        </div>
-                      </td>
+                          <div className='text-white cursor_pointer d-sm-block d-md-none' onClick={() => handlehideTeacher()}>
+                            <FiMoreHorizontal />
+                          </div>
+                        </td>
 
-                    </tr>
-                  )}
-                </tbody>
-              }
+                      </tr>
+                    )}
+                  </tbody>
+                  : (
+                    <tbody>
+                      <tr>
+                        <td colSpan={6}>لا يوجد تلاميذ</td>
+                      </tr>
+                    </tbody>
+                  ))}
             </table>
           </div>
-          {hidepagination ? '' :
-            <Pagination
-              shape="rounded"
-              count={total}
-              page={page}
-              size="small"
-              onChange={changePage}
-              variant="outlined" />
-          }
+          <Pagination
+            shape="rounded"
+            count={total}
+            page={page}
+            size="small"
+            onChange={changePage}
+            variant="outlined" />
+
         </>
         {/* : <p><b>لا يوجد اي طالب بعد</b></p>} */}
       </div>
