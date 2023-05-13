@@ -91,6 +91,7 @@ class StudentsController extends Controller
             $check_name = Students::where('first_name',str_replace(' ', '', $request->first_name))
                                     ->where('middle_name',str_replace(' ', '', $request->middle_name))
                                     ->where('last_name',str_replace(' ', '', $request->last_name))
+                                    ->where('mother_name',str_replace(' ', '', $request->mother_name))
                                     ->first();
             if($check_name){
                 return response([
