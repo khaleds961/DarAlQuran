@@ -44,6 +44,7 @@ export default function EditTeacher() {
                         setnewpassword(res.data.data.password)
                         setnewphone_number(res.data.data.phone_number)
                         setnewcenterid(res.data.data.center_id)
+                        setUserRole(res.data.data.role_id)
                         setLoading(false)
                     } else {
                         Swal.fire(res.data.message, '', 'warning')
@@ -76,7 +77,6 @@ export default function EditTeacher() {
     }
 
     const editTeacher = (teacher_id) => {
-
         Api.post(`/editteacherbyid/${teacher_id}`, {
             first_name: newfirst_name,
             middle_name: newmiddle_name,

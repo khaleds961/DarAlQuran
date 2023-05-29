@@ -72,47 +72,47 @@ function TeachersTable() {
   };
 
   const addTeacher = () => {
-    if(fname && lname && phone_number && center_id ){
-    Api.post("/addteacher", {
-      username: username,
-      password: password,
-      first_name: fname,
-      middle_name: mname,
-      last_name: lname,
-      role_id: role_id === 3 ? 4 : user_role,
-      phone_number: phone_number,
-      center_id: role_id === 3 ? centers[0]['center_id'] : filterCenterId
-    }, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then((response) => {
-        if (response.data.success) {
-          hideModal()
-          Swal.fire(response.data.message, '', 'success')
-          if (role_id === 3) {
-            getTeachersByCenter(center_id, 1)
-          } else {
-            getTeachers(1)
-          }
-          if (role_id === 1 || role_id === 2) {
-            setFilterCenterId(0)
-            setUser_role(0)
-          }
-        } else {
-          Swal.fire(response.data.message, '', 'warning')
-        }
+    if (fname && lname && phone_number && center_id || fname && lname && phone_number && filterCenterId != 0) {
+      Api.post("/addteacher", {
+        username: username,
+        password: password,
+        first_name: fname,
+        middle_name: mname,
+        last_name: lname,
+        role_id: role_id === 3 ? 4 : user_role,
+        phone_number: phone_number,
+        center_id: role_id === 3 ? centers[0]['center_id'] : filterCenterId
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       })
-      .catch(function (error) {
-        console.log(error.response);
-        const errors_array = error.response.data.errors;
-        console.log(errors_array?.first_name);
-        errors_array?.first_name ? setFname_error(errors_array.first_name) : setFname_error('')
-        errors_array?.middle_name ? setMname_error(errors_array.middle_name) : setMname_error('')
-        errors_array?.last_name ? setLname_error(errors_array.last_name) : setLname_error('')
-        errors_array?.phone_number ? setPhone_error(errors_array.phone_number) : setPhone_error('')
-      });
-    }else{
-      Swal.fire('ادخل المعلومات كاملة','','warning')
+        .then((response) => {
+          if (response.data.success) {
+            hideModal()
+            Swal.fire(response.data.message, '', 'success')
+            if (role_id === 3) {
+              getTeachersByCenter(center_id, 1)
+            } else {
+              getTeachers(1)
+            }
+            if (role_id === 1 || role_id === 2) {
+              setFilterCenterId(0)
+              setUser_role(0)
+            }
+          } else {
+            Swal.fire(response.data.message, '', 'warning')
+          }
+        })
+        .catch(function (error) {
+          console.log(error.response);
+          const errors_array = error.response.data.errors;
+          console.log(errors_array?.first_name);
+          errors_array?.first_name ? setFname_error(errors_array.first_name) : setFname_error('')
+          errors_array?.middle_name ? setMname_error(errors_array.middle_name) : setMname_error('')
+          errors_array?.last_name ? setLname_error(errors_array.last_name) : setLname_error('')
+          errors_array?.phone_number ? setPhone_error(errors_array.phone_number) : setPhone_error('')
+        });
+    } else {
+      Swal.fire('ادخل المعلومات كاملة', '', 'warning')
     }
   }
 
