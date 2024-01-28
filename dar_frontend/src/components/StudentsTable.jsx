@@ -15,6 +15,7 @@ import { AES } from 'crypto-js';
 import CryptoJS from 'crypto-js';
 import Table from 'react-bootstrap/Table';
 import { AiOutlineSearch } from 'react-icons/ai';
+import moment from 'moment';
 
 
 
@@ -147,7 +148,7 @@ function StudentsTable() {
 
   const searchforstudent = (p) => {
     setLoading(true)
-    if(role_id == 1 || role_id == 2){
+    if (role_id == 1 || role_id == 2) {
       setCenter_id(0)
     }
     setfilterteacher(0)
@@ -214,6 +215,10 @@ function StudentsTable() {
     getStudentsByCenter(center_id, 1)
   }
 
+  console.log({ students });
+
+  console.log({ studentfilter });
+
   return (
     <div>
 
@@ -268,6 +273,7 @@ function StudentsTable() {
                   <th scope="col">الاسم</th>
                   <th scope="col" className="d-none d-md-table-cell">الجنسية</th>
                   <th scope="col">رقم الهاتف</th>
+                  <th scope="col">العمر</th>
                   <th scope="col" className={`d-${hideTeacher ? 'none' : 'table-cell'} d-md-table-cell`}>الاستاذ</th>
                   <th scope="col">المركز</th>
                   <th scope="col"></th>
@@ -276,7 +282,7 @@ function StudentsTable() {
               {loading ?
                 <tbody>
                   <tr>
-                    <td colSpan={2}></td>
+                    <td colSpan={3}></td>
                     <td>
                       <Spinner animation="border" variant="primary" />
                     </td>
@@ -289,6 +295,7 @@ function StudentsTable() {
                         <th scope="row">{student.first_name} {student.middle_name} {student.last_name}</th>
                         <td className="d-none d-md-table-cell">{student.nationality}</td>
                         <td>{student.phone_number}</td>
+                        <td>{student?.birthdate ? moment().diff(student.birthdate, 'years') : ''}</td>
                         <td className={`d-${hideTeacher ? 'none' : 'table-cell'} d-md-table-cell`}>{student.teacher_fn} {student.teacher_mn} {student.teacher_ln}</td>
                         <td>{student.center_name}</td>
                         <td>
@@ -298,12 +305,10 @@ function StudentsTable() {
                           <span className='text-white cursor_pointer' onClick={() => handleNavigate(student.id)}>
                             <TbPencil />
                           </span>
-
                           <div className='text-white cursor_pointer d-sm-block d-md-none' onClick={() => handlehideTeacher()}>
                             <FiMoreHorizontal />
                           </div>
                         </td>
-
                       </tr>
                     )}
                   </tbody>
